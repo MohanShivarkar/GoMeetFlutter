@@ -1,0 +1,24 @@
+Category,Feature Name,Description,Key Files,Status
+Authentication,Login (Email/Phone),Sign in with Email or Phone Number & Password,lib/presentation/screens/auth/login_screen.dart,Implemented
+Authentication,OTP Verification,Phone verification using Firebase / Msg91 / Twilio,lib/Logic/cubits/onBording_cubit/onbording_cubit.dart,Implemented
+Authentication,Social Login,Google / Facebook / Apple Login integration,lib/Logic/cubits/auth_cubit/auth_cubit.dart,Disabled (Commented Out)
+Authentication,Onboarding,Intro screens and initial profile setup steps,lib/presentation/screens/splash_bording/onbording_screens.dart,Implemented
+Profile,Edit Profile,Update personal info / photos / bio / interests,lib/presentation/screens/other/editProfile/editprofile.dart,Implemented
+Profile,Privacy Settings,Manage visibility and blocked users,lib/presentation/screens/other/profileScreen/profile_privacy.dart,Implemented
+Discovery,Swipe Matching,Swipe Left (Pass) / Right (Like) mechanism,lib/presentation/screens/BottomNavBar/home_screen.dart,Implemented
+Discovery,Browse Users,Grid view of available users,lib/presentation/screens/BottomNavBar/match/browes.dart,Implemented
+Discovery,Map View,Locate users on Google Maps,lib/presentation/screens/BottomNavBar/mapscreen.dart,Implemented
+Communication,Real-time Chat,Text messaging with Firebase Firestore,lib/presentation/screens/BottomNavBar/chats.dart,Implemented
+Communication,Video Call,1-on-1 Video calling using Agora SDK,lib/presentation/firebase/videocall_screen.dart,Implemented
+Communication,Audio Call,1-on-1 Audio calling,lib/presentation/screens/AudioCall/audiocall_screen.dart,Implemented
+Communication,Push Notifications,FCM notifications for messages and calls,lib/core/push_notification_function.dart,Implemented
+Monetization,Premium Subscriptions,Purchase premium plans (Gold/VIP),lib/presentation/screens/other/premium/premium.dart,Implemented
+Monetization,Payment Gateways,Integration with Razorpay / PayPal / Stripe / Paystack,lib/payment/,Implemented
+Monetization,Wallet System,In-app wallet to add funds,lib/wallete_code/wallete_screen.dart,Implemented
+Monetization,Virtual Coins,Buy coins to send virtual gifts,lib/by_coin_screen/coin_screen.dart,Implemented
+Monetization,Google AdMob,Banner and Interstitial ads,lib/core/google_ads.dart,Implemented
+Engagement,Refer & Earn,Invite friends to earn rewards,lib/by_coin_screen/refer_and_earn_screen.dart,Implemented
+Engagement,Gifting,Send virtual gifts to matches,lib/by_coin_screen/mygift.dart,Implemented
+Settings,Localization,Multi-language support,lib/language/,Implemented
+Settings,Theme,Light and Dark mode support,lib/Logic/cubits/litedark/lite_dark_cubit.dart,Implemented
+Security,Block/Report,Block or report inappropriate users,lib/presentation/screens/other/profileScreen/blocklist_page.dart,Implemented

@@ -1,0 +1,498 @@
+{
+	"info": {
+		"_postman_id": "b3e6a9d2-1f4a-4b9e-8c1a-9d2e1f4a4b9e",
+		"name": "GoMeet API Collection",
+		"description": "API Collection for GoMeet Flutter Application",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "General Lists",
+			"item": [
+				{
+					"name": "Relation Goal List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/goal.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["goal.php"]
+						}
+					}
+				},
+				{
+					"name": "Interest List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/interest.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["interest.php"]
+						}
+					}
+				},
+				{
+					"name": "Language List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/languagelist.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["languagelist.php"]
+						}
+					}
+				},
+				{
+					"name": "Religion List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/religionlist.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["religionlist.php"]
+						}
+					}
+				},
+				{
+					"name": "SMS Type Config",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sms_type.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["sms_type.php"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "User Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mobile\": \"1234567890\",\n    \"ccode\": \"91\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user_login.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["user_login.php"]
+						}
+					}
+				},
+				{
+					"name": "Mobile Check",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mobile\": \"1234567890\",\n    \"ccode\": \"91\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/mobile_check.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["mobile_check.php"]
+						}
+					}
+				},
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "John Doe", "type": "text" },
+								{ "key": "email", "value": "john@example.com", "type": "text" },
+								{ "key": "mobile", "value": "1234567890", "type": "text" },
+								{ "key": "ccode", "value": "+91", "type": "text" },
+								{ "key": "password", "value": "password123", "type": "text" },
+								{ "key": "gender", "value": "Male", "type": "text" },
+								{ "key": "birth_date", "value": "2000-01-01", "type": "text" },
+								{ "key": "lats", "value": "21.1702", "type": "text" },
+								{ "key": "longs", "value": "72.8311", "type": "text" },
+								{ "key": "profile_bio", "value": "Hello there!", "type": "text" },
+								{ "key": "imlist", "value": "image1.jpg,image2.jpg", "type": "text" }
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reg_user.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["reg_user.php"]
+						}
+					}
+				},
+				{
+					"name": "Social Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/social_login.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["social_login.php"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "User Profile & Actions",
+			"item": [
+				{
+					"name": "Home Data",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": \"1\",\n    \"lats\": \"21.1702\",\n    \"longs\": \"72.8311\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/home_data.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["home_data.php"]
+						}
+					}
+				},
+				{
+					"name": "Profile Info",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": \"1\",\n    \"profile_id\": \"2\",\n    \"lats\": \"21.1702\",\n    \"longs\": \"72.8311\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/profile_info.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["profile_info.php"]
+						}
+					}
+				},
+				{
+					"name": "Like / Dislike",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": \"1\",\n    \"profile_id\": \"2\",\n    \"action\": \"LIKE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/like_dislike.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["like_dislike.php"]
+						}
+					}
+				},
+				{
+					"name": "Edit Profile",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "uid", "value": "1", "type": "text" },
+								{ "key": "name", "value": "John Updated", "type": "text" },
+								{ "key": "profile_bio", "value": "Updated bio", "type": "text" }
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/edit_profile.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["edit_profile.php"]
+						}
+					}
+				},
+				{
+					"name": "Like Me List",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": \"1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/like_me.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["like_me.php"]
+						}
+					}
+				},
+				{
+					"name": "New Matches",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": \"1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/new_match.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["new_match.php"]
+						}
+					}
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": \"1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/acc_delete.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["acc_delete.php"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Payment & Wallet",
+			"item": [
+				{
+					"name": "Plan List",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/plan.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["plan.php"]
+						}
+					}
+				},
+				{
+					"name": "Purchase Plan",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": \"1\",\n    \"plan_id\": \"1\",\n    \"transaction_id\": \"txn_123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/plan_purchase.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["plan_purchase.php"]
+						}
+					}
+				},
+				{
+					"name": "Update Wallet",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": \"1\",\n    \"wallet\": \"100\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/wallet_up.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["wallet_up.php"]
+						}
+					}
+				},
+				{
+					"name": "Package List (Coins)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": \"1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/list_package.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["list_package.php"]
+						}
+					}
+				},
+				{
+					"name": "Buy Gift",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sender_id\": \"1\",\n    \"receiver_id\": \"2\",\n    \"gift_id\": \"10\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/giftbuy.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["giftbuy.php"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Support & Other",
+			"item": [
+				{
+					"name": "FAQ",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": \"1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/faq.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["faq.php"]
+						}
+					}
+				},
+				{
+					"name": "Report User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": \"1\",\n    \"reporter_id\": \"2\",\n    \"comment\": \"Fake profile\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/report.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["report.php"]
+						}
+					}
+				},
+				{
+					"name": "Identity Verify",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": \"1\",\n    \"img\": \"base64string...\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/identity_doc.php",
+							"host": ["{{baseUrl}}"],
+							"path": ["identity_doc.php"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://gomeet.cscodetech.cloud/api",
+			"type": "string"
+		}
+	]
+}
