@@ -19,6 +19,7 @@ import 'package:dating/presentation/screens/other/likeMatch/likematch_provider.d
 import 'package:dating/presentation/screens/other/premium/premium_provider.dart';
 import 'package:dating/presentation/screens/other/profileAbout/detailprovider.dart';
 import 'package:dating/presentation/screens/splash_bording/onBordingProvider/onbording_provider.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,11 +32,23 @@ import 'Logic/cubits/litedark/lite_dark_state.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // ── Firebase Core ──────────────────────────────────────────────────────────
+  // Initialise on ALL platforms. The previous `if (!kIsWeb)` guard was wrong:
+  // web needs Firebase for Firestore, Auth, and Storage just as mobile does.
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // ── Firebase App Check (web only) ──────────────────────────────────────────
+  // Uses reCAPTCHA v3 on web. Mobile device attestation is registered in
+  // Firebase Console (Play Integrity / DeviceCheck).
+  // Current mode: monitoring (non-enforcing) — safe for QA.
+  // Replace the site key below with the reCAPTCHA v3 key from
+  // https://www.google.com/recaptcha/admin registered for your domain.
   if (kIsWeb) {
     usePathUrlStrategy();
-  } else {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
+    await FirebaseAppCheck.instance.activate(
+      webProvider: ReCaptchaV3Provider('6LcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'),
     );
   }
 
