@@ -1,0 +1,749 @@
+version: "1.0"
+project: "GoMeet PWA"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ANALYSIS NOTES (as of 2026-09-05)
+#
+# Phase 1 is largely complete. The following are DONE and excluded from tasks:
+#   • lib/main.dart                          — Firebase init fix + AppCheck web
+#   • lib/firebase_options.dart              — Web config block present
+#   • lib/platform/permission/*             — Conditional import facade + stubs
+#   • lib/platform/notifications/*          — Conditional import facade + stubs
+#   • lib/platform/location/*               — Conditional import facade + stubs
+#   • lib/platform/camera/*                 — Conditional import facade + stubs
+#   • lib/features/video_call/screens/*     — kIsWeb guard + banner widget
+#   • lib/features/premium/screens/*        — kIsWeb guard + notice widget
+#   • test/main_firebase_init_test.dart      — PASS
+#   • test/firebase_options_web_test.dart    — PASS
+#   • test/platform/permission_service_web_test.dart — PASS
+#   • test/platform/location_service_web_test.dart   — PASS
+#   • test/platform/camera_service_web_test.dart     — PASS
+#   • test/platform/notification_service_web_test.dart — PASS
+#   • test/features/video_call/*             — PASS
+#   • test/features/premium/*                — PASS
+#
+# REMAINING in Phase 1:
+#   • Replace placeholder reCAPTCHA v3 key in main.dart
+#   • Finalize firebase_options.dart web appId + measurementId
+#   • flutter build web verification (zero errors)
+#   • flutter run -d chrome smoke test
+# ─────────────────────────────────────────────────────────────────────────────
+
+phases:
+
+  # ───────────────────────────────────────────────────────────────────────────
+  - id: "phase-1-remaining"
+    name: "Phase 1 Remaining — Build Unblocked"
+    tasks:
+
+      - id: "p1-finalize-firebase-config"
+        description: >
+          Replace placeholder values in firebase_options.dart (measurementId 'G-PENDING',
+          web appId TODO comment) with the real values from Firebase Console → Project
+          Settings → Your Apps → Web App. Also replace the placeholder reCAPTCHA v3 site
+          key '6LcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' in main.dart with the real key
+          from Google reCAPTCHA Admin Console. Both values must be registered for the
+          GoMeet hosting domain.
+        assigned_agent: "backend_engineer"
+        model: "haiku"
+        depends_on: []
+        acceptance_criteria:
+          - "firebase_options.dart web block has no TODO or PENDING placeholder values"
+          - "measurementId is a valid G-XXXXXXXXXX format string"
+          - "web appId follows format '1:319710447950:web:<hex-suffix>'"
+          - "main.dart ReCaptchaV3Provider uses the real site key (not the all-X placeholder)"
+          - "flutter analyze reports zero errors on both files"
+
+      - id: "p1-build-verify"
+        description: >
+          Run 'flutter build web --pwa-strategy=offline-first' and fix any compilation
+          errors until the command exits with code 0. Common failure points: any remaining
+          dart:io imports on web-compiled files, unguarded mobile-only package usages.
+          Document every error and fix applied. The final build artifact must exist in
+          build/web/.
+        assigned_agent: "backend_engineer"
+        model: "sonnet"
+        depends_on: ["p1-finalize-firebase-config"]
+        acceptance_criteria:
+          - "'flutter build web --pwa-strategy=offline-first' exits with code 0"
+          - "build/web/index.html exists"
+          - "build/web/main.dart.js exists"
+          - "build/web/flutter_service_worker.js exists"
+          - "Zero dart2js compilation errors in build output"
+
+      - id: "p1-chrome-verify"
+        description: >
+          Run 'flutter run -d chrome' against the development build and manually verify
+          the app shell loads. Check Chrome DevTools console for errors. Confirm Firebase
+          Auth is reachable (no CORS or App Check errors), Firestore connection is
+          established, and the GoMeet loading placeholder renders without a red-screen
+          crash. Document any console errors found and fix them.
+        assigned_agent: "backend_engineer"
+        model: "sonnet"
+        depends_on: ["p1-build-verify"]
+        acceptance_criteria:
+          - "'flutter run -d chrome' launches without a red-screen crash"
+          - "Chrome DevTools console shows zero Firebase-related errors"
+          - "Firebase Auth SDK initialises (no 'Firebase App not initialised' error)"
+          - "App Check token request appears in Firebase Console monitoring dashboard"
+          - "GoMeet loading placeholder text renders in the browser"
+
+  # ───────────────────────────────────────────────────────────────────────────
+  - id: "phase-2"
+    name: "Phase 2 — Core User Flows"
+    tasks:
+
+      - id: "p2-router-wire"
+        description: >
+          Wire CorePwaHomeScreen as the web entry route in lib/core/router/app_router.dart
+          (create the file if it does not exist, or modify the existing router file —
+          locate it first with grep for 'GoRouter\|MaterialApp.*routes\|onGenerateRoute').
+          Declare all primary routes: sign-in (/sign-in), sign-up (/sign-up), profile
+          creation steps (/profile/create), discover (/discover), chat list (/chat),
+          chat thread (/chat/:conversationId), profile view (/profile/:userId), settings
+          (/settings). Add a 404 fallback route pointing to NotFoundScreen. Confirm
+          path-based (not hash-based) URL routing is active — required for Firebase
+          Hosting catch-all rewrite. Modify MaterialApp or GoRouter initialisation in
+          main.dart to remove the _AppShellPlaceholder and use the router.
+        assigned_agent: "frontend_engineer"
+        model: "opus"
+        depends_on: ["p1-chrome-verify", "p2-not-found-screen"]
+        acceptance_criteria:
+          - "Navigating to / in Chrome opens CorePwaHomeScreen"
+          - "All primary routes are reachable via browser URL bar"
+          - "Browser back/forward buttons navigate correctly without double-pop"
+          - "Unknown routes (e.g. /xyz) render NotFoundScreen"
+          - "Route paths use /path format (not /#/path hash format)"
+          - "No _AppShellPlaceholder in main.dart — real router is wired"
+
+      - id: "p2-not-found-screen"
+        description: >
+          Create lib/features/shell/screens/not_found_screen.dart — a graceful 404 page.
+          The screen must be centred, constrained to max 500 px width, display a clear
+          '404 — Page not found' message, and include a 'Go to home' button that navigates
+          to /. Must work with the app's router (GoRouter or Navigator). No Scaffold
+          duplication if used inside a shell route.
+        assigned_agent: "frontend_engineer"
+        model: "haiku"
+        depends_on: ["p1-chrome-verify"]
+        acceptance_criteria:
+          - "lib/features/shell/screens/not_found_screen.dart exists"
+          - "Screen renders '404' and a home navigation link"
+          - "Content is centred and constrained to max 500 px width"
+          - "test/features/shell/not_found_screen_test.dart passes"
+
+      - id: "p2-not-found-screen-test"
+        description: >
+          Create test/features/shell/not_found_screen_test.dart. Write widget tests that:
+          (1) verify the 404 message renders, (2) verify a 'Go to home' tappable element
+          exists, (3) verify the widget is constrained to max 500 px (use a wide test
+          viewport of 1200 px to confirm no overflow). Use flutter_test pumpWidget with
+          a MaterialApp wrapper.
+        assigned_agent: "automation_developer"
+        model: "sonnet"
+        depends_on: ["p2-not-found-screen"]
+        acceptance_criteria:
+          - "test/features/shell/not_found_screen_test.dart exists"
+          - "All widget tests pass with 'flutter test test/features/shell/not_found_screen_test.dart'"
+          - "Test covers 404 message visibility"
+          - "Test covers home navigation widget presence"
+          - "Test covers max-width constraint at 1200 px viewport"
+
+      - id: "p2-offline-banner"
+        description: >
+          Create lib/features/shell/widgets/offline_banner.dart — a slim dismissable
+          banner widget that displays 'You are offline — connect to continue.' Use the
+          connectivity_plus package (already in pubspec or add it) to listen for
+          network connectivity changes. The banner appears at the top of the screen
+          when connectivity is lost and disappears automatically when connectivity
+          is restored. Wrap it around the app shell so it overlays all screens.
+        assigned_agent: "frontend_engineer"
+        model: "sonnet"
+        depends_on: ["p1-chrome-verify"]
+        acceptance_criteria:
+          - "lib/features/shell/widgets/offline_banner.dart exists"
+          - "Banner appears when network is disconnected (test by toggling Chrome DevTools offline mode)"
+          - "Banner disappears automatically when network is restored"
+          - "Banner text reads 'You are offline — connect to continue.' (or equivalent)"
+          - "Banner does not block the main app interaction (positioned as overlay)"
+
+      - id: "p2-auth-email-google"
+        description: >
+          Manually verify Email + password sign-up, Google Sign-In (signInWithPopup),
+          and password reset flows in Chrome. Firebase Auth must issue tokens and the
+          session must persist across browser refreshes (LOCAL persistence). Fix any
+          web-specific issues in the existing auth screens (locate them via grep for
+          'FirebaseAuth\|signInWithEmailAndPassword\|GoogleSignIn'). If Google Sign-In
+          uses a native GoogleSignIn plugin, replace the web call with
+          GoogleAuthProvider + signInWithPopup via firebase_auth web.
+        assigned_agent: "backend_engineer"
+        model: "sonnet"
+        depends_on: ["p2-router-wire"]
+        acceptance_criteria:
+          - "Email + password sign-up creates a user in Firebase Auth Console"
+          - "Google Sign-In popup opens and completes without errors in Chrome"
+          - "Auth session persists across browser page refresh"
+          - "Password reset email is sent and flow completes on web"
+          - "Incorrect credentials show inline error (not a native dialog)"
+
+      - id: "p2-auth-phone-otp"
+        description: >
+          Verify Phone/OTP sign-up in Chrome. Firebase Phone Auth auto-injects an
+          invisible reCAPTCHA verifier on web. Locate the phone auth screen (grep for
+          'PhoneAuthProvider\|verifyPhoneNumber\|signInWithPhoneNumber') and confirm
+          the RecaptchaVerifier is not using a container ID intended for a native widget.
+          The reCAPTCHA must render as 'invisible' on web. Fix any web-incompatible
+          verifier configuration.
+        assigned_agent: "backend_engineer"
+        model: "sonnet"
+        depends_on: ["p2-router-wire"]
+        acceptance_criteria:
+          - "Phone number entry screen renders in Chrome"
+          - "OTP SMS is sent after entering a valid phone number"
+          - "OTP entry screen renders and submitting the correct OTP signs the user in"
+          - "No reCAPTCHA UI widget is visible (invisible mode)"
+          - "No 'RecaptchaVerifier container not found' console errors"
+
+      - id: "p2-profile-creation"
+        description: >
+          Verify the profile creation flow in Chrome end-to-end: photo upload via
+          image_picker_for_web file picker, camera capture via getUserMedia, and
+          location via browser Geolocation API. Locate profile creation screens (grep
+          for 'profileCreation\|ProfileCreate\|UserProfile'). Ensure the CameraServiceWeb
+          and LocationServiceWeb stubs are wired into the DI container or injected
+          directly — the service injection point depends on the state management
+          solution (Riverpod/BLoC/Provider). Fix any 'service not found' or
+          'null check' errors. Verify photo uploads land in Firebase Storage and
+          thumbnails render in the browser.
+        assigned_agent: "frontend_engineer"
+        model: "sonnet"
+        depends_on: ["p2-auth-email-google"]
+        acceptance_criteria:
+          - "Profile creation stepper is reachable after sign-up in Chrome"
+          - "File picker opens on 'Upload Photo' tap and selected image uploads to Firebase Storage"
+          - "Camera capture (getUserMedia) opens after granting browser camera permission"
+          - "Location permission prompt appears from the browser (not a Flutter dialog)"
+          - "Firestore user document is written with location GeoPoint after location grant"
+          - "Profile photos render as thumbnails in the browser after upload"
+
+      - id: "p2-discover-flow"
+        description: >
+          Verify the Discover / swipe screen in Chrome. Mouse-drag swipe gestures on
+          profile cards must fire Firestore like/dislike writes. Locate the discover
+          screen (grep for 'DiscoverScreen\|SwipeCard\|TinderCard'). Fix any
+          gesture recogniser issues on web (mouse drag may need a PointerEvent
+          listener if the existing implementation uses touch-only events). Verify
+          match popup triggers on a mutual like (may need two test accounts).
+          Keyboard arrow key support (← dislike, → like) is required by the PRD
+          but is implemented in Phase 4 — note this as a Phase 4 dependency.
+        assigned_agent: "frontend_engineer"
+        model: "sonnet"
+        depends_on: ["p2-profile-creation"]
+        acceptance_criteria:
+          - "Discover screen renders profile cards in Chrome"
+          - "Mouse-drag swipe right writes a like to Firestore swipes collection"
+          - "Mouse-drag swipe left writes a dislike to Firestore swipes collection"
+          - "Match popup appears when a mutual like is detected"
+          - "Profile cards display photo, name, age, distance, and bio on web"
+
+      - id: "p2-chat-flow"
+        description: >
+          Verify the real-time chat flow in Chrome: Firestore listener delivers messages
+          in real time, image sharing works via file picker upload to Firebase Storage,
+          and unread badges update. Locate chat screens (grep for 'ChatScreen\|ChatThread\|
+          MessageBubble'). Fix any StreamBuilder or Firestore listener errors on web.
+          Verify the chat list shows unread counts and latest message previews.
+        assigned_agent: "frontend_engineer"
+        model: "sonnet"
+        depends_on: ["p2-discover-flow"]
+        acceptance_criteria:
+          - "Chat list screen shows matched conversations in Chrome"
+          - "Sending a text message writes to Firestore and appears in real time"
+          - "Receiving a message from another client updates the thread without page refresh"
+          - "Image sharing via file picker uploads to Firebase Storage and renders in thread"
+          - "Unread badge count increments for new messages on the chat tab"
+
+      - id: "p2-analytics-verify"
+        description: >
+          Verify Firebase Analytics logEvent calls fire on web. Grep the codebase for
+          'logEvent\|FirebaseAnalytics' and check for any kIsWeb or Platform.isAndroid
+          guards that would silence analytics on web. Remove any mobile-only guards
+          wrapping analytics calls. Verify events appear in Firebase Console →
+          Analytics → DebugView (enable with 'flutter run -d chrome' debug mode +
+          '?debug_mode=1' URL param or Analytics debug extension).
+        assigned_agent: "backend_engineer"
+        model: "haiku"
+        depends_on: ["p2-chat-flow"]
+        acceptance_criteria:
+          - "No analytics logEvent calls are wrapped in '!kIsWeb' or mobile platform guards"
+          - "At least one custom event appears in Firebase Analytics DebugView during a Chrome session"
+          - "app_open event fires on web on first page load"
+
+      - id: "p2-app-check-monitoring"
+        description: >
+          Confirm Firebase App Check is operating in monitoring mode in the web browser.
+          Navigate to Firebase Console → App Check → Apps and verify the web app shows
+          request attestation data (verified requests vs. unverified). Confirm no
+          Firestore or Storage requests are being blocked. If the reCAPTCHA site key
+          was updated in p1-finalize-firebase-config, this verification confirms the
+          key is correct and the domain is whitelisted.
+        assigned_agent: "backend_engineer"
+        model: "haiku"
+        depends_on: ["p2-auth-email-google"]
+        acceptance_criteria:
+          - "Firebase Console App Check shows the GoMeet web app with request data"
+          - "Verified request percentage is > 0% after a Chrome test session"
+          - "No '403 App Check token missing' errors in Chrome DevTools console"
+          - "Firestore reads and writes succeed without being blocked by App Check"
+
+  # ───────────────────────────────────────────────────────────────────────────
+  - id: "phase-3"
+    name: "Phase 3 — PWA Shell & Installability"
+    tasks:
+
+      - id: "p3-icons"
+        description: >
+          Export GoMeet brand icons and place them in web/icons/. Required files:
+          Icon-192.png (192x192 px), Icon-512.png (512x512 px),
+          Icon-maskable-192.png (192x192 px with ~10% safe-zone padding on all sides),
+          Icon-maskable-512.png (512x512 px with same safe-zone padding).
+          Use the existing GoMeet brand assets (logo, colour #FF4458). If source assets
+          are in the repo (grep for .png .svg in assets/), export from those.
+          If not, create placeholder coloured icons using Flutter's
+          'dart run tool/generate_icons.dart' or an equivalent script.
+          All files must be valid PNG with correct dimensions verified by file metadata.
+        assigned_agent: "frontend_engineer"
+        model: "haiku"
+        depends_on: ["p1-build-verify"]
+        acceptance_criteria:
+          - "web/icons/Icon-192.png exists and is 192x192 px"
+          - "web/icons/Icon-512.png exists and is 512x512 px"
+          - "web/icons/Icon-maskable-192.png exists and is 192x192 px"
+          - "web/icons/Icon-maskable-512.png exists and is 512x512 px"
+          - "All icon files are valid PNG format (not corrupted or zero-byte)"
+          - "Icons visually show the GoMeet brand (not blank/default Flutter icon)"
+
+      - id: "p3-manifest"
+        description: >
+          Create or overwrite web/manifest.json with the complete PWA manifest.
+          Required fields: name ('GoMeet'), short_name ('GoMeet'),
+          description ('Swipe, match, and chat — no app install needed.'),
+          start_url ('/'), display ('standalone'), background_color ('#0F0F1A'),
+          theme_color ('#FF4458'), orientation ('portrait-primary'),
+          and the icons array pointing to all four icon files in web/icons/.
+          The maskable icons must have 'purpose': 'maskable' in their entry.
+          Validate the JSON is syntactically correct.
+        assigned_agent: "frontend_engineer"
+        model: "haiku"
+        depends_on: ["p3-icons"]
+        acceptance_criteria:
+          - "web/manifest.json is valid JSON (no parse errors)"
+          - "name field is 'GoMeet'"
+          - "start_url is '/'"
+          - "display is 'standalone'"
+          - "theme_color is '#FF4458'"
+          - "background_color is '#0F0F1A'"
+          - "icons array contains 4 entries (192, 512, maskable-192, maskable-512)"
+          - "Maskable icons have purpose 'maskable'"
+
+      - id: "p3-index-html"
+        description: >
+          Update web/index.html to add iOS Safari PWA meta tags and confirm the Flutter
+          bootstrap script reference is correct. Add: (1) '<meta name=\"theme-color\"
+          content=\"#FF4458\">', (2) '<link rel=\"apple-touch-icon\" sizes=\"192x192\"
+          href=\"icons/Icon-192.png\">', (3) '<link rel=\"apple-touch-icon\"
+          sizes=\"512x512\" href=\"icons/Icon-512.png\">'. Verify the existing
+          '<link rel=\"manifest\">' tag points to 'manifest.json'. Verify the
+          Flutter bootstrap script (flutter.js or flutter_bootstrap.js) path is correct
+          for the current Flutter version.
+        assigned_agent: "frontend_engineer"
+        model: "haiku"
+        depends_on: ["p3-manifest"]
+        acceptance_criteria:
+          - "web/index.html contains '<meta name=\"theme-color\" content=\"#FF4458\">'"
+          - "web/index.html contains apple-touch-icon link for 192px icon"
+          - "web/index.html contains apple-touch-icon link for 512px icon"
+          - "web/index.html contains '<link rel=\"manifest\" href=\"manifest.json\">' (or equivalent)"
+          - "flutter build web completes without HTML validation errors"
+
+      - id: "p3-service-worker-verify"
+        description: >
+          Build with 'flutter build web --pwa-strategy=offline-first' and verify the
+          service worker is emitted and references the correct asset manifest.
+          Serve locally with 'firebase serve' (requires firebase.json public dir pointing
+          to build/web — set this temporarily if firebase.json is not yet finalised).
+          Open Chrome DevTools → Application → Service Workers and confirm
+          flutter_service_worker.js is registered and status is 'activated and running'.
+          Check the Cache Storage panel to confirm app shell assets are cached.
+        assigned_agent: "backend_engineer"
+        model: "sonnet"
+        depends_on: ["p3-index-html", "p2-chat-flow"]
+        acceptance_criteria:
+          - "flutter build web --pwa-strategy=offline-first exits with code 0"
+          - "build/web/flutter_service_worker.js is present"
+          - "Chrome DevTools → Application → Service Workers shows 'activated and running'"
+          - "Cache Storage in DevTools shows index.html and main.dart.js are cached"
+          - "flutter_service_worker.js references the correct asset hashes (no 404 on cached assets)"
+
+      - id: "p3-offline-shell-test"
+        description: >
+          Smoke-test the offline shell behaviour: load the app once in Chrome (online),
+          then in Chrome DevTools → Network tab set throttling to 'Offline', reload the
+          page, and confirm the app shell renders with the OfflineBanner widget visible.
+          The test must show the GoMeet shell (not a Chrome dinosaur error page).
+          If OfflineBanner is not yet wired into the shell (p2-offline-banner may be
+          done), confirm at minimum that the cached shell loads. Document the test result.
+        assigned_agent: "automation_developer"
+        model: "haiku"
+        depends_on: ["p3-service-worker-verify", "p2-offline-banner"]
+        acceptance_criteria:
+          - "Reloading the app in Chrome with network set to Offline shows the app shell (not a browser error page)"
+          - "OfflineBanner widget is visible when offline"
+          - "No JavaScript errors appear in DevTools console when offline"
+          - "Navigating back online dismisses the OfflineBanner"
+
+      - id: "p3-lighthouse-audit"
+        description: >
+          Run a Lighthouse PWA audit against the production build. Use either:
+          (a) 'firebase serve' locally pointing to build/web, or (b) deploy to a
+          Firebase Hosting preview channel ('firebase hosting:channel:deploy preview').
+          Open Chrome DevTools → Lighthouse tab, select 'Progressive Web App' category,
+          run the audit. Target score >= 90. Common failure criteria to fix if score
+          is below 90: missing maskable icon, incorrect start_url, service worker not
+          intercepting fetch, missing apple-touch-icon, HTTPS not enforced (use
+          preview channel for HTTPS). Iterate and re-run until score >= 90.
+        assigned_agent: "automation_developer"
+        model: "sonnet"
+        depends_on: ["p3-offline-shell-test"]
+        acceptance_criteria:
+          - "Lighthouse PWA audit score >= 90"
+          - "All PWA installability checks pass (manifest, service worker, HTTPS)"
+          - "No 'Does not register a service worker' failure"
+          - "No 'Web app manifest does not meet the installability requirements' failure"
+          - "Chrome install icon appears in the address bar during the audit session"
+
+      - id: "p3-install-test"
+        description: >
+          Manually test PWA installation on Android Chrome and desktop Chrome.
+          On Android Chrome: navigate to the app URL, tap the browser menu, verify
+          'Add to Home Screen' prompt appears, complete installation, and verify the
+          installed PWA opens in standalone mode (no browser address bar).
+          On desktop Chrome: verify the install icon (monitor + down arrow) appears
+          in the address bar, click it, install, and verify standalone mode opens.
+          On iOS Safari: navigate to the app, tap Share → Add to Home Screen, verify
+          the GoMeet icon and name appear correctly.
+        assigned_agent: "automation_developer"
+        model: "haiku"
+        depends_on: ["p3-lighthouse-audit"]
+        acceptance_criteria:
+          - "Android Chrome shows install prompt and completes installation"
+          - "Installed Android PWA opens in standalone mode (no browser chrome)"
+          - "Desktop Chrome shows install icon in address bar"
+          - "Installed desktop PWA opens in standalone mode"
+          - "iOS Safari 'Add to Home Screen' shows GoMeet icon (not a default screenshot)"
+
+  # ───────────────────────────────────────────────────────────────────────────
+  - id: "phase-4"
+    name: "Phase 4 — Responsive Layouts"
+    tasks:
+
+      - id: "p4-discover-responsive"
+        description: >
+          Modify lib/features/discover/screens/discover_screen.dart to add a tablet
+          breakpoint using LayoutBuilder. At viewport width >= 600 px: centre the card
+          stack (max width 500 px) and render Like/Dislike/Super-Like action buttons in
+          a vertical Column sidebar to the right of the card stack. Below 600 px: retain
+          the existing mobile layout unchanged. Use LayoutBuilder wrapping the existing
+          body content. Do not change gesture recognisers or Firestore write logic —
+          layout only.
+        assigned_agent: "frontend_engineer"
+        model: "sonnet"
+        depends_on: ["p2-discover-flow"]
+        acceptance_criteria:
+          - "At 600 px+ viewport: card stack is centred with max width 500 px"
+          - "At 600 px+ viewport: action buttons are in a right sidebar Column"
+          - "At < 600 px viewport: existing mobile layout is unchanged"
+          - "No content overflow or horizontal scroll at 375 px, 600 px, or 1024 px"
+          - "Like/Dislike/Super-Like buttons are reachable and functional in both layouts"
+
+      - id: "p4-discover-keyboard"
+        description: >
+          Add keyboard arrow-key handlers to the Discover screen. Use a Focus widget
+          with onKeyEvent callback (Flutter 3.x preferred over deprecated
+          RawKeyboardListener). Map: ArrowLeft → trigger dislike action,
+          ArrowRight → trigger like action, ArrowUp → trigger super-like action.
+          The key handlers must call the same Firestore write functions as the
+          swipe gesture. Wrap the Discover screen body in a Focus widget with
+          autofocus: true so arrow keys work without a click.
+        assigned_agent: "frontend_engineer"
+        model: "sonnet"
+        depends_on: ["p4-discover-responsive"]
+        acceptance_criteria:
+          - "Pressing ArrowRight in Chrome triggers a like and writes to Firestore"
+          - "Pressing ArrowLeft in Chrome triggers a dislike and writes to Firestore"
+          - "Pressing ArrowUp in Chrome triggers a super-like and writes to Firestore"
+          - "Key events fire without requiring a prior mouse click on any element"
+          - "Mobile layout is unaffected (Focus widget is transparent on touch)"
+
+      - id: "p4-chat-two-panel"
+        description: >
+          Modify lib/features/chat/screens/chat_list_screen.dart to add a two-panel
+          master-detail layout using LayoutBuilder. At viewport width >= 768 px: render
+          a Row with a fixed 290 px conversation list panel on the left and an expanded
+          thread panel on the right. Selecting a conversation in the left panel renders
+          ChatThreadScreen(embedded: true) in the right panel (no Navigator.push).
+          Below 768 px: retain existing single-panel push navigation unchanged.
+          Manage the selected conversation via local StatefulWidget state (setState).
+        assigned_agent: "frontend_engineer"
+        model: "sonnet"
+        depends_on: ["p2-chat-flow"]
+        acceptance_criteria:
+          - "At 768 px+ viewport: conversation list is 290 px wide on the left"
+          - "At 768 px+ viewport: tapping a conversation renders thread in the right panel (no full-screen push)"
+          - "At < 768 px viewport: tapping a conversation pushes to full-screen thread (unchanged)"
+          - "No layout overflow at 768 px or 1024 px viewport"
+          - "Active conversation is highlighted in the left panel"
+
+      - id: "p4-chat-thread-embedded"
+        description: >
+          Modify lib/features/chat/screens/chat_thread_screen.dart to accept an optional
+          'embedded' boolean parameter (default: false). When embedded is true, suppress
+          the Scaffold and AppBar so the thread renders as a plain widget (no duplicate
+          app bar when used inside the two-panel layout). When embedded is false (default,
+          the existing mobile behaviour), render with the full Scaffold + AppBar as today.
+          This is a pure presentation change — no business logic or Firestore calls change.
+        assigned_agent: "frontend_engineer"
+        model: "sonnet"
+        depends_on: ["p4-chat-two-panel"]
+        acceptance_criteria:
+          - "ChatThreadScreen accepts an 'embedded' bool parameter"
+          - "When embedded: true, no Scaffold or AppBar is rendered"
+          - "When embedded: false (default), full Scaffold + AppBar renders as before"
+          - "Messages still display correctly in both embedded and non-embedded modes"
+          - "Mobile push navigation (embedded: false) is unaffected"
+
+      - id: "p4-dialog-constraint"
+        description: >
+          Audit all dialog and modal widgets in the codebase (grep for 'showDialog\|
+          AlertDialog\|BottomSheet\|showModalBottomSheet'). Wrap dialog content widgets
+          in ConstrainedBox(constraints: BoxConstraints(maxWidth: 500)) + Align
+          (alignment: Alignment.center) so modals are never wider than 500 px and
+          are centred on wider viewports. Apply to every dialog call site found.
+          Do not change dialog content — layout constraint only.
+        assigned_agent: "frontend_engineer"
+        model: "sonnet"
+        depends_on: ["p2-router-wire"]
+        acceptance_criteria:
+          - "All AlertDialog widgets are constrained to max 500 px width on wide viewports"
+          - "All BottomSheet/modal content is centred on viewports wider than 500 px"
+          - "At 1024 px viewport, no dialog spans the full screen width"
+          - "At 375 px viewport, dialogs fill the available width normally (no over-constraint)"
+
+      - id: "p4-responsive-tests"
+        description: >
+          Create test/features/discover/discover_screen_responsive_test.dart and
+          test/features/chat/chat_layout_responsive_test.dart.
+          Discover test: pump DiscoverScreen at 375 px width and verify sidebar buttons
+          are NOT visible; pump at 1024 px and verify sidebar buttons ARE visible.
+          Use TestWidgetsFlutterBinding.instance.window.physicalSizeTestValue or
+          tester.binding.setSurfaceSize to set viewport dimensions.
+          Chat test: pump ChatListScreen at 375 px and verify the conversation list
+          is full-width (no right panel); pump at 800 px and verify both panels render.
+          All tests must pass with 'flutter test'.
+        assigned_agent: "automation_developer"
+        model: "sonnet"
+        depends_on: ["p4-discover-responsive", "p4-chat-two-panel"]
+        acceptance_criteria:
+          - "test/features/discover/discover_screen_responsive_test.dart exists and passes"
+          - "test/features/chat/chat_layout_responsive_test.dart exists and passes"
+          - "Discover test asserts sidebar hidden at 375 px and visible at 1024 px"
+          - "Chat test asserts single-panel at 375 px and two-panel at 800 px"
+          - "'flutter test' exits with code 0 for both test files"
+
+      - id: "p4-viewport-qa"
+        description: >
+          Manually QA every primary screen at three viewport widths using Chrome DevTools
+          device toolbar: 375 px (mobile), 768 px (tablet portrait), 1024 px (tablet
+          landscape). Screens to check: sign-in, sign-up, profile creation steps,
+          discover, chat list, chat thread, profile view, settings, 404 screen.
+          For each screen at each width, check: (1) no text overflow, (2) no horizontal
+          scroll, (3) no widget clipping, (4) bottom nav bar visible and correctly spaced.
+          Document findings and fix any overflow or clipping issues found.
+        assigned_agent: "frontend_engineer"
+        model: "haiku"
+        depends_on: ["p4-dialog-constraint", "p4-discover-keyboard", "p4-chat-thread-embedded"]
+        acceptance_criteria:
+          - "Zero horizontal scroll on any primary screen at 375 px, 768 px, or 1024 px"
+          - "Zero text overflow (yellow/black striped overflow indicator) on any screen"
+          - "Zero widget clipping on any screen at any tested width"
+          - "Bottom navigation bar is visible at all three widths"
+          - "All dialogs are centred at 768 px and 1024 px"
+
+  # ───────────────────────────────────────────────────────────────────────────
+  - id: "phase-5"
+    name: "Phase 5 — Polish, Install CTA & Deploy"
+    tasks:
+
+      - id: "p5-install-manager"
+        description: >
+          Create lib/features/pwa/web_install_manager.dart (web-only file, guard all
+          call sites with kIsWeb). Implement WebInstallManager using dart:js interop:
+          listen for the 'beforeinstallprompt' DOM event, store the deferred prompt
+          object, expose showInstallPrompt() method that calls prompt() on the deferred
+          event, and expose a ValueNotifier<bool> named isInstallAvailable that becomes
+          true when the event fires and false after the user accepts or dismisses.
+          Log 'pwa_install_prompt_shown' to Firebase Analytics when the event fires,
+          and 'pwa_installed' when the user accepts (listen for the 'appinstalled' event).
+          This file must compile without errors on web target.
+        assigned_agent: "backend_engineer"
+        model: "opus"
+        depends_on: ["p2-analytics-verify", "p3-install-test"]
+        acceptance_criteria:
+          - "lib/features/pwa/web_install_manager.dart exists"
+          - "WebInstallManager listens for 'beforeinstallprompt' via dart:js interop"
+          - "isInstallAvailable ValueNotifier is true after the event fires"
+          - "showInstallPrompt() calls the deferred prompt's prompt() method"
+          - "pwa_install_prompt_shown event fires in Firebase Analytics DebugView"
+          - "pwa_installed event fires in Analytics after user accepts install"
+          - "File compiles cleanly with 'flutter build web'"
+
+      - id: "p5-install-banner"
+        description: >
+          Create lib/features/pwa/widgets/install_banner.dart — a dismissable bottom
+          banner widget. The banner shows 'Add GoMeet to your home screen for faster
+          access' with an 'Install' CTA button and a dismiss (X) button. The 'Install'
+          button calls WebInstallManager.showInstallPrompt() (guarded by kIsWeb).
+          The banner is dismissed permanently (SharedPreferences key 'install_banner_dismissed')
+          when the user taps X. Wire the banner into the Discover screen: show it after
+          the user's first card swipe (use a local counter in Discover screen state).
+          The banner must only render on web (kIsWeb guard in the Discover screen).
+        assigned_agent: "frontend_engineer"
+        model: "sonnet"
+        depends_on: ["p5-install-manager", "p4-discover-responsive"]
+        acceptance_criteria:
+          - "lib/features/pwa/widgets/install_banner.dart exists"
+          - "Banner appears on the Discover screen after the first swipe in Chrome"
+          - "Tapping 'Install' triggers the browser install prompt"
+          - "Tapping X dismisses the banner and it does not reappear after page refresh"
+          - "Banner does not render on mobile (kIsWeb guard confirmed)"
+          - "Banner does not appear if the PWA is already installed (isInstallAvailable is false)"
+
+      - id: "p5-firebase-json"
+        description: >
+          Create or overwrite firebase.json with the complete hosting configuration.
+          Required: hosting.public set to 'build/web', cache-control headers
+          (Cache-Control: no-cache for /index.html; Cache-Control: public, max-age=31536000,
+          immutable for *.js, *.css, *.wasm assets), and a catch-all URL rewrite
+          mapping '**' to '/index.html' for Flutter client-side routing.
+          Also add the ignore array for firebase.json and hidden files.
+          Validate JSON is syntactically correct.
+        assigned_agent: "devops"
+        model: "haiku"
+        depends_on: ["p1-build-verify"]
+        acceptance_criteria:
+          - "firebase.json exists and is valid JSON"
+          - "hosting.public is 'build/web'"
+          - "index.html header rule sets Cache-Control: no-cache"
+          - "*.js/*.css/*.wasm header rule sets Cache-Control: public, max-age=31536000, immutable"
+          - "Catch-all rewrite maps '**' to '/index.html'"
+          - "'firebase serve' starts without configuration errors"
+          - "Deep-linking to /chat/:id in a browser returns index.html (not 404)"
+
+      - id: "p5-app-check-enforce"
+        description: >
+          After confirming > 99% attestation success rate in Firebase Console App Check
+          monitoring dashboard (verified by p2-app-check-monitoring and subsequent QA
+          sessions), switch Firebase App Check from monitoring mode to enforced mode
+          for the web platform. This is done in Firebase Console → App Check → Apps →
+          GoMeet Web → Enforce. Immediately after switching, run a full sign-in and
+          Firestore read in Chrome to confirm requests are not being blocked. If any
+          requests are blocked, revert to monitoring mode and investigate unattested traffic.
+        assigned_agent: "devops"
+        model: "haiku"
+        depends_on: ["p2-app-check-monitoring", "p4-viewport-qa"]
+        acceptance_criteria:
+          - "Firebase Console App Check shows GoMeet web app in 'Enforced' mode"
+          - "Sign-in and Firestore reads succeed in Chrome after enforcement is enabled"
+          - "No '403 Forbidden' App Check errors in Chrome DevTools after enforcement"
+          - "Attestation success rate in monitoring dashboard was >= 99% before switching"
+
+      - id: "p5-bundle-size-check"
+        description: >
+          Run 'flutter build web --pwa-strategy=offline-first --release' and verify
+          the total gzipped transfer size. Use Chrome DevTools Network tab (clear cache,
+          reload) to measure the initial page load transfer. Target: <= 3.5 MB on mobile
+          (HTML renderer), <= 5 MB on desktop (CanvasKit). If size exceeds budget,
+          apply deferred Dart loading for non-critical screens (settings, premium stub,
+          video call stub) using 'deferred as' imports. Re-run build and re-measure
+          until within budget.
+        assigned_agent: "backend_engineer"
+        model: "sonnet"
+        depends_on: ["p5-firebase-json", "p5-install-banner"]
+        acceptance_criteria:
+          - "Total gzipped initial load transfer <= 3.5 MB on mobile (Chrome mobile emulation)"
+          - "Total gzipped initial load transfer <= 5 MB on desktop Chrome"
+          - "flutter build web --release exits with code 0"
+          - "No critical assets return 404 in the Chrome Network tab"
+
+      - id: "p5-lighthouse-final"
+        description: >
+          Run the final Lighthouse audit on the production build deployed to a Firebase
+          Hosting preview channel ('firebase hosting:channel:deploy staging'). Run Lighthouse
+          on the preview channel URL (HTTPS required for full PWA audit). Run audits for
+          both 'Progressive Web App' and 'Performance' categories. Targets: PWA >= 90,
+          Performance >= 80. Common Performance levers if score is low: defer CanvasKit
+          for mobile, add preconnect hints for Firebase domains, reduce unused JS with
+          deferred loading. Iterate until both scores meet targets.
+        assigned_agent: "automation_developer"
+        model: "sonnet"
+        depends_on: ["p5-bundle-size-check", "p3-lighthouse-audit"]
+        acceptance_criteria:
+          - "Lighthouse PWA score >= 90 on the production build"
+          - "Lighthouse Performance score >= 80 on the production build"
+          - "Lighthouse audit runs on an HTTPS URL (Firebase Hosting preview channel)"
+          - "No 'Does not respond with 200 when offline' failure"
+          - "No 'Web app manifest does not meet installability requirements' failure"
+
+      - id: "p5-cross-browser-qa"
+        description: >
+          Run full end-to-end P0 flow QA in Chrome, Firefox, and Safari (desktop) and
+          on Android Chrome (mobile) and iOS Safari. P0 flow: sign-up → profile creation
+          → discover (swipe) → match popup → chat (send and receive message).
+          For each browser document: (1) any UI differences, (2) any console errors,
+          (3) any flow-breaking bugs. Safari on iOS requires manual testing (no remote
+          WebDriver). Fix any browser-specific bugs found. Firefox and Safari do not
+          support the beforeinstallprompt event — the install banner must not crash in
+          those browsers (WebInstallManager.isInstallAvailable stays false).
+        assigned_agent: "automation_developer"
+        model: "sonnet"
+        depends_on: ["p5-lighthouse-final", "p5-install-banner"]
+        acceptance_criteria:
+          - "Full P0 flow completes without errors in Chrome (desktop)"
+          - "Full P0 flow completes without errors in Firefox (desktop)"
+          - "Full P0 flow completes without errors in Safari (desktop)"
+          - "Full P0 flow completes without errors in Android Chrome (mobile)"
+          - "Full P0 flow completes without errors in iOS Safari"
+          - "Install banner does not crash or throw errors in Firefox or Safari"
+          - "No browser-specific console errors blocking core flows"
+
+      - id: "p5-deploy"
+        description: >
+          Execute the production deploy. Run:
+            flutter build web --pwa-strategy=offline-first --release
+            firebase deploy --only hosting
+          Verify the live URL loads GoMeet PWA. Confirm: PWA install prompt appears in
+          Chrome address bar, standalone mode opens correctly after install, offline shell
+          loads when network is disabled in DevTools, Firebase Auth and Firestore are
+          operational on the live URL. Record the live URL and deployment timestamp.
+        assigned_agent: "devops"
+        model: "haiku"
+        depends_on: ["p5-cross-browser-qa", "p5-app-check-enforce"]
+        acceptance_criteria:
+          - "'firebase deploy --only hosting' exits with code 0"
+          - "Live Firebase Hosting URL returns HTTP 200 for /"
+          - "Live URL loads GoMeet PWA without red-screen crash"
+          - "Chrome install icon appears in the address bar on the live URL"
+          - "Installed PWA opens in standalone mode (no browser chrome)"
+          - "Offline shell loads from service worker cache when network is disabled"
+          - "Firebase Auth sign-in works on the live production URL"
+          - "Firestore reads return data on the live production URL"

@@ -65,13 +65,13 @@ class DefaultFirebaseOptions {
     projectId: 'redbus-3ec46',
     storageBucket: 'redbus-3ec46.appspot.com',
     messagingSenderId: '319710447950',
-    // TODO(web-registration): Replace with actual web appId from Firebase Console.
-    // Go to: Firebase Console → Project Settings → Your Apps → Add App → Web
-    // The format is "1:319710447950:web:<hex-suffix>"
+    // Web App ID sourced from Firebase Console → Project Settings → Your Apps.
+    // Format: "1:PROJECT_NUMBER:web:HEX_SUFFIX"
     appId: '1:319710447950:web:4552bb9d524b911ba2f61f',
-    // TODO(web-registration): Replace with actual Analytics measurementId, or
-    // remove this field if Firebase Analytics is not enabled for the web app.
-    measurementId: 'G-PENDING',
+    // measurementId intentionally omitted: Firebase Analytics has not yet
+    // been configured for the web app registration. When a real G-XXXXXXXXXX
+    // Measurement ID is available (Firebase Console → Analytics → Data streams),
+    // add it here. Omitting the field disables Analytics without any error.
   );
 
   static const FirebaseOptions android = FirebaseOptions(

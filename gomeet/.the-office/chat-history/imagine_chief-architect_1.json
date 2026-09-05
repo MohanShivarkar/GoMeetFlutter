@@ -1,0 +1,82 @@
+[
+  {
+    "id": "4be9d994-aeff-4d80-b97a-29a1e69a9d42",
+    "timestamp": 1787409420211,
+    "role": "agent",
+    "agentRole": "chief-architect",
+    "text": "Great — I have all three prior documents in context. Before I draft the architecture, let me lock down the two genuinely undecided technical choices from the PRD so the design is accurate."
+  },
+  {
+    "id": "74bd87f1-5d92-454f-b7ee-af2f5f29c7a5",
+    "role": "agent",
+    "agentRole": "chief-architect",
+    "text": "Which Flutter Web renderer should the PWA use?",
+    "timestamp": 1787409615577
+  },
+  {
+    "id": "5cc26dce-03f2-4d4d-a489-c20f4d405c4e",
+    "role": "user",
+    "text": "Auto (Flutter decides)",
+    "timestamp": 1787409615577
+  },
+  {
+    "id": "528fd872-8e04-459b-b72c-bdd2e610234c",
+    "timestamp": 1787409640982,
+    "role": "agent",
+    "agentRole": "chief-architect",
+    "text": "Got it — **Auto renderer** (Flutter picks HTML on mobile, CanvasKit on desktop). Let me grab the remaining two decisions:"
+  },
+  {
+    "id": "57752192-37ee-4a94-b319-11247244a66a",
+    "role": "agent",
+    "agentRole": "chief-architect",
+    "text": "Should Firebase App Check be included in v1 to protect backend APIs from abuse?",
+    "timestamp": 1787409744966
+  },
+  {
+    "id": "c5c555ad-19d9-4a8c-9845-7839f1907c63",
+    "role": "user",
+    "text": "Yes — include in v1",
+    "timestamp": 1787409744966
+  },
+  {
+    "id": "8471d028-77da-47cb-a1d6-2ea7ff4699a9",
+    "role": "agent",
+    "agentRole": "chief-architect",
+    "text": "How should web deployments be automated?",
+    "timestamp": 1787409806866
+  },
+  {
+    "id": "1f2acdbc-9a01-495c-bded-c911bc2b9fb7",
+    "role": "user",
+    "text": "Manual deploy only",
+    "timestamp": 1787409806866
+  },
+  {
+    "id": "81527934-ac62-488e-bd7c-b529db795e39",
+    "timestamp": 1787409817759,
+    "role": "agent",
+    "agentRole": "chief-architect",
+    "text": "All three decisions captured:\n- **Renderer:** Auto (HTML on mobile, CanvasKit on desktop)\n- **App Check:** Yes — include in v1 (reCAPTCHA v3)\n- **CI/CD:** Manual deploy\n\nNow writing the architecture document."
+  },
+  {
+    "id": "322abd45-6e69-4dc3-88d3-306fda5f50c7",
+    "timestamp": 1787409967380,
+    "role": "agent",
+    "agentRole": "chief-architect",
+    "text": "The architecture document is written. Here's a summary of the design decisions:\n\n---\n\n## GoMeet PWA — System Design Summary\n\n### Core Architecture Decision\nThis is a **web compilation layer**, not a new product. ~95% of the Flutter codebase is unchanged. All changes are confined to four areas: Firebase init fix, package stubs, PWA shell config, and responsive layout additions.\n\n### Key Technical Decisions (incorporating your choices)\n\n| Decision | Choice | Rationale |\n|----------|--------|-----------|\n| **Web Renderer** | Auto (HTML mobile / CanvasKit desktop) | Optimises bundle size per device without manual override |\n| **App Check** | reCAPTCHA v3 — included in v1 | Monitoring mode during QA → enforced before public launch |\n| **CI/CD** | Manual deploy | `flutter build web --release` + `firebase deploy` |\n| **Backend** | Firebase only — no new API server | Existing Firestore + Auth + Storage; unchanged Security Rules |\n| **Offline** | App shell cached; live data requires network | Service worker via `offline-first` Flutter build strategy |\n\n### 5-Phase Implementation Sequence\n1. **Build unblocked** — Fix Firebase init, add package stubs, zero build errors\n2. **Core flows** — Auth, profile creation, swipe/match, chat all working in Chrome\n3. **PWA shell** — manifest.json, icons, service worker, Lighthouse PWA ≥ 90\n4. **Responsive layouts** — Tablet breakpoints for Discover (600px) and Chat (768px)\n5. **Polish & deploy** — App Check enforced, install CTA, cache headers, final Lighthouse run\n\n### 7 Open Questions to Resolve Before Implementation\nThe most critical blockers are: Firebase web config values (#1), reCAPTCHA v3 site key (#2), and Firestore Security Rules platform audit (#3).\n\n---\n\n**Does this architecture look right?** Any adjustments before I mark the phase complete?"
+  },
+  {
+    "id": "4d259c09-a718-4215-852a-4353eff4e5f0",
+    "role": "agent",
+    "agentRole": "chief-architect",
+    "text": "Imagine phase complete. Ready to move to the War Room?",
+    "timestamp": 1787410143880
+  },
+  {
+    "id": "10ce7b00-9c8b-44f7-ad4a-3eed30e2c828",
+    "role": "user",
+    "text": "Wait Chief Architect \nAPIs are already developed and working in that provided repository\nWhy we need Firebase?",
+    "timestamp": 1787410143880
+  }
+]

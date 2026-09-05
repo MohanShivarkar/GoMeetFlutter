@@ -23,6 +23,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:dating/web_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:provider/provider.dart';
@@ -47,9 +48,25 @@ Future<void> main() async {
   // https://www.google.com/recaptcha/admin registered for your domain.
   if (kIsWeb) {
     usePathUrlStrategy();
-    await FirebaseAppCheck.instance.activate(
-      webProvider: ReCaptchaV3Provider('6LcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'),
-    );
+
+    // ── Firebase App Check (web — production builds only) ────────────────────
+    // Guard: skip App Check during debug builds (`flutter run -d chrome`).
+    // Reason: the reCAPTCHA v3 site key may be a placeholder in dev, and
+    // hitting the reCAPTCHA endpoint with an invalid key produces a visible
+    // 400/attestation error in Chrome DevTools console.
+    //
+    // In release builds (flutter build web) App Check is always activated.
+    // Replace kReCaptchaV3SiteKey in lib/web_constants.dart with the real
+    // reCAPTCHA v3 site key from https://www.google.com/recaptcha/admin
+    // before the first public deployment.
+    //
+    // kAppCheckEnabledInDebug is false by default; set to true locally
+    // if you have a valid debug reCAPTCHA key registered for localhost.
+    if (kReleaseMode || kAppCheckEnabledInDebug) {
+      await FirebaseAppCheck.instance.activate(
+        webProvider: ReCaptchaV3Provider(kReCaptchaV3SiteKey),
+      );
+    }
   }
 
   final prefs = await SharedPreferences.getInstance();

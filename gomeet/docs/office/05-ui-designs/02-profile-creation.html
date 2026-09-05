@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoMeet PWA — Create Profile</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #08080F;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 20px;
+  }
+
+  .screen-label {
+    background: rgba(255, 68, 88, 0.15);
+    border: 1px solid rgba(255, 68, 88, 0.3);
+    color: #FF6B7A; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 20px;
+  }
+
+  .phone-frame {
+    width: 390px;
+    min-height: 820px;
+    background: #F8F8FC;
+    border-radius: 44px;
+    border: 2px solid #252538;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 8px #0A0A12,
+      0 40px 100px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Top bar */
+  .top-bar {
+    background: white;
+    padding: 20px 20px 0;
+    border-bottom: 1px solid #F0F0F5;
+    flex-shrink: 0;
+  }
+  .top-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .back-btn {
+    width: 38px; height: 38px;
+    background: #F5F5FA; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer; color: #333;
+    border: none;
+  }
+  .step-counter {
+    color: #999; font-size: 13px; font-weight: 500;
+  }
+  .step-counter strong { color: #FF4458; }
+  .skip-btn {
+    color: #999; font-size: 14px; background: none; border: none;
+    cursor: pointer; font-family: inherit; padding: 4px 8px;
+  }
+
+  .step-title { font-size: 22px; font-weight: 800; color: #1A1A2E; margin-bottom: 4px; }
+  .step-sub { color: #888; font-size: 13.5px; margin-bottom: 18px; line-height: 1.5; }
+
+  /* Progress stepper */
+  .stepper { display: flex; gap: 5px; padding-bottom: 18px; }
+  .step-seg {
+    flex: 1; height: 4px; border-radius: 2px; transition: background 0.3s;
+  }
+  .step-seg.done { background: #FF4458; }
+  .step-seg.active { background: linear-gradient(90deg, #FF4458 60%, rgba(255,68,88,0.3) 100%); }
+  .step-seg.pending { background: #E8E8F0; }
+
+  /* Step labels */
+  .step-labels {
+    display: flex; justify-content: space-between;
+    padding: 6px 2px 16px;
+  }
+  .step-label { font-size: 10px; color: #bbb; font-weight: 500; text-align: center; flex: 1; }
+  .step-label.active { color: #FF4458; font-weight: 700; }
+  .step-label.done { color: #FF4458; }
+
+  /* Content area */
+  .content {
+    padding: 22px 20px;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  /* Photo grid */
+  .section-heading {
+    font-size: 14px; font-weight: 700; color: #333; margin-bottom: 4px;
+  }
+  .section-sub {
+    font-size: 12px; color: #999; margin-bottom: 16px; line-height: 1.5;
+  }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .photo-cell {
+    aspect-ratio: 3/4;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+  }
+  /* First photo spans 2 rows */
+  .photo-cell.main {
+    grid-row: 1 / 3;
+  }
+
+  .photo-filled {
+    width: 100%; height: 100%;
+    display: flex; align-items: flex-end;
+    position: relative;
+  }
+  .photo-bg-1 { background: linear-gradient(160deg, #A18CD1 0%, #FBC2EB 100%); }
+  .photo-bg-2 { background: linear-gradient(160deg, #84FAB0 0%, #8FD3F4 100%); }
+  .photo-bg-3 { background: linear-gradient(160deg, #F6D365 0%, #FDA085 100%); }
+
+  .photo-avatar {
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    font-size: 64px; line-height: 1; opacity: 0.6;
+  }
+  .photo-avatar.sm { font-size: 40px; }
+
+  .photo-remove {
+    position: absolute; top: 6px; right: 6px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(0,0,0,0.55); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; cursor: pointer; z-index: 2;
+    border: none;
+  }
+  .photo-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+    padding: 8px 8px 6px;
+    font-size: 10px; color: white; font-weight: 600;
+    text-align: center;
+  }
+
+  .photo-empty {
+    width: 100%; height: 100%;
+    background: white; border: 2px dashed #E0E0EC;
+    border-radius: 14px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 6px;
+    transition: border-color 0.2s;
+  }
+  .photo-empty:hover { border-color: #FF4458; }
+  .photo-empty-icon { font-size: 28px; opacity: 0.35; }
+  .photo-empty-text { font-size: 10px; color: #bbb; font-weight: 500; }
+
+  /* Primary photo badge */
+  .primary-badge {
+    position: absolute; top: 8px; left: 8px; z-index: 2;
+    background: #FF4458; color: white; font-size: 9px;
+    font-weight: 700; padding: 3px 8px; border-radius: 10px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* Upload options */
+  .upload-options {
+    display: flex; gap: 10px; margin-bottom: 20px;
+  }
+  .upload-btn {
+    flex: 1; padding: 14px 10px;
+    border-radius: 14px; border: 1.5px solid #E0E0EC;
+    background: white; font-family: inherit; font-size: 13px;
+    font-weight: 600; color: #444; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .upload-btn:hover { border-color: #FF4458; box-shadow: 0 2px 12px rgba(255,68,88,0.1); }
+  .upload-btn-icon { font-size: 24px; }
+  .upload-btn.primary-action {
+    border-color: #FF4458; background: rgba(255,68,88,0.04);
+    color: #FF4458;
+  }
+
+  /* Tips */
+  .tips-box {
+    background: #FFF8F8;
+    border: 1px solid rgba(255,68,88,0.15);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+  }
+  .tips-title {
+    font-size: 12px; font-weight: 700; color: #FF4458;
+    margin-bottom: 8px; display: flex; align-items: center; gap: 5px;
+  }
+  .tip-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    margin-bottom: 5px; font-size: 12px; color: #666; line-height: 1.4;
+  }
+  .tip-item:last-child { margin-bottom: 0; }
+  .tip-check { color: #FF4458; font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Bottom bar */
+  .bottom-bar {
+    background: white;
+    border-top: 1px solid #F0F0F5;
+    padding: 16px 20px 24px;
+    flex-shrink: 0;
+  }
+  .progress-text {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .progress-text span { font-size: 12px; color: #999; }
+  .progress-text strong { font-size: 12px; color: #FF4458; }
+
+  .progress-bar {
+    height: 4px; background: #F0F0F5; border-radius: 2px;
+    margin-bottom: 16px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; width: 60%; background: linear-gradient(90deg, #FF4458, #FF6B35);
+    border-radius: 2px;
+  }
+
+  .btn-row { display: flex; gap: 10px; }
+  .btn-back {
+    width: 50px; padding: 14px;
+    background: #F5F5FA; border: none; border-radius: 14px;
+    font-size: 18px; cursor: pointer;
+  }
+  .btn-next {
+    flex: 1; padding: 15px;
+    background: linear-gradient(135deg, #FF4458 0%, #FF6B35 100%);
+    border: none; border-radius: 14px; color: white;
+    font-size: 15px; font-weight: 800; font-family: inherit;
+    cursor: pointer; box-shadow: 0 6px 20px rgba(255,68,88,0.35);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="screen-label">&#9679; Screen 02 — Profile Creation (Step 3: Photos)</div>
+
+<div class="phone-frame">
+  <div class="top-bar">
+    <div class="top-nav">
+      <button class="back-btn">&#8592;</button>
+      <span class="step-counter">Step <strong>3</strong> of 5</span>
+      <button class="skip-btn">Skip</button>
+    </div>
+    <div class="step-title">Add your photos &#128247;</div>
+    <div class="step-sub">Add at least 2 photos. Your first photo is your main profile photo.</div>
+    <div class="stepper">
+      <div class="step-seg done"></div>
+      <div class="step-seg done"></div>
+      <div class="step-seg active"></div>
+      <div class="step-seg pending"></div>
+      <div class="step-seg pending"></div>
+    </div>
+    <div class="step-labels">
+      <span class="step-label done">Name</span>
+      <span class="step-label done">Birthday</span>
+      <span class="step-label active">Photos</span>
+      <span class="step-label">Bio</span>
+      <span class="step-label">Prefs</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section-heading">Your Photos</div>
+    <div class="section-sub">Drag to reorder. Tap a photo to remove it.</div>
+
+    <div class="photo-grid">
+      <!-- Main photo (2 rows tall) -->
+      <div class="photo-cell main">
+        <div class="photo-filled photo-bg-1">
+          <div class="photo-avatar">&#128105;</div>
+        </div>
+        <div class="primary-badge">Main</div>
+        <button class="photo-remove">&#10005;</button>
+        <div class="photo-label">Drag to reorder</div>
+      </div>
+
+      <!-- Photo 2 -->
+      <div class="photo-cell">
+        <div class="photo-filled photo-bg-2">
+          <div class="photo-avatar sm">&#127774;</div>
+        </div>
+        <button class="photo-remove">&#10005;</button>
+      </div>
+
+      <!-- Photo 3 -->
+      <div class="photo-cell">
+        <div class="photo-filled photo-bg-3">
+          <div class="photo-avatar sm">&#127796;</div>
+        </div>
+        <button class="photo-remove">&#10005;</button>
+      </div>
+
+      <!-- Empty slot 4 -->
+      <div class="photo-cell">
+        <div class="photo-empty">
+          <div class="photo-empty-icon">&#43;</div>
+          <div class="photo-empty-text">Add photo</div>
+        </div>
+      </div>
+
+      <!-- Empty slot 5 -->
+      <div class="photo-cell">
+        <div class="photo-empty">
+          <div class="photo-empty-icon">&#43;</div>
+          <div class="photo-empty-text">Add photo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="upload-options">
+      <button class="upload-btn primary-action">
+        <span class="upload-btn-icon">&#128247;</span>
+        Take Photo
+      </button>
+      <button class="upload-btn">
+        <span class="upload-btn-icon">&#128193;</span>
+        Upload File
+      </button>
+    </div>
+
+    <div class="tips-box">
+      <div class="tips-title">&#128161; Photo tips for more matches</div>
+      <div class="tip-item">
+        <span class="tip-check">&#10003;</span>
+        Use a clear, recent face photo as your main photo
+      </div>
+      <div class="tip-item">
+        <span class="tip-check">&#10003;</span>
+        Smile — profiles with smiling photos get 40% more likes
+      </div>
+      <div class="tip-item">
+        <span class="tip-check">&#10003;</span>
+        Add variety: an outdoor shot, a hobby photo, and a social photo
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="progress-text">
+      <span>Profile completeness</span>
+      <strong>60% done</strong>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-back">&#8592;</button>
+      <button class="btn-next">
+        Continue to Bio &#8594;
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoMeet PWA — Install &amp; Offline Shell</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #08080F;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 32px;
+  }
+
+  .screen-label {
+    background: rgba(255, 68, 88, 0.15);
+    border: 1px solid rgba(255, 68, 88, 0.3);
+    color: #FF6B7A; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 20px;
+  }
+
+  .section-title {
+    color: #555; font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; text-align: center;
+  }
+
+  .row {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* ---- PHONE FRAME (Install prompt) ---- */
+  .phone-frame {
+    width: 390px;
+    min-height: 720px;
+    background: #0F0F1A;
+    border-radius: 44px;
+    border: 2px solid #252538;
+    overflow: hidden;
+    box-shadow: 0 0 0 8px #0A0A12, 0 40px 100px rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* App shell beneath the prompt */
+  .app-shell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0F0F1A;
+    filter: blur(2px);
+  }
+
+  /* Top bar placeholder */
+  .shell-bar {
+    height: 56px; background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; padding: 0 20px;
+    gap: 12px;
+  }
+  .shell-logo {
+    font-size: 20px; font-weight: 900; color: #FF4458; letter-spacing: -1px;
+  }
+  .shell-spacer { flex: 1; }
+  .shell-icon {
+    width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 50%;
+  }
+
+  /* Cards placeholder */
+  .shell-card-area {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 16px; padding: 20px;
+  }
+  .shell-card {
+    width: 100%; max-width: 320px; height: 280px;
+    background: linear-gradient(160deg, #1A1A2E, #252545);
+    border-radius: 22px; border: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .shell-avatar { font-size: 80px; opacity: 0.3; }
+  .shell-actions {
+    display: flex; gap: 20px; justify-content: center;
+  }
+  .shell-action-circle {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  /* Bottom nav placeholder */
+  .shell-nav {
+    height: 60px; background: rgba(255,255,255,0.02);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: space-around; padding: 0 16px;
+  }
+  .shell-nav-dot {
+    width: 28px; height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px;
+  }
+  .shell-nav-dot.active { background: rgba(255,68,88,0.3); }
+
+  /* Install prompt overlay */
+  .install-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: #1A1A2E;
+    border-radius: 28px 28px 44px 44px;
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.8);
+    padding: 8px 0 32px;
+    z-index: 10;
+  }
+
+  .pull-handle {
+    width: 40px; height: 4px; background: #333;
+    border-radius: 2px; margin: 12px auto 20px;
+  }
+
+  .install-content { padding: 0 24px; }
+
+  .install-app-row {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 20px;
+  }
+  .install-app-icon {
+    width: 60px; height: 60px; border-radius: 16px;
+    background: linear-gradient(135deg, #FF4458, #FF6B35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; flex-shrink: 0;
+    box-shadow: 0 6px 20px rgba(255,68,88,0.4);
+  }
+  .install-app-info { flex: 1; }
+  .install-app-name { font-size: 20px; font-weight: 800; color: white; }
+  .install-app-url { font-size: 13px; color: #555; margin-top: 2px; }
+
+  .install-headline {
+    font-size: 17px; font-weight: 700; color: white; margin-bottom: 6px;
+  }
+  .install-desc {
+    font-size: 13.5px; color: #777; line-height: 1.6; margin-bottom: 20px;
+  }
+
+  .install-features {
+    display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;
+  }
+  .install-feature {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,0.03); border-radius: 12px; padding: 10px 14px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .install-feature-icon { font-size: 20px; flex-shrink: 0; }
+  .install-feature-text { flex: 1; }
+  .install-feature-text strong { color: #D0D0E0; font-size: 13px; display: block; margin-bottom: 1px; }
+  .install-feature-text span { color: #555; font-size: 12px; }
+
+  .install-btn {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #FF4458 0%, #FF6B35 100%);
+    border: none; border-radius: 16px; color: white;
+    font-size: 16px; font-weight: 800; font-family: inherit;
+    cursor: pointer; box-shadow: 0 8px 28px rgba(255,68,88,0.4);
+    margin-bottom: 12px;
+  }
+  .install-later {
+    width: 100%; padding: 12px;
+    background: none; border: 1.5px solid #252538;
+    border-radius: 14px; color: #666; font-size: 14px;
+    font-weight: 600; font-family: inherit; cursor: pointer;
+  }
+
+  /* ---- OFFLINE SHELL FRAME ---- */
+  .offline-frame {
+    width: 390px;
+    min-height: 720px;
+    background: #0F0F1A;
+    border-radius: 44px;
+    border: 2px solid #252538;
+    overflow: hidden;
+    box-shadow: 0 0 0 8px #0A0A12, 0 40px 100px rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Cached shell — top bar visible */
+  .offline-app-bar {
+    padding: 20px 20px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+  .offline-logo { font-size: 22px; font-weight: 900; color: white; letter-spacing: -1px; }
+  .offline-logo em {
+    font-style: normal;
+    background: linear-gradient(135deg, #FF4458, #FF6B35);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Offline banner */
+  .offline-banner {
+    background: rgba(255, 152, 0, 0.1);
+    border-bottom: 1px solid rgba(255,152,0,0.2);
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0;
+  }
+  .offline-icon { font-size: 18px; }
+  .offline-banner-text { flex: 1; }
+  .offline-banner-text strong { color: #FFB74D; font-size: 13px; display: block; }
+  .offline-banner-text span { color: #7A6040; font-size: 12px; }
+  .retry-btn {
+    background: rgba(255,152,0,0.2); border: 1px solid rgba(255,152,0,0.3);
+    border-radius: 8px; color: #FFB74D; font-size: 12px; font-weight: 700;
+    padding: 5px 12px; cursor: pointer; font-family: inherit;
+  }
+
+  /* Cached content area */
+  .cached-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .cached-label {
+    align-self: stretch; font-size: 11px; color: #444; font-weight: 700;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .cached-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.04); }
+
+  /* Offline illustration */
+  .offline-illustration {
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,68,88,0.06) 0%, rgba(255,68,88,0.02) 70%, transparent 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 72px;
+    margin: 10px 0;
+  }
+
+  .offline-message {
+    text-align: center;
+  }
+  .offline-message h2 { color: white; font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .offline-message p { color: #555; font-size: 14px; line-height: 1.6; max-width: 280px; margin: 0 auto; }
+
+  /* Cached match cards (faded, available offline) */
+  .cached-matches {
+    align-self: stretch;
+  }
+  .cached-match-row {
+    display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
+  }
+  .cached-match-card {
+    width: 90px; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    opacity: 0.55;
+  }
+  .cached-match-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    border: 2px solid rgba(255,255,255,0.08);
+  }
+  .cached-match-name { color: #555; font-size: 11px; }
+
+  .offline-try-btn {
+    width: 100%; padding: 14px;
+    background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 14px; color: #666; font-size: 14px;
+    font-weight: 600; font-family: inherit; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: auto;
+  }
+
+  /* Bottom nav on offline frame */
+  .offline-nav {
+    background: rgba(14,14,26,0.98);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 12px 0 24px;
+    display: flex; justify-content: space-around;
+    flex-shrink: 0;
+  }
+  .offline-nav-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; cursor: pointer; color: #333; font-size: 10px; font-weight: 600;
+  }
+  .offline-nav-item .nicon { font-size: 22px; }
+</style>
+</head>
+<body>
+
+<div class="screen-label">&#9679; Screen 05 — PWA Install Prompt &amp; Offline Shell</div>
+
+<div class="row">
+  <!-- INSTALL PROMPT -->
+  <div>
+    <div class="section-title" style="margin-bottom: 14px;">A — Chrome Install Prompt (Android / Desktop)</div>
+    <div class="phone-frame">
+      <!-- Blurred app shell behind prompt -->
+      <div class="app-shell">
+        <div class="shell-bar">
+          <div class="shell-logo">GoMeet</div>
+          <div class="shell-spacer"></div>
+          <div class="shell-icon"></div>
+          <div class="shell-icon"></div>
+        </div>
+        <div class="shell-card-area">
+          <div class="shell-card">
+            <div class="shell-avatar">&#128105;</div>
+          </div>
+          <div class="shell-actions">
+            <div class="shell-action-circle"></div>
+            <div class="shell-action-circle"></div>
+            <div class="shell-action-circle"></div>
+          </div>
+        </div>
+        <div class="shell-nav">
+          <div class="shell-nav-dot active"></div>
+          <div class="shell-nav-dot"></div>
+          <div class="shell-nav-dot"></div>
+          <div class="shell-nav-dot"></div>
+        </div>
+      </div>
+
+      <!-- Install prompt sheet -->
+      <div class="install-overlay">
+        <div class="pull-handle"></div>
+        <div class="install-content">
+          <div class="install-app-row">
+            <div class="install-app-icon">&#10084;&#65039;</div>
+            <div class="install-app-info">
+              <div class="install-app-name">GoMeet</div>
+              <div class="install-app-url">gomeet.app</div>
+            </div>
+          </div>
+
+          <div class="install-headline">Install GoMeet to your device</div>
+          <div class="install-desc">
+            Get the full app experience — no app store required. Opens instantly from your home screen.
+          </div>
+
+          <div class="install-features">
+            <div class="install-feature">
+              <div class="install-feature-icon">&#128640;</div>
+              <div class="install-feature-text">
+                <strong>Instant access</strong>
+                <span>Launch in under a second, no browser loading</span>
+              </div>
+            </div>
+            <div class="install-feature">
+              <div class="install-feature-icon">&#128268;</div>
+              <div class="install-feature-text">
+                <strong>Works offline</strong>
+                <span>App shell loads even without a connection</span>
+              </div>
+            </div>
+            <div class="install-feature">
+              <div class="install-feature-icon">&#128276;</div>
+              <div class="install-feature-text">
+                <strong>Match notifications</strong>
+                <span>Get alerts the moment someone likes you back</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="install-btn">&#8681; Add GoMeet to Home Screen</button>
+          <button class="install-later">Not now — continue in browser</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OFFLINE SHELL -->
+  <div>
+    <div class="section-title" style="margin-bottom: 14px;">B — Offline Shell (Service Worker Cache Active)</div>
+    <div class="offline-frame">
+      <div class="offline-app-bar">
+        <div class="offline-logo">Go<em>Meet</em></div>
+        <div style="width:32px;height:32px;background:rgba(255,255,255,0.04);border-radius:50%;"></div>
+      </div>
+
+      <!-- Offline warning banner -->
+      <div class="offline-banner">
+        <div class="offline-icon">&#128268;</div>
+        <div class="offline-banner-text">
+          <strong>You're offline</strong>
+          <span>Connect to discover new matches and send messages</span>
+        </div>
+        <button class="retry-btn">Retry</button>
+      </div>
+
+      <div class="cached-content">
+        <!-- Offline illustration -->
+        <div class="offline-illustration">&#127756;</div>
+
+        <div class="offline-message">
+          <h2>No connection</h2>
+          <p>GoMeet is cached and ready. Reconnect to swipe, match, and chat with your people.</p>
+        </div>
+
+        <!-- Cached matches (viewable offline) -->
+        <div class="cached-matches" style="width:100%;">
+          <div class="cached-label">Cached matches (offline)</div>
+          <div style="margin-top: 12px;">
+            <div class="cached-match-row">
+              <div class="cached-match-card">
+                <div class="cached-match-avatar bg-purple">&#128105;</div>
+                <div class="cached-match-name">Priya</div>
+              </div>
+              <div class="cached-match-card">
+                <div class="cached-match-avatar bg-teal">&#128104;</div>
+                <div class="cached-match-name">Karan</div>
+              </div>
+              <div class="cached-match-card">
+                <div class="cached-match-avatar bg-orange">&#128105;</div>
+                <div class="cached-match-name">Shreya</div>
+              </div>
+              <div class="cached-match-card">
+                <div class="cached-match-avatar bg-blue">&#128102;</div>
+                <div class="cached-match-name">Meera</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:14px; padding:14px; display:flex; align-items:flex-start; gap:10px;">
+          <span style="font-size:18px; flex-shrink:0;">&#128336;</span>
+          <div>
+            <div style="color:#555; font-size:12px; font-weight:700; margin-bottom:3px;">Cached as of 9:22 AM today</div>
+            <div style="color:#404050; font-size:12px; line-height:1.5;">Your matches and chat history are saved locally. New messages will sync when you reconnect.</div>
+          </div>
+        </div>
+
+        <button class="offline-try-btn">&#8635; Try reconnecting</button>
+      </div>
+
+      <div class="offline-nav">
+        <div class="offline-nav-item">
+          <span class="nicon">&#128285;</span>
+          Discover
+        </div>
+        <div class="offline-nav-item">
+          <span class="nicon">&#128140;</span>
+          Matches
+        </div>
+        <div class="offline-nav-item">
+          <span class="nicon">&#128172;</span>
+          Chat
+        </div>
+        <div class="offline-nav-item">
+          <span class="nicon">&#128100;</span>
+          Profile
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Gradient helper classes used inline via bg-* -->
+<style>
+  .bg-purple { background: linear-gradient(135deg, #A18CD1, #FBC2EB); }
+  .bg-teal   { background: linear-gradient(135deg, #4ECDC4, #44CF6C); }
+  .bg-orange { background: linear-gradient(135deg, #F6D365, #FDA085); }
+  .bg-blue   { background: linear-gradient(135deg, #89F7FE, #66A6FF); }
+</style>
+</body>
+</html>

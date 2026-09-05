@@ -1,0 +1,17 @@
+===SEARCH RESULTS=== 
+INFO: Could not find files for the given pattern(s).
+INFO: Could not find files for the given pattern(s).
+--- PATH --- 
+C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\Nitin Tale\bin;N:\Works\Projects\the-office\node_modules\.bin;N:\Works\Projects\node_modules\.bin;N:\Works\node_modules\.bin;N:\node_modules\.bin;C:\Program Files\nodejs\node_modules\npm\node_modules\@npmcli\run-script\lib\node-gyp-bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Users\Nitin Tale\AppData\Local\Microsoft\WindowsApps;C:\Users\Nitin Tale\AppData\Local\Programs\Antigravity IDE\bin;C:\Users\Nitin Tale\AppData\Roaming\npm 
+--- ENV FLUTTER_ROOT --- 
+ECHO is off.
+--- Checking common locations --- 
+--- Checking Program Files --- 
+The system cannot find the path specified.
+ Volume in drive C has no label.
+ Volume Serial Number is DA04-2CBE
+
+ Directory of C:\Users\Nitin Tale
+
+File Not Found
+DONE 
