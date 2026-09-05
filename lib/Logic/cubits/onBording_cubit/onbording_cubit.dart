@@ -7,6 +7,7 @@ import 'package:dating/data/localdatabase.dart';
 import 'package:dating/data/models/languagemodel.dart';
 import 'package:dating/data/models/religionmodel.dart';
 import 'package:dating/data/models/usermodel.dart';
+import 'package:dating/features/auth/services/phone_auth_web_service.dart';
 import 'package:dating/presentation/firebase/auth_firebase.dart';
 import 'package:dating/presentation/screens/splash_bording/onBordingProvider/onbording_provider.dart';
 import 'package:dio/dio.dart';
@@ -26,36 +27,46 @@ import '../../../extra_otp_code/msg_api_model.dart';
 import '../../../extra_otp_code/sms_type_api_model.dart';
 import '../../../extra_otp_code/twilyo_api_model.dart';
 import '../../../presentation/screens/splash_bording/auth_screen.dart';
+
 class OnbordingCubit extends Cubit<OnbordingState> {
   OnbordingCubit() : super(InitState());
 
   final Api _api = Api();
 
-  sendOtpFunction({required String number, context,required bool isForgot}) async {
+  sendOtpFunction({required String number, context, required bool isForgot}) async {
     emit(LoadingState());
     try {
-      await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: number,
-        verificationCompleted: (PhoneAuthCredential credential) {},
-        verificationFailed: (FirebaseAuthException e) {
-          emit(ErrorState(e.toString()));
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          Provider.of<OnBordingProvider>(context, listen: false).vericitionId = verificationId;
-          emit(otpComplete());
-          Provider.of<OnBordingProvider>(context, listen: false).otpBottomSheet(context,isForgot);
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
-
-
-
-
-
+      if (kIsWeb) {
+        // Web: Firebase Phone Auth requires an invisible reCAPTCHA verifier.
+        // PhoneAuthWebService.sendOtp() calls signInWithPhoneNumber, which
+        // auto-creates an invisible verifier -- no visible widget is shown.
+        final service = PhoneAuthWebService();
+        final confirmationResult = await service.sendOtp(number);
+        Provider.of<OnBordingProvider>(context, listen: false)
+            .webConfirmationResult = confirmationResult;
+        emit(otpComplete());
+        Provider.of<OnBordingProvider>(context, listen: false)
+            .otpBottomSheet(context, isForgot);
+      } else {
+        // Mobile: native verifyPhoneNumber path (unchanged).
+        await FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: number,
+          verificationCompleted: (PhoneAuthCredential credential) {},
+          verificationFailed: (FirebaseAuthException e) {
+            emit(ErrorState(e.toString()));
+          },
+          codeSent: (String verificationId, int? resendToken) {
+            Provider.of<OnBordingProvider>(context, listen: false).vericitionId =
+                verificationId;
+            emit(otpComplete());
+            Provider.of<OnBordingProvider>(context, listen: false)
+                .otpBottomSheet(context, isForgot);
+          },
+          codeAutoRetrievalTimeout: (String verificationId) {},
+        );
+      }
     } catch (e) {
-
       emit(ErrorState(e.toString()));
-
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:dating/core/ui.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:dating/data/models/relationgoalmodel.dart';
 import 'package:dating/data/models/religionmodel.dart';
 import 'package:dating/data/models/usermodel.dart';
@@ -186,6 +187,10 @@ class EditProfileProvider extends ChangeNotifier {
   String vericitionId = "";
   String otp = "";
 
+  /// Stores the [ConfirmationResult] returned by [signInWithPhoneNumber] on web.
+  /// Used in [otpBottomSheet] to confirm the SMS code via [ConfirmationResult.confirm].
+  ConfirmationResult? webConfirmationResult;
+
   otpBottomSheet(context) {
     return showModalBottomSheet(
         context: context,
@@ -237,14 +242,18 @@ class EditProfileProvider extends ChangeNotifier {
                       onTap: () async {
 
                         try {
-                          PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: vericitionId, smsCode: otp);
-
-
-                          await FirebaseAuth.instance.signInWithCredential(credential).then((value) {
-                            if (value.user != null) {
-                              finalApiCall(context,true);
-                            }
-                          });
+                          UserCredential value;
+                          if (kIsWeb && webConfirmationResult != null) {
+                            // Web: use ConfirmationResult.confirm() set by PhoneAuthWebService
+                            value = await webConfirmationResult!.confirm(otp);
+                          } else {
+                            // Mobile: build credential from verificationId
+                            PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: vericitionId, smsCode: otp);
+                            value = await FirebaseAuth.instance.signInWithCredential(credential);
+                          }
+                          if (value.user != null) {
+                            finalApiCall(context, true);
+                          }
                         } catch (e) {
                           Fluttertoast.showToast(msg: AppLocalizations.of(context)?.translate("OTP Invalid") ?? "OTP Invalid");
                         }

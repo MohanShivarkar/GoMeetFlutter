@@ -1,11 +1,13 @@
 
 
 import 'package:dating/Logic/cubits/editProfile_cubit/editprofile_state.dart';
+import 'package:dating/features/auth/services/phone_auth_web_service.dart';
 import 'package:dating/presentation/firebase/auth_firebase.dart';
 import 'package:dating/presentation/screens/BottomNavBar/homeProvider/homeprovier.dart';
 import 'package:dating/presentation/screens/other/editProfile/editprofile_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -37,19 +39,35 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   sendOtpFunction({required String number, context}) async {
     emit(EditInnerLoadingState());
     try {
-      await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: number,
-        verificationCompleted: (PhoneAuthCredential credential) {},
-        verificationFailed: (FirebaseAuthException e) {
-          emit(EditErrorState(e.toString()));
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          Provider.of<EditProfileProvider>(context, listen: false).vericitionId = verificationId;
-          Provider.of<EditProfileProvider>(context, listen: false).otpBottomSheet(context);
-          emit(EditSuccess());
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
+      if (kIsWeb) {
+        // Web: Firebase Phone Auth requires an invisible reCAPTCHA verifier.
+        // PhoneAuthWebService.sendOtp() calls signInWithPhoneNumber, which
+        // auto-creates an invisible verifier -- no visible widget is shown.
+        final service = PhoneAuthWebService();
+        final confirmationResult = await service.sendOtp(number);
+        Provider.of<EditProfileProvider>(context, listen: false)
+            .webConfirmationResult = confirmationResult;
+        Provider.of<EditProfileProvider>(context, listen: false)
+            .otpBottomSheet(context);
+        emit(EditSuccess());
+      } else {
+        // Mobile: native verifyPhoneNumber path (unchanged).
+        await FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: number,
+          verificationCompleted: (PhoneAuthCredential credential) {},
+          verificationFailed: (FirebaseAuthException e) {
+            emit(EditErrorState(e.toString()));
+          },
+          codeSent: (String verificationId, int? resendToken) {
+            Provider.of<EditProfileProvider>(context, listen: false).vericitionId =
+                verificationId;
+            Provider.of<EditProfileProvider>(context, listen: false)
+                .otpBottomSheet(context);
+            emit(EditSuccess());
+          },
+          codeAutoRetrievalTimeout: (String verificationId) {},
+        );
+      }
     } catch (e) {
       emit(EditErrorState(e.toString()));
     }

@@ -150,6 +150,10 @@ class OnBordingProvider with ChangeNotifier {
 
   String vericitionId = "";
 
+  /// Stores the [ConfirmationResult] returned by [signInWithPhoneNumber] on web.
+  /// Used in [otpBottomSheet] to confirm the SMS code via [ConfirmationResult.confirm].
+  ConfirmationResult? webConfirmationResult;
+
   otpBottomSheet(context,bool isForgot) {
     return showModalBottomSheet(
         context: context,
@@ -201,18 +205,24 @@ class OnBordingProvider with ChangeNotifier {
                       onTap: () async {
 
                         try {
-                          PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: vericitionId, smsCode: otp);
-                          await FirebaseAuth.instance.signInWithCredential(credential).then((value) {
-                            if (value.user != null) {
-                              if(isForgot){
-                                Navigator.pop(context);
-                                newPassWord(context,mobileNumber.text,ccode);
-                              }else{
-                                updatestepsCount(2);
-                                Navigator.pop(context);
-                              }
+                          UserCredential value;
+                          if (kIsWeb && webConfirmationResult != null) {
+                            // Web: use ConfirmationResult.confirm() set by PhoneAuthWebService
+                            value = await webConfirmationResult!.confirm(otp);
+                          } else {
+                            // Mobile: build credential from verificationId set by verifyPhoneNumber
+                            PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: vericitionId, smsCode: otp);
+                            value = await FirebaseAuth.instance.signInWithCredential(credential);
+                          }
+                          if (value.user != null) {
+                            if(isForgot){
+                              Navigator.pop(context);
+                              newPassWord(context,mobileNumber.text,ccode);
+                            }else{
+                              updatestepsCount(2);
+                              Navigator.pop(context);
                             }
-                          });
+                          }
                         } catch (e) {
                           print("Error for OTP-- ${e.toString()}");
                           Fluttertoast.showToast(msg: AppLocalizations.of(context)?.translate("OTP Invalid") ?? "OTP Invalid");
