@@ -6,19 +6,31 @@
 //     from initialising on the web target entirely.
 //   • FirebaseAppCheck is activated on web only, using ReCaptchaV3Provider in
 //     monitoring mode. Switch to enforcement mode before public launch.
+//   • FirebaseAuth persistence is explicitly set to LOCAL on web (p2-auth-email-google).
+//     LOCAL is the Firebase default, but we call it explicitly so the intent
+//     is clear and verifiable in code review.
 //
 // App Check monitoring mode: tokens are generated and logged but requests are
 // NOT blocked when a token is absent or invalid. This is safe for QA/staging.
 // To enforce: set enforcement=true in Firebase Console → App Check.
 
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:gomeet/firebase_options.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:dating/features/shell/widgets/offline_banner.dart';
+import 'package:dating/firebase_options.dart';
+
+import 'core/router/app_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Use path-based URLs (e.g. /sign-in) instead of hash-based (/#/sign-in).
+  // Required for Firebase Hosting catch-all rewrite to work correctly.
+  usePathUrlStrategy();
 
   // ── Firebase Core ──────────────────────────────────────────────────────────
   // Initialise on ALL platforms. The kIsWeb guard that previously wrapped this
@@ -39,9 +51,21 @@ Future<void> main() async {
       // registered for the domain(s) where GoMeet is hosted.
       webProvider: ReCaptchaV3Provider('6LcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'),
     );
+
+    // ── Firebase Auth — LOCAL persistence (web) ────────────────────────────
+    // Explicitly set LOCAL persistence so the Firebase Auth session survives
+    // browser refreshes. Firebase defaults to LOCAL on web, but we call this
+    // explicitly to make the intent clear and auditable in code review.
+    // SESSION persistence would clear the token on tab close (wrong for a PWA).
+    // NONE persistence would clear on every refresh (wrong for a dating app).
+    await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
   }
 
-  runApp(const GoMeetApp());
+  runApp(
+    OfflineBanner(
+      child: const GoMeetApp(),
+    ),
+  );
 }
 
 class GoMeetApp extends StatelessWidget {
@@ -49,27 +73,17 @@ class GoMeetApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: appRouter,
       title: 'GoMeet',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFE91E8C)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFFF4458),
+          brightness: Brightness.dark,
+          surface: const Color(0xFF0F0F1A),
+        ),
         useMaterial3: true,
-      ),
-      home: const _AppShellPlaceholder(),
-    );
-  }
-}
-
-/// Temporary placeholder — replaced by the real router/shell in phase 2.
-class _AppShellPlaceholder extends StatelessWidget {
-  const _AppShellPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('GoMeet is loading…'),
       ),
     );
   }
