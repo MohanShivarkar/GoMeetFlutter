@@ -14,7 +14,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart'
+    if (dart.library.html) 'package:dating/stubs/onesignal_stub.dart';
 import 'package:provider/provider.dart';
 import '../../../core/push_notification_function.dart';
 import '../../../data/models/getinterest_model.dart';

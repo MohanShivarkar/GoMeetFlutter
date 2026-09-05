@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart'
+    if (dart.library.html) 'package:dating/stubs/razorpay_stub.dart';
 
 class RazorPayClass {
   Razorpay _razorpay = Razorpay();

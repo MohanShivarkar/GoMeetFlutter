@@ -8,7 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart'
+    if (dart.library.html) 'package:dating/stubs/razorpay_stub.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../Logic/cubits/Home_cubit/home_cubit.dart';
 import '../Logic/cubits/Home_cubit/homestate.dart';

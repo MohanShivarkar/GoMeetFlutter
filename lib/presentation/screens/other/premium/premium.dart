@@ -15,7 +15,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart'
+    if (dart.library.html) 'package:dating/stubs/razorpay_stub.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../../Logic/paymentGateway/razorpayy.dart';

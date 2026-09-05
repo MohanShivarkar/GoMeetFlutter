@@ -1,6 +1,8 @@
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart'
+    if (dart.library.html) 'package:dating/stubs/agora_stub.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart'
+    if (dart.library.html) 'package:dating/stubs/permission_stub.dart';
 import '../../language/localization/app_localization.dart';
 
 

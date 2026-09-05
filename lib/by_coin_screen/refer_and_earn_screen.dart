@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'dart:io' show Platform;
+// dart:io removed — Platform.isAndroid/isIOS usage is commented out in this file.
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../core/ui.dart';

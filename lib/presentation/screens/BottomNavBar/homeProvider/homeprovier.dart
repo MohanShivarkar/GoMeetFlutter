@@ -20,13 +20,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:geocoding/geocoding.dart'
+    if (dart.library.html) 'package:dating/stubs/geocoding_stub.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../Logic/cubits/Home_cubit/home_cubit.dart';
 import '../../../../data/models/getinterest_model.dart';
 import '../../../../data/models/languagemodel.dart';
 import '../../../../data/models/notificationmodel.dart';
-import '../../../../data/models/relationGoalModel.dart';
+import '../../../../data/models/relationgoalmodel.dart';
 import '../../../../data/models/religionmodel.dart';
 import '../../../../language/localization/app_localization.dart';
 import '../../../../wallete_code/gift_list_api_model.dart';

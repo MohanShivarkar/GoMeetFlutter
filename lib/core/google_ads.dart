@@ -1,7 +1,8 @@
-import 'dart:io';
 import 'package:dating/core/config.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart'
+    if (dart.library.html) 'package:dating/stubs/google_mobile_ads_stub.dart';
 
 import '../presentation/screens/BottomNavBar/home_screen.dart';
 import '../presentation/screens/splash_bording/splash_screen.dart';
@@ -29,7 +30,7 @@ InterstitialAd interstitialAda(){
 
 void createInterstitialAd() {
   InterstitialAd.load(
-    adUnitId: Platform.isAndroid
+    adUnitId: defaultTargetPlatform == TargetPlatform.android
         ? android_in_id
         : ios_in_id,
     request: request,
@@ -80,7 +81,7 @@ void showInterstitialAd() {
 
 void loadAd() {
   _bannerAd = BannerAd(
-    adUnitId: Platform.isAndroid
+    adUnitId: defaultTargetPlatform == TargetPlatform.android
         ? android_bannerid
         : ios_bannerid,
     request: const AdRequest(),

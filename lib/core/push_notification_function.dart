@@ -2,7 +2,8 @@
 
 import 'package:dating/core/config.dart';
 import 'package:flutter/foundation.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart'
+    if (dart.library.html) 'package:dating/stubs/onesignal_stub.dart';
 
 
 

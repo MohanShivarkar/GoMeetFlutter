@@ -137,8 +137,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_flutter_android/webview_flutter_android.dart';
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart'
+    if (dart.library.html) 'package:dating/stubs/webview_android_stub.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart'
+    if (dart.library.html) 'package:dating/stubs/webview_wkwebview_stub.dart';
 
 class PaymentWebVIew extends StatefulWidget {
   final String initialUrl;

@@ -1,8 +1,10 @@
 import 'dart:async';
 
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart'
+    if (dart.library.html) 'package:dating/stubs/agora_stub.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart'
+    if (dart.library.html) 'package:dating/stubs/permission_stub.dart';
 
 class AudioCallProvider extends ChangeNotifier {
   int uid = 0; // uid of the local user

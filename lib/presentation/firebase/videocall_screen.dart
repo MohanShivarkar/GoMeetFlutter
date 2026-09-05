@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart'
+    if (dart.library.html) 'package:dating/stubs/agora_stub.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dating/core/config.dart';
 import 'package:dating/presentation/firebase/vc_provider.dart';
