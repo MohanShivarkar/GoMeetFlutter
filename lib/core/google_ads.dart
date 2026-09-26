@@ -7,6 +7,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart'
 import '../presentation/screens/BottomNavBar/home_screen.dart';
 import '../presentation/screens/splash_bording/splash_screen.dart';
 
+const bool _adsSupported = !kIsWeb;
+
 InterstitialAd? _interstitialAd;
 int _numInterstitialLoadAttempts = 0;
 const int maxFailedLoadAttempts = 3;
@@ -29,6 +31,7 @@ InterstitialAd interstitialAda(){
 }
 
 void createInterstitialAd() {
+  if (!_adsSupported) return;
   InterstitialAd.load(
     adUnitId: defaultTargetPlatform == TargetPlatform.android
         ? android_in_id
@@ -54,6 +57,7 @@ void createInterstitialAd() {
 }
 
 void showInterstitialAd() {
+  if (!_adsSupported) return;
   if (_interstitialAd == null) {
     print('Warning: attempt to show interstitial before loaded.');
     return;
@@ -80,6 +84,7 @@ void showInterstitialAd() {
 
 
 void loadAd() {
+  if (!_adsSupported) return;
   _bannerAd = BannerAd(
     adUnitId: defaultTargetPlatform == TargetPlatform.android
         ? android_bannerid

@@ -462,6 +462,33 @@ class _ChattingPageState extends State<ChattingPage> {
                   const Spacer(flex: 2),
                   InkWell(
                       onTap: () {
+                        if (foundation.kIsWeb) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              backgroundColor: Theme.of(context).cardColor,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              title: Row(
+                                children: [
+                                  Icon(Icons.phone_in_talk, color: AppColors.appColor),
+                                  const SizedBox(width: 8),
+                                  const Text("Voice Call", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              content: const Text(
+                                "Voice calling is optimized for the LoveCloud Mobile App.\n\nPlease experience real-time calling via our Android or iOS mobile apps.",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text("Understood", style: TextStyle(color: AppColors.appColor, fontWeight: FontWeight.bold)),
+                                )
+                              ],
+                            ),
+                          );
+                          return;
+                        }
                         if (state.homeData.audioVideo == "0") {
                           Navigator.pushNamed(context, PremiumScreen.premiumScreenRoute);
                         }
@@ -478,16 +505,15 @@ class _ChattingPageState extends State<ChattingPage> {
                             _firebaseStorage.collection("chat_rooms").doc(vcRoomId).collection("isVcAvailable").doc(vcRoomId).get().then((value) {
 
                               chattingProvider.audioNotificationMessage(
-                                  "In Coming Audio Call From ${Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin!.name}",
-                                  Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin!.name.toString(),
+                                  "In Coming Audio Call From ${Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin?.name ?? 'User'}",
+                                  Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin?.name?.toString() ?? "User",
                                   chattingProvider.fmctoken, context, vcRoomId)
                                   .then((value) {
                                 chattingProvider.updateIsLoading(false);
-                                print("widget.userData!:- ${widget.userData!}");
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => AudioCallingScreen(userData: widget.userData!, channel: vcRoomId),
+                                      builder: (context) => AudioCallingScreen(userData: widget.userData ?? {}, channel: vcRoomId),
                                     ));
                               });
 
@@ -507,13 +533,37 @@ class _ChattingPageState extends State<ChattingPage> {
                   const Spacer(),
                   InkWell(
                       onTap: () {
-                        print("---------------${chattingProvider.fmctoken}");
+                        if (foundation.kIsWeb) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              backgroundColor: Theme.of(context).cardColor,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              title: Row(
+                                children: [
+                                  Icon(Icons.videocam, color: AppColors.appColor),
+                                  const SizedBox(width: 8),
+                                  const Text("Video Call", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              content: const Text(
+                                "Video calling is optimized for the LoveCloud Mobile App.\n\nPlease experience HD video calling via our Android or iOS mobile apps.",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text("Understood", style: TextStyle(color: AppColors.appColor, fontWeight: FontWeight.bold)),
+                                )
+                              ],
+                            ),
+                          );
+                          return;
+                        }
                         if (state.homeData.audioVideo == "0") {
-                          print("************** if");
                           Navigator.pushNamed(context, PremiumScreen.premiumScreenRoute);
                         }
                         else {
-                          print("************** else");
                           chattingProvider.updateIsLoading(true);
                           List<String> ids = [
                             Provider.of<HomeProvider>(context, listen: false).uid,
@@ -524,10 +574,9 @@ class _ChattingPageState extends State<ChattingPage> {
                           isvc(vcRoomId, true).then((value) {
                             _firebaseStorage.collection("chat_rooms").doc(vcRoomId).collection("isVcAvailable").doc(vcRoomId).get().then((value) {
                               if (value.data()!["isVc"] == true) {
-                                print("qqqqqqqqqqqqqqqq");
                                 chattingProvider.vcNotificationMessage(
-                                    "In Coming Video Call From ${Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin!.name}",
-                                    Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin!.name.toString(),
+                                    "In Coming Video Call From ${Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin?.name ?? 'User'}",
+                                    Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin?.name?.toString() ?? "User",
                                     chattingProvider.fmctoken,
                                     context,
                                     vcRoomId)

@@ -619,7 +619,7 @@ class _CreatStepsState extends State<CreatSteps> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppLocalizations.of(context)?.translate("Your GoMeet identity 😎") ?? "Your GoMeet identity 😎",
+            AppLocalizations.of(context)?.translate("Your LoveCloud identity 😎") ?? "Your LoveCloud identity 😎",
             style: Theme.of(context).textTheme.headlineMedium,
             textAlign: TextAlign.center,
           ),

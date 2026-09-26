@@ -1,20 +1,17 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:typed_data';
-
 import 'package:dating/Logic/cubits/onBording_cubit/onbording_cubit.dart';
 import 'package:dating/data/models/relationgoalmodel.dart';
 import 'package:dating/extra_app_screen.dart';
-import 'package:dating/presentation/screens/BottomNavBar/home_screen.dart';
 import 'package:dating/presentation/screens/splash_bording/onbording_screens.dart';
 import 'package:dating/presentation/widgets/main_button.dart';
 import 'package:dating/presentation/widgets/textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geolocator/geolocator.dart'
-    if (dart.library.html) 'package:dating/stubs/geolocator_stub.dart';
+import 'package:geolocator/geolocator.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:otp_text_field/otp_field.dart';
@@ -27,6 +24,7 @@ import '../../../../data/models/getinterest_model.dart';
 import '../../../../data/models/languagemodel.dart';
 import '../../../../data/models/religionmodel.dart';
 import '../../../../language/localization/app_localization.dart';
+import '../../BottomNavBar/bottombar.dart';
 import '../auth_screen.dart';
 
 class OnBordingProvider with ChangeNotifier {
@@ -142,16 +140,16 @@ class OnBordingProvider with ChangeNotifier {
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
         images.add(image);
-        imageBytes.add(await image.readAsBytes());
+        try {
+          final bytes = await image.readAsBytes();
+          imageBytes.add(bytes);
+        } catch (_) {}
         notifyListeners();
       }
     }
   }
 
   String vericitionId = "";
-
-  /// Stores the [ConfirmationResult] returned by [signInWithPhoneNumber] on web.
-  /// Used in [otpBottomSheet] to confirm the SMS code via [ConfirmationResult.confirm].
   ConfirmationResult? webConfirmationResult;
 
   otpBottomSheet(context,bool isForgot) {
@@ -207,10 +205,8 @@ class OnBordingProvider with ChangeNotifier {
                         try {
                           UserCredential value;
                           if (kIsWeb && webConfirmationResult != null) {
-                            // Web: use ConfirmationResult.confirm() set by PhoneAuthWebService
                             value = await webConfirmationResult!.confirm(otp);
                           } else {
-                            // Mobile: build credential from verificationId set by verifyPhoneNumber
                             PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: vericitionId, smsCode: otp);
                             value = await FirebaseAuth.instance.signInWithCredential(credential);
                           }
@@ -285,7 +281,6 @@ newPassWord(context,mobileNumber,ccode){
 
   removeImages(int index) {
     images.removeAt(index);
-    imageBytes.removeAt(index);
     notifyListeners();
   }
 
@@ -449,8 +444,9 @@ newPassWord(context,mobileNumber,ccode){
   }
 
   updateNameFiled({required TextEditingController controller, value}) {
-    controller.text = value;
-    notifyListeners();
+    if (controller.text != value) {
+      controller.text = value ?? "";
+    }
   }
 
   updateVeriable(value2) {
@@ -470,35 +466,31 @@ newPassWord(context,mobileNumber,ccode){
     notifyListeners();
   }
 
-  double? lat;
-  double? long;
+  double? lat = 19.0760;
+  double? long = 72.8777;
 
   getCurrentLatAndLong(context) async {
-    if (kIsWeb) {
-      lat = 40.463667;
-      long = -3.74922;
-      notifyListeners();
-      nextPage(context);
-      return;
-    }
-
-    LocationPermission permission;
-    permission = await Geolocator.checkPermission();
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      lat = 40.463667;
-      long = -3.74922;
-      notifyListeners();
-    }
     try {
+      LocationPermission permission;
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        lat = 19.0760;
+        long = 72.8777;
+        notifyListeners();
+        nextPage(context);
+        return;
+      }
       var currentLocation = await locateUser();
       lat = currentLocation.latitude;
       long = currentLocation.longitude;
       notifyListeners();
       nextPage(context);
     } catch (e) {
-      lat = 40.463667;
-      long = -3.74922;
+      lat = 19.0760;
+      long = 72.8777;
       notifyListeners();
       nextPage(context);
     }
@@ -513,16 +505,7 @@ newPassWord(context,mobileNumber,ccode){
         String? maintain = prefs.getString("maintainanceenabled");
         print("+++++ maintainance_Enabled +++++ :- ${maintain}");
         if (value != null && value.toString().isNotEmpty) {
-          maintain == "Yes"
-              ? Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ExtraAppScreen()),
-                )
-              : Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  HomeScreen.homeScrennRoute,
-                  (route) => false,
-                );
+          maintain == "Yes" ? Navigator.push(context, MaterialPageRoute(builder: (context) => const ExtraAppScreen(),)) :  Navigator.pushNamedAndRemoveUntil(context, BottomBar.bottomBarRoute, (route) => false);
         } else {
           if(onBording){
             Navigator.pushNamedAndRemoveUntil(context, OnBoardingScreen.onBoardingScreenRoute, (route) => false);

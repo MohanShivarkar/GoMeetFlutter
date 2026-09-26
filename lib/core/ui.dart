@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static Color appColor = const Color(0xff9610FF);
+  static Color appColor = const Color(0xFFFF4458); // LoveCloud Flame Rose
   static Color appBgColorlite = const Color(0xffffffff);
-  static Color appBgColordart = const Color(0xff10100b);
+  static Color appBgColordart = const Color(0xff0F0E14); // Sleek modern dark mode
   static Color textLight = const Color(0xff10192D);
   static Color text1Light = const Color(0xff8E9BAE);
   static Color textDark = const Color(0xffF8FAFC);
@@ -13,9 +13,9 @@ class AppColors {
   static Color white = const Color(0xffffffff);
   static Color black = const Color(0xff0F172A);
   static Color borderColor = const Color(0xffEAEAEA);
-  static Color darkBorderColor = const Color(0xff24211F);
-  static Color darkBgColor = const Color(0xff110D0A);
-  static Color darkContainer = const Color(0xff1B1816);
+  static Color darkBorderColor = const Color(0xff2B283A);
+  static Color darkBgColor = const Color(0xff161520);
+  static Color darkContainer = const Color(0xff1E1C29);
 }
 
 class Themes {

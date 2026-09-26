@@ -1,7 +1,10 @@
+import 'package:fluttertoast/fluttertoast.dart';
+import 'dart:typed_data';
+import 'dart:convert';
 // ignore_for_file: unused_local_variable, avoid_print, unnecessary_brace_in_string_interps, use_build_context_synchronously, non_constant_identifier_names
 
-import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:camera/camera.dart';
 import 'package:dating/Logic/cubits/Home_cubit/home_cubit.dart';
 import 'package:dating/Logic/cubits/language_cubit/language_bloc.dart';
@@ -23,8 +26,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart'
-    if (dart.library.html) 'package:dating/stubs/google_mobile_ads_stub.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart' if (dart.library.html) 'package:dating/stubs/google_mobile_ads_stub.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -83,6 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
     homeProvider = Provider.of<HomeProvider>(context,listen: false);
     BlocProvider.of<OnbordingCubit>(context).smstypeapi(context);
     profileProvider.faqApi(context);
+
     profileProvider.pageListApi(context);
     profileProvider.getPackage();
     walleteProvider.walletreportApi(context: context);
@@ -103,12 +106,103 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void dispose() {
-    imagecontroller.dispose();
+    try {
+      imagecontroller.dispose();
+    } catch (_) {}
     super.dispose();
   }
 
+  void _showProfilePhotoSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).cardColor,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocalizations.of(context)?.translate("Update Profile Photo") ?? "Update Profile Photo",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.appColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        await _pickAndUploadProfilePic(ImageSource.gallery);
+                      },
+                      icon: const Icon(Icons.photo_library),
+                      label: Text(AppLocalizations.of(context)?.translate("Gallery") ?? "Gallery"),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.appColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        await _pickAndUploadProfilePic(kIsWeb ? ImageSource.gallery : ImageSource.camera);
+                      },
+                      icon: const Icon(Icons.camera_alt),
+                      label: Text(AppLocalizations.of(context)?.translate("Camera") ?? "Camera"),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickAndUploadProfilePic(ImageSource source) async {
+    try {
+      final picked = await picker.pickImage(source: source);
+      if (picked != null) {
+        setState(() {
+          profileloader = true;
+          selectImageprofile = picked;
+        });
+        final bytes = await picked.readAsBytes();
+        setState(() {
+          selectImageprofileBytes = Uint8List.fromList(bytes);
+        });
+        final base64Str = base64Encode(bytes);
+        await profileProvider.profilepicApi(context: context, img: base64Str);
+        setState(() {
+          profileloader = false;
+        });
+        Fluttertoast.showToast(msg: "Profile photo updated successfully!");
+      }
+    } catch (e) {
+      setState(() {
+        profileloader = false;
+      });
+      Fluttertoast.showToast(msg: "Error: $e");
+    }
+  }
+
+
   String networkImage = "";
   XFile? selectImageprofile;
+  Uint8List? selectImageprofileBytes;
   XFile? selectImageprofilevaridfy;
   ImagePicker picker = ImagePicker();
   ImagePicker pickervaridfy = ImagePicker();
@@ -148,10 +242,11 @@ class _ProfilePageState extends State<ProfilePage> {
     'assets/icons/L-Spanish.png',
     'assets/icons/L-Arabic.png',
     'assets/icons/L-Hindi-Gujarati.png',
-    'assets/icons/L-Hindi-Gujarati.png',
+    'assets/icons/L-Portuguese.png',
     'assets/icons/L-Afrikaans.png',
     'assets/icons/L-Bengali.png',
-    'assets/icons/L-Indonesion.png',
+    'assets/icons/L-German.png',
+    'assets/icons/L-Indonesian.png',
   ];
 
   List languagetext = [
@@ -160,8 +255,10 @@ class _ProfilePageState extends State<ProfilePage> {
     'Arabic',
     'Hindi',
     'Gujarati',
+    'Portuguese',
     'Afrikaans',
     'Bengali',
+    'German',
     'Indonesian',
   ];
 
@@ -180,7 +277,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   getdata() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-   value = preferences.getInt("valuelangauge")!;
+    value = preferences.getInt("valuelangauge") ?? 0;
   }
 
   bool profileloader = false;
@@ -233,649 +330,226 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: [
 
 
-                                  state.homeData.profilelist!.isEmpty ? const SizedBox() : SizedBox(
-                                    height: 70,
-                                    width : 70,
-                                    child: CircularProgressIndicator(
-                                      strokeCap: StrokeCap.round,
-                                        strokeWidth: 4,
-                                        valueColor: AlwaysStoppedAnimation(AppColors.appColor),
-                                        value: (double.parse(state.homeData.profilelist![homeProvider.currentIndex].matchRatio.toString().split(".").first) /100)
-                                    ),
-                                  ),
+                                   Builder(
+                                     builder: (context) {
+                                       final profileList = state.homeData.profilelist;
+                                       if (profileList == null || profileList.isEmpty) {
+                                         return const SizedBox();
+                                       }
+                                       final safeIndex = (homeProvider.currentIndex >= 0 && homeProvider.currentIndex < profileList.length)
+                                           ? homeProvider.currentIndex
+                                           : 0;
+                                       final ratioStr = profileList[safeIndex].matchRatio?.toString().split(".").first ?? "100";
+                                       final ratioVal = (double.tryParse(ratioStr) ?? 100.0) / 100.0;
+                                       return SizedBox(
+                                         height: 70,
+                                         width: 70,
+                                         child: CircularProgressIndicator(
+                                           strokeCap: StrokeCap.round,
+                                           strokeWidth: 4,
+                                           valueColor: AlwaysStoppedAnimation(AppColors.appColor),
+                                           value: ratioVal,
+                                         ),
+                                       );
+                                     },
+                                   ),
 
 
-                                  homeProvider.userlocalData.userLogin!.profilePic != null ? Container(
-                                      height: 66,
-                                      width: 66,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        // image: DecorationImage(image:  NetworkImage('${Config.imagebaseurl}${profileImageController.profileimageeditApi!.userLogin.profilePic}'), fit: BoxFit.cover),
-                                        image: DecorationImage(image:  NetworkImage("${Config.baseUrl}${homeProvider.userlocalData.userLogin!.profilePic}"), fit: BoxFit.cover),
-                                      )) : selectImageprofile == null ? CircleAvatar(
-                                    backgroundColor: Colors.grey.withOpacity(0.2),
-                                    maxRadius: 33,
-                                    child: Center(child: Text("${homeProvider.userlocalData.userLogin!.name?[0]}",style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)),
-                                  ) : Container(
-                                    height: 70,
-                                    width: 70,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(image: FileImage(File(selectImageprofile!.path)), fit: BoxFit.cover),
-                                    ),
-                                  ),
-
-
-                                  state.homeData.planId != "0" ? Positioned(
-                                      top: -10,
-                                      child: Image.asset("assets/icons/tajicon.png",height: 25,width: 25,),
-                                  ) : const SizedBox(),
-
-
-                                  state.homeData.profilelist!.isEmpty ? const SizedBox() : Positioned(
-                                    bottom: -10,
-                                    child: Container(
-                                      height: 22,
-                                      width: 35,
-                                      decoration: BoxDecoration(
-                                         border: Border.all(color: Colors.white,width: 3),
-                                         // color: AppColors.appColor,
-                                         borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Container(
-                                        height: 22,
-                                        width: 35,
+                                   InkWell(
+                                     onTap: () => _showProfilePhotoSheet(),
+                                     child: selectImageprofileBytes != null ? Container(
+                                        height: 66,
+                                        width: 66,
                                         decoration: BoxDecoration(
-                                            color: AppColors.appColor,
-                                            borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            "${state.homeData.profilelist![homeProvider.currentIndex].matchRatio.toString().split(".").first}%",
-                                            style: Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.white,fontSize: 9,fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                      ),
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(image: MemoryImage(selectImageprofileBytes!), fit: BoxFit.cover),
+                                        )) : (homeProvider.userlocalData.userLogin?.profilePic != null && homeProvider.userlocalData.userLogin!.profilePic!.isNotEmpty) ? Container(
+                                        height: 66,
+                                        width: 66,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(image: NetworkImage("${Config.baseUrl}${homeProvider.userlocalData.userLogin!.profilePic}"), fit: BoxFit.cover),
+                                        )) : CircleAvatar(
+                                      backgroundColor: Colors.grey.withOpacity(0.2),
+                                      maxRadius: 33,
+                                      child: Center(child: Text(
+                                        (homeProvider.userlocalData.userLogin?.name != null && homeProvider.userlocalData.userLogin!.name!.isNotEmpty)
+                                            ? "${homeProvider.userlocalData.userLogin!.name![0]}"
+                                            : "U",
+                                        style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
+                                      )),
                                     ),
-                                  )
-
-
-                                ],
-                              ),
-                              const SizBoxW(size: 0.02),
-
-
-                              BlocBuilder<HomePageCubit, HomePageStates>(
-                                  builder: (context, state) {
-                                    if (state is HomeCompleteState) {
-                                      return Expanded(
-                                        child: Row(
-                                          children: [
-                                            Flexible(
-                                              child: Text(
-                                                "${homeProvider.userlocalData.userLogin!.name}",
-                                                style: Theme.of(context).textTheme.headlineSmall,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 5),
-                                            state.homeData.isVerify == "0" ? InkWell(
-                                              onTap: () {
-
-                                                imagecontroller = CameraController(
-                                                  cameras[0],
-                                                  ResolutionPreset.medium,
-                                                  enableAudio: false,
-                                                );
-                                                initializeControllerFuture = imagecontroller.initialize();
-
-                                                showDialog<String>(
-                                                  barrierDismissible: false,
-                                                  context: context,
-                                                  builder: (BuildContext context) => AlertDialog(
-                                                    elevation: 0,
-                                                    insetPadding: const EdgeInsets.only(left: 10,right: 10),
-                                                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(20),
-                                                    ),
-                                                    title: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Center(child: Icon(Icons.camera_alt,color: AppColors.appColor,size: 30)),
-                                                        const SizedBox(height: 10,),
-                                                        Center(child: Text(AppLocalizations.of(context)?.translate("Get Photo Verified") ?? "Get Photo Verified",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 22),)),
-                                                        const SizedBox(height: 10,),
-                                                        Text(AppLocalizations.of(context)?.translate("We want to know it`s really you.") ?? "We want to know it`s really you.",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16),),
-                                                        ListTile(
-                                                          contentPadding: EdgeInsets.zero,
-                                                          title: Text(AppLocalizations.of(context)?.translate("Tack a quick video selfie") ?? "Tack a quick video selfie",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16,fontWeight: FontWeight.bold),),
-                                                          subtitle: Text(AppLocalizations.of(context)?.translate("Confirm you`re the person in your photos.") ?? "Confirm you`re the person in your photos.",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 14,color: Colors.grey),),
-                                                        ),
-                                                        const SizedBox(height: 10,),
-                                                        MainButton(
-                                                            bgColor: AppColors.appColor,titleColor: Colors.white,
-                                                            title: AppLocalizations.of(context)?.translate("Continue") ?? "Continue",
-                                                            onTap: () {
-                                                              showDialog<String>(
-                                                                barrierDismissible: false,
-                                                                context: context,
-                                                                builder: (BuildContext context) => AlertDialog(
-                                                                  elevation: 0,
-                                                                  insetPadding: const EdgeInsets.only(left: 10,right: 10),
-                                                                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                                                  shape: RoundedRectangleBorder(
-                                                                    borderRadius: BorderRadius.circular(20),
-                                                                  ),
-                                                                  title: Column(
-                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                                    children: [
-                                                                      const SizedBox(height: 10,),
-                                                                      Center(child: Text(AppLocalizations.of(context)?.translate("Before you continue...") ?? "Before you continue...",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 22),)),
-                                                                      const SizedBox(height: 10,),
-                                                                      ListTile(
-                                                                        isThreeLine: true,
-                                                                        contentPadding: EdgeInsets.zero,
-                                                                        leading: Container(
-                                                                          height: 20,
-                                                                          width: 20,
-                                                                          decoration: BoxDecoration(
-                                                                              color: AppColors.appColor,
-                                                                              borderRadius: BorderRadius.circular(65)
-                                                                          ),
-                                                                          child: const Center(child: Icon(Icons.check,color: Colors.white,size: 12,)),
-                                                                        ),
-                                                                        title: Transform.translate(offset: const Offset(-10, -3),child: Text(AppLocalizations.of(context)?.translate("Prep your lighting") ?? "Prep your lighting",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 18,fontWeight: FontWeight.bold),)),
-                                                                        subtitle: Transform.translate(
-                                                                          offset: const Offset(-10, 0),
-                                                                          child: Column(
-                                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                                            children: [
-                                                                              Row(
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                                children: [
-                                                                                  Padding(
-                                                                                    padding: const EdgeInsets.only(top: 7.0),
-                                                                                    child: Container(
-                                                                                      height: 7,
-                                                                                      width: 7,
-                                                                                      decoration: const BoxDecoration(
-                                                                                          color: Colors.grey,
-                                                                                          shape: BoxShape.circle
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                  const SizedBox(width: 5,),
-                                                                                  Flexible(child: Text(AppLocalizations.of(context)?.translate("Choose a well-lit environment") ?? "Choose a well-lit environment",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16,color: Colors.grey,),maxLines: 2,))
-                                                                                ],
-                                                                              ),
-                                                                              const SizedBox(height: 5,),
-                                                                              Row(
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                                children: [
-                                                                                  Padding(
-                                                                                    padding: const EdgeInsets.only(top: 7.0),
-                                                                                    child: Container(
-                                                                                      height: 7,
-                                                                                      width: 7,
-                                                                                      decoration: const BoxDecoration(
-                                                                                          color: Colors.grey,
-                                                                                          shape: BoxShape.circle
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                  const SizedBox(width: 5,),
-                                                                                  Flexible(child: Text(AppLocalizations.of(context)?.translate("Turn up your brightness") ?? "Turn up your brightness",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16,color: Colors.grey,),maxLines: 2,))
-
-                                                                                ],
-                                                                              ),
-                                                                              const SizedBox(height: 5,),
-                                                                              Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                children: [
-                                                                                  Padding(
-                                                                                    padding: const EdgeInsets.only(top: 7.0),
-                                                                                    child: Container(
-                                                                                      height: 7,
-                                                                                      width: 7,
-                                                                                      decoration: const BoxDecoration(
-                                                                                          color: Colors.grey,
-                                                                                          shape: BoxShape.circle
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                  const SizedBox(width: 5,),
-                                                                                  Flexible(child: Text("Avoid ${homeProvider.userlocalData.userLogin!.name} glare and backlighting",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16,color: Colors.grey,),maxLines: 2,))
-                                                                                ],
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      const SizedBox(height: 10,),
-                                                                      ListTile(
-                                                                        isThreeLine: true,
-                                                                        contentPadding: EdgeInsets.zero,
-                                                                        leading: Container(
-                                                                          height: 20,
-                                                                          width: 20,
-                                                                          decoration: BoxDecoration(
-                                                                              color: AppColors.appColor,
-                                                                              borderRadius: BorderRadius.circular(65)
-                                                                          ),
-                                                                          child: const Center(child: Icon(Icons.check,color: Colors.white,size: 12,)),
-                                                                        ),
-                                                                        title: Transform.translate(offset: const Offset(-10, -3),child: Text(AppLocalizations.of(context)?.translate("Show your face") ?? "Show your face",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 18,fontWeight: FontWeight.bold),)),
-                                                                        subtitle: Transform.translate(
-                                                                          offset: const Offset(-10, 0),
-                                                                          child: Column(
-                                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                                            children: [
-                                                                              Row(
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                                children: [
-                                                                                  Padding(
-                                                                                    padding: const EdgeInsets.only(top: 7.0),
-                                                                                    child: Container(
-                                                                                      height: 7,
-                                                                                      width: 7,
-                                                                                      decoration: const BoxDecoration(
-                                                                                          color: Colors.grey,
-                                                                                          shape: BoxShape.circle
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                  const SizedBox(width: 5,),
-                                                                                  Flexible(child: Text(AppLocalizations.of(context)?.translate("Face the camera directly") ?? "Face the camera directly",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16,color: Colors.grey,),maxLines: 2,))
-                                                                                ],
-                                                                              ),
-                                                                              const SizedBox(height: 5,),
-                                                                              Row(
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                                                children: [
-                                                                                  Padding(
-                                                                                    padding: const EdgeInsets.only(top: 7.0),
-                                                                                    child: Container(
-                                                                                      height: 7,
-                                                                                      width: 7,
-                                                                                      decoration: const BoxDecoration(
-                                                                                          color: Colors.grey,
-                                                                                          shape: BoxShape.circle
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                  const SizedBox(width: 5,),
-                                                                                  Flexible(child: Text(AppLocalizations.of(context)?.translate("Remove hats, sunglasses, and face coverings") ?? "Remove hats, sunglasses, and face coverings",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16,color: Colors.grey,),maxLines: 2,))
-                                                                                ],
-                                                                              ),
-
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      const SizedBox(height: 10,),
-                                                                      MainButton(
-                                                                          bgColor: AppColors.appColor,titleColor: Colors.white,
-                                                                          title: AppLocalizations.of(context)?.translate("Continue") ?? "Continue",
-                                                                          onTap: () async {
-                                                                            showModalBottomSheet(
-                                                                                isScrollControlled: true,
-                                                                                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                                                                context: context,
-                                                                                builder: (c) {
-                                                                                  return StatefulBuilder(builder: (context, setState) {
-                                                                                    return Container(
-                                                                                      padding: const EdgeInsets.all(15),
-                                                                                      decoration: BoxDecoration(
-                                                                                        color: Theme.of(context).scaffoldBackgroundColor,
-                                                                                        borderRadius: BorderRadius.circular(16),
-                                                                                      ),
-                                                                                      child: SafeArea(
-                                                                                        child: Scaffold(
-                                                                                          resizeToAvoidBottomInset: false,
-                                                                                          body: SingleChildScrollView(
-                                                                                            child: Column(
-                                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                              children: [
-                                                                                                const SizedBox(height: 30,),
-                                                                                                InkWell(
-                                                                                                    onTap: () {
-                                                                                                      Navigator.pop(context);
-                                                                                                    },
-                                                                                                    child: const Icon(Icons.close)
-                                                                                                ),
-                                                                                                const SizedBox(height: 10,),
-                                                                                                Center(child: Text(AppLocalizations.of(context)?.translate("Get ready for") ?? "Get ready for",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 24,fontWeight: FontWeight.bold))),
-                                                                                                Center(child: Text(AppLocalizations.of(context)?.translate("your image selfie") ?? "your image selfie",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 24,fontWeight: FontWeight.bold))),
-                                                                                                const SizedBox(height: 10,),
-                                                                                                Center(
-                                                                                                  child: ClipOval(
-                                                                                                    child: SizedBox(
-                                                                                                      height: 350,
-                                                                                                      width: 230,
-                                                                                                      child: selectImageprofilevaridfy == null ?
-                                                                                                      GestureDetector(
-                                                                                                        onDoubleTap: () {
-                                                                                                          setState((){
-                                                                                                            _toggleCamera();
-                                                                                                          });
-                                                                                                        },
-                                                                                                        child: FutureBuilder<void>(
-                                                                                                          future: initializeControllerFuture,
-                                                                                                          builder: (context, snapshot) {
-                                                                                                            if (snapshot.connectionState == ConnectionState.done) {
-                                                                                                              return CameraPreview(imagecontroller);
-                                                                                                            } else {
-                                                                                                              return Center(child: CircularProgressIndicator(color: AppColors.appColor,));
-                                                                                                            }
-                                                                                                          },
-                                                                                                        ),
-                                                                                                      ) :
-                                                                                                      Image.file(File(selectImageprofilevaridfy!.path),fit: BoxFit.cover),
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                ),
-                                                                                                const SizedBox(height: 10,),
-                                                                                                Center(child: Text(AppLocalizations.of(context)?.translate("Make sure to frame your face in the oval, then tap  'I am Ready'!") ?? "Make sure to frame your face in the oval, then tap  'I am Ready'!",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16,fontWeight: FontWeight.bold),maxLines: 2,textAlign: TextAlign.center,)),
-                                                                                                const SizedBox(height: 10,),
-                                                                                                MainButton(
-                                                                                                  bgColor: AppColors.appColor,titleColor: Colors.white,
-                                                                                                  title: AppLocalizations.of(context)?.translate("I am Ready") ?? "I am Ready",
-                                                                                                  onTap: () async {
-
-                                                                                                    try {
-                                                                                                      await initializeControllerFuture;
-                                                                                                      selectImageprofilevaridfy = await imagecontroller.takePicture();
-                                                                                                      List<int> imageByte = File(selectImageprofilevaridfy!.path).readAsBytesSync();
-                                                                                                      base64Stringverfy =base64Encode(imageByte);
-
-                                                                                                      profileProvider.identiverifyApi(context: context,img: base64Stringverfy.toString()).then((value) {
-                                                                                                        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const BottomBar()), (route) => false);
-                                                                                                        setState(() {
-
-                                                                                                        });
-                                                                                                      });
-
-                                                                                                      print(" + + + + + :----  ${base64Stringverfy}");
-                                                                                                    } catch (e) {
-                                                                                                      print('Error taking picture: $e');
-                                                                                                    }
-
-
-                                                                                                    setState((){});
-
-                                                                                                  },
-                                                                                                ),
-                                                                                              ],
-                                                                                            ),
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                    );
-                                                                                  },);
-                                                                                });
-
-                                                                          }
-                                                                      ),
-                                                                      const SizedBox(height: 10,),
-                                                                      InkWell(
-                                                                        onTap: () {
-                                                                          for(int i=0; i<2; i++){
-                                                                            Navigator.pop(context);
-                                                                          }
-                                                                        },
-                                                                          child: Center(child: Text(AppLocalizations.of(context)?.translate("Maybe Later") ?? "Maybe Later",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 18),))),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              );
-                                                            })
-                                                      ],
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              child: const Padding(
-                                                padding: EdgeInsets.only(top: 4.0),
-                                                child: Image(image: AssetImage("assets/icons/newverfy.png"),height: 22,width: 22),
-                                              ),
-                                            ) : state.homeData.isVerify == "1" ? InkWell(
-                                              onTap: () {
-                                                showDialog<String>(
-                                                  barrierDismissible: false,
-                                                  context: context,
-                                                  builder: (BuildContext context) => AlertDialog(
-                                                    elevation: 0,
-                                                    insetPadding: const EdgeInsets.only(left: 10,right: 10),
-                                                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(20),
-                                                    ),
-                                                    title: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                                      children: [
-                                                        Container(
-                                                          height: 100,
-                                                          width: 100,
-                                                          decoration: BoxDecoration(
-                                                              shape: BoxShape.circle,
-                                                              image: DecorationImage(image: NetworkImage("${Config.baseUrl}${homeProvider.userlocalData.userLogin!.identityPicture}"),fit: BoxFit.cover)
-                                                          ),
-                                                        ),
-                                                        const SizedBox(height: 10,),
-                                                        Center(child: Text(AppLocalizations.of(context)?.translate("verification Under") ?? "verification Under",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 22),)),
-                                                        Center(child: Text('Review',style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 22),)),
-                                                        const SizedBox(height: 10,),
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(left: 15,right: 15),
-                                                          child: Text(AppLocalizations.of(context)?.translate("We are currently reviewing your selfies and will get back to you shortly!") ?? "We are currently reviewing your selfies and will get back to you shortly!",style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 16),textAlign: TextAlign.center),
-                                                        ),
-                                                        const SizedBox(height: 20,),
-                                                        MainButton(
-                                                            bgColor: AppColors.appColor,titleColor: Colors.white,
-                                                            title: AppLocalizations.of(context)?.translate("OKAY") ?? "OKAY",
-                                                            onTap: () {
-                                                              Navigator.pop(context);
-                                                            }),
-                                                        const SizedBox(height: 10,),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              child: const Padding(
-                                                padding: EdgeInsets.only(top: 4.0),
-                                                child: Image(image: AssetImage("assets/icons/progressicon.png"),height: 22,width: 22,),
-                                              ),
-                                            ) : const Padding(
-                                              padding: EdgeInsets.only(top: 4.0),
-                                              child: Image(image: AssetImage("assets/icons/approveicon.png"),height: 22,width: 22,),
-                                            ),
-                                            const SizedBox(width: 15,),
-                                          ],
-                                        ),
-                                      );
-                                    }else{
-                                      return const SizedBox();
-                                    }
-                                  }
-                              ),
-
-
-                              InkWell(
-                               onTap: () {
-
-                                 showModalBottomSheet(
-                                   context: context,
-                                   backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(15),topRight: Radius.circular(15))),
-                                   builder: (context) {
-                                   return Padding(
-                                     padding: const EdgeInsets.all(15),
-                                     child: SingleChildScrollView(
-                                       child: Column(
-                                         children: [
-                                           Text(AppLocalizations.of(context)?.translate("From where do you want to take the photo?") ?? "From where do you want to take the photo?", style: Theme.of(context).textTheme.bodyLarge,),
-                                           const SizedBox(height: 15),
-                                           Row(
-                                             children: [
-                                               Expanded(
-                                                 child: MainButton(
-                                                     bgColor: AppColors.appColor,titleColor: Colors.white,
-                                                     title: AppLocalizations.of(context)?.translate("Gallery") ?? "Gallery",
-                                                     onTap: () async {
-                                                       final picked = await picker.pickImage(source: ImageSource.gallery);
-                                                       setState(() {
-                                                         profileloader = true;
-                                                       });
-                                                       if(picked!= null){
-
-                                                         setState(() {
-                                                           selectImageprofile = picked;
-                                                         });
-
-                                                         List<int> imageByte = File(selectImageprofile!.path).readAsBytesSync();
-                                                         base64String = base64Encode(imageByte);
-
-                                                         profileProvider.profilepicApi(context: context,img: base64String.toString()).then((value) {
-                                                           Navigator.of(context).pop();
-                                                           profileloader = false;
-                                                           setState(() {});
-                                                         });
-
-
-                                                       } else{
-                                                         print("did not pick an image!!");
-                                                       }
-                                                     }),
-                                               ),
-                                               const SizedBox(width: 8),
-                                               Expanded(
-                                                 child: MainButton(
-                                                     bgColor: AppColors.appColor,titleColor: Colors.white,
-                                                     title: AppLocalizations.of(context)?.translate("Camera") ?? "Camera",
-                                                     onTap: () async {
-                                                       final picked=await picker.pickImage(source: ImageSource.camera);
-                                                       setState(() {
-                                                         profileloader = true;
-                                                       });
-                                                       if(picked!= null){
-                                                         setState(() {
-                                                           selectImageprofile = picked;
-                                                         });
-
-                                                         List<int> imageByte =File(selectImageprofile!.path).readAsBytesSync();
-                                                         base64String =base64Encode(imageByte);
-                                                         profileProvider.profilepicApi(context: context,img: base64String.toString()).then((value) {
-                                                           Navigator.of(context).pop();
-                                                           profileloader = false;
-                                                           setState(() {
-
-                                                           });
-                                                         });
-
-                                                       } else{
-                                                         print("did not pick an image!!");
-                                                       }
-                                                     }
-                                                     ),
-                                               ),
-                                             ],
-                                           ),
-                                           const SizedBox(height: 15),
-                                         ],
+                                   ),
+                                   Positioned(
+                                     bottom: 0,
+                                     right: 0,
+                                     child: InkWell(
+                                       onTap: () => _showProfilePhotoSheet(),
+                                       child: Container(
+                                         padding: const EdgeInsets.all(4),
+                                         decoration: BoxDecoration(
+                                           color: AppColors.appColor,
+                                           shape: BoxShape.circle,
+                                           border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 2),
+                                         ),
+                                         child: const Icon(Icons.camera_alt, size: 14, color: Colors.white),
                                        ),
                                      ),
-                                   );
-                                 },
-                               );
-
-
-                               },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.appColor,
-                                    borderRadius: BorderRadius.circular(20)
-                                  ),
-                                  padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 8),
-                                  child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(AppLocalizations.of(context)?.translate("Edit") ?? "Edit",style: Theme.of(context).textTheme.bodySmall!.copyWith(color: AppColors.white),),
-                                        const SizedBox(width: 5,),
-                                        SvgPicture.asset("assets/icons/edit.svg"),
-
-                                  ]),
-                                ),
-                              ),
-
-                            ],
-                          ),
-                          const SizedBox(height: 10,),
-
-
-                          onbordingCubit.smaTypeApiModel?.admobEnabled == "Yes" ? SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            height: 60,
-                            child: bannerADs == null
-                                ? SizedBox()
-                                : AdWidget(ad: bannerADs()),
-                          ) : const SizedBox(),
-
-
-                          const SizedBox(height: 10,),
-
-
-
-                          InkWell(
-                            onTap: () {
-                              state.homeData.planId != "0" ?
-                              Navigator.pushNamed(context, PlanDetils.planRoutes) :
-                              Navigator.pushNamed(context, PremiumScreen.premiumScreenRoute);
-                            },
-
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  color: AppColors.appColor,
-                                  image: const DecorationImage(image: AssetImage("assets/Image/profileBg.png"),fit: BoxFit.cover),
-                              ),
-
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(state.homeData.planId != "0" ?AppLocalizations.of(context)?.translate("You're Activated Membership!") ?? "You're Activated Membership!" :AppLocalizations.of(context)?.translate("Join Our Membership Today!") ?? "Join Our Membership Today!",style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: AppColors.white,fontWeight: FontWeight.w700),maxLines: 1,overflow: TextOverflow.ellipsis),
-                                        const SizedBox(height: 5,),
-                                        Text(state.homeData.planId != "0" ? AppLocalizations.of(context)?.translate("Enjoy  premium and match anywhere.") ?? "Enjoy  premium and match anywhere." : AppLocalizations.of(context)?.translate("Checkout GoMeet Premium") ?? "Checkout GoMeet Premium",style: Theme.of(context).textTheme.bodySmall!.copyWith(color: AppColors.white,overflow: TextOverflow.ellipsis),maxLines: 1,overflow: TextOverflow.ellipsis),
-                                      ],
-                                    ),),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 8),
-                                      decoration: BoxDecoration(
-                                          color: AppColors.white,
-                                          borderRadius: BorderRadius.circular(12)
-                                      ),
-                                      child: Text(state.homeData.planId != "0" ? AppLocalizations.of(context)?.translate("Active") ?? "Active" : AppLocalizations.of(context)?.translate("Go") ?? "Go",style: Theme.of(context).textTheme.bodySmall!.copyWith(color: AppColors.appColor)),
                                     ),
                                   ],
                                 ),
+                                const SizedBox(width: 15),
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Flexible(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    "${homeProvider.userlocalData.userLogin?.name ?? ''}",
+                                                    style: Theme.of(context).textTheme.headlineSmall,
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 5),
+                                                state.homeData.isVerify == "1"
+                                                    ? const Padding(
+                                                        padding: EdgeInsets.only(top: 2.0),
+                                                        child: Image(
+                                                          image: AssetImage("assets/icons/newverfy.png"),
+                                                          height: 20,
+                                                          width: 20,
+                                                        ),
+                                                      )
+                                                    : const SizedBox(),
+                                              ],
+                                            ),
+                                            if (homeProvider.userlocalData.userLogin?.mobile != null && homeProvider.userlocalData.userLogin!.mobile!.isNotEmpty)
+                                              Text(
+                                                "${homeProvider.userlocalData.userLogin!.mobile}",
+                                                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              )
+                                            else if (homeProvider.userlocalData.userLogin?.email != null && homeProvider.userlocalData.userLogin!.email!.isNotEmpty)
+                                              Text(
+                                                "${homeProvider.userlocalData.userLogin!.email}",
+                                                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.pushNamed(context, EditProfile.editProfileRoute);
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: AppColors.appColor,
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                AppLocalizations.of(context)?.translate("Edit") ?? "Edit",
+                                                style: Theme.of(context).textTheme.bodySmall!.copyWith(color: AppColors.white, fontWeight: FontWeight.bold),
+                                              ),
+                                              const SizedBox(width: 5),
+                                              SvgPicture.asset(
+                                                "assets/icons/edit.svg",
+                                                width: 14,
+                                                height: 14,
+                                                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            (onbordingCubit.smaTypeApiModel?.admobEnabled == "Yes" && !kIsWeb && bannerADs != null && bannerADs() != null)
+                                ? SizedBox(
+                                    width: MediaQuery.of(context).size.width,
+                                    height: 60,
+                                    child: AdWidget(ad: bannerADs()!),
+                                  )
+                                : const SizedBox(),
+                            const SizedBox(height: 10),
+                            InkWell(
+                              onTap: () {
+                                state.homeData.planId != "0"
+                                    ? Navigator.pushNamed(context, PlanDetils.planRoutes)
+                                    : Navigator.pushNamed(context, PremiumScreen.premiumScreenRoute);
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: AppColors.appColor,
+                                  image: const DecorationImage(image: AssetImage("assets/Image/profileBg.png"), fit: BoxFit.cover),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              state.homeData.planId != "0"
+                                                  ? AppLocalizations.of(context)?.translate("You're Activated Membership!") ?? "You're Activated Membership!"
+                                                  : AppLocalizations.of(context)?.translate("Join Our Membership Today!") ?? "Join Our Membership Today!",
+                                              style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: AppColors.white, fontWeight: FontWeight.w700),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              state.homeData.planId != "0"
+                                                  ? AppLocalizations.of(context)?.translate("Enjoy  premium and match anywhere.") ?? "Enjoy  premium and match anywhere."
+                                                  : "Checkout LoveCloud Premium",
+                                              style: Theme.of(context).textTheme.bodySmall!.copyWith(color: AppColors.white, overflow: TextOverflow.ellipsis),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.white,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          state.homeData.planId != "0"
+                                              ? AppLocalizations.of(context)?.translate("Active") ?? "Active"
+                                              : AppLocalizations.of(context)?.translate("Go") ?? "Go",
+                                          style: Theme.of(context).textTheme.bodySmall!.copyWith(color: AppColors.appColor),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizBoxH(size: 0.01),
+                            const SizBoxH(size: 0.01),
                           onbordingCubit.smaTypeApiModel?.giftFun == "Enabled" ?  ListView.builder(
                             clipBehavior: Clip.none,
                               physics: const NeverScrollableScrollPhysics(),
@@ -1074,11 +748,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                       profileProvider.deleteButtomSheet(context);
                                     }else if(i == profileProvider.menuList.length -3) {
                                       Share.share(
-                                        "Hey! 👋've found this awesome dating app called ${profileProvider.appName} and thought you might be interested too! 😊.Check it out:${Platform.isAndroid
+                                        "Hey! 👋've found this awesome dating app called ${profileProvider.appName} and thought you might be interested too! 😊.Check it out:${kIsWeb ? '' : (Platform.isAndroid
                                             ? 'https://play.google.com/store/apps/details?id=${profileProvider.packageName}'
                                             : Platform.isIOS
                                             ? 'https://apps.apple.com/us/app/${profileProvider.appName}/id${profileProvider.packageName}'
-                                            : ""}",
+                                            : '')}",
                                       );
                                     }
                                     else if(i == profileProvider.menuList.length -1) {
@@ -1321,11 +995,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                       profileProvider.deleteButtomSheet(context);
                                     }else if(i == profileProvider.menuListcondition.length -3) {
                                       Share.share(
-                                        "Hey! 👋've found this awesome dating app called ${profileProvider.appName} and thought you might be interested too! 😊.Check it out:${Platform.isAndroid
+                                        "Hey! 👋've found this awesome dating app called ${profileProvider.appName} and thought you might be interested too! 😊.Check it out:${kIsWeb ? '' : (Platform.isAndroid
                                             ? 'https://play.google.com/store/apps/details?id=${profileProvider.packageName}'
                                             : Platform.isIOS
                                             ? 'https://apps.apple.com/us/app/${profileProvider.appName}/id${profileProvider.packageName}'
-                                            : ""}",
+                                            : '')}",
                                       );
                                     }
                                     else if(i == profileProvider.menuListcondition.length -1) {

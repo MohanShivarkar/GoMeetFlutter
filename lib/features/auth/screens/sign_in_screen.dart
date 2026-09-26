@@ -123,7 +123,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 children: [
                   // ── Logo / heading ──
                   const Text(
-                    'GoMeet',
+                    'LoveCloud',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 36,

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dating/core/config.dart';
 import 'package:dating/presentation/screens/AudioCall/audiocall_provider.dart';
 import 'package:dating/presentation/screens/splash_bording/splash_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -23,37 +24,66 @@ class _PickUpAudioCallState extends State<PickUpAudioCall> {
   void initState() {
     super.initState();
     audioCallProvider = Provider.of<AudioCallProvider>(context,listen: false);
-    audioCallProvider.updateIsLoading(true);
-    audioCallProvider.setupVoiceSDKEngine(agoraVcKey).then((value) {
-      audioCallProvider.join(widget.channel, agoraVcKey);
-      audioCallProvider.stopwatch = Stopwatch();
-      audioCallProvider.managetimer();
-      audioCallProvider.updateIsLoading(false);
-    });
-
+    if (!kIsWeb) {
+      audioCallProvider.updateIsLoading(true);
+      audioCallProvider.setupVoiceSDKEngine(agoraVcKey).then((value) {
+        audioCallProvider.join(widget.channel, agoraVcKey);
+        audioCallProvider.stopwatch = Stopwatch();
+        audioCallProvider.managetimer();
+        audioCallProvider.updateIsLoading(false);
+      });
+    }
 
     FirebaseFirestore.instance.collection("chat_rooms").doc(widget.channel).collection("isVcAvailable").doc(widget.channel).snapshots().listen((event) {
       Map data = event.data()!;
        if(data["Audio"] == false) {
         Navigator.pop(context);
-        audioCallProvider.leave();
-        audioCallProvider.stopwatch.reset();
+        if (!kIsWeb) {
+          audioCallProvider.leave();
+          audioCallProvider.stopwatch.reset();
+        }
       }
     });
   }
 
   @override
   void dispose() async {
-    await audioCallProvider.agoraEngine.leaveChannel();
-    audioCallProvider.isJoined = false;
-    audioCallProvider.muteUnmute = false;
-    audioCallProvider.isLoading = false;
+    if (!kIsWeb) {
+      await audioCallProvider.agoraEngine.leaveChannel();
+      audioCallProvider.isJoined = false;
+      audioCallProvider.muteUnmute = false;
+      audioCallProvider.isLoading = false;
+    }
     isAudio(widget.channel, false);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.phone_disabled, size: 64, color: Colors.grey),
+              const SizedBox(height: 16),
+              Text(
+                'Video/Audio calls are available in the mobile app.',
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Back'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     audioCallProvider = Provider.of<AudioCallProvider>(context);
     return Scaffold(
       body: audioCallProvider.isLoading ? Center(child: CircularProgressIndicator(color: AppColors.appColor)) : Container(

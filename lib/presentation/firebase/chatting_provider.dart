@@ -45,13 +45,17 @@ updateIsSearch(){
   String fmctoken = "";
 
   Future<dynamic> isMeassageAvalable(String uid) async {
-    CollectionReference collectionReference =  FirebaseFirestore.instance.collection('datingUser');
-    collectionReference.doc(uid).get().then((value) {
-      var fields;
-      fields = value.data();
-        fmctoken = fields["token"];
-         notifyListeners();
-    });
+    try {
+      CollectionReference collectionReference =  FirebaseFirestore.instance.collection('datingUser');
+      DocumentSnapshot value = await collectionReference.doc(uid).get();
+      if (value.exists && value.data() != null) {
+        var fields = value.data() as Map<String, dynamic>;
+        fmctoken = fields["token"]?.toString() ?? "";
+        notifyListeners();
+      }
+    } catch (e) {
+      print("isMeassageAvalable error: $e");
+    }
   }
 
 List searchIndexList = [];
@@ -85,33 +89,52 @@ bool isLoadingchat = true;
 
 
 Future demo1(context) async{
-   userData.clear();
-   Stream<QuerySnapshot<Map<String, dynamic>>> snep =  FirebaseFirestore.instance.collection("datingUser").snapshots();
-   snep.forEach((element) {
- List<QueryDocumentSnapshot<Map<String, dynamic>>> data = element.docs;
- for(int a = 0;a <data.length;a++){
-   Map<String, dynamic> dataa = data[a].data();
-   print("* * :-- ${data[a].data()}");
-   Stream<QuerySnapshot<Object?>> snapshot  = chatservices.getMessage(userId: dataa["uid"], otherUserId: Provider.of<HomeProvider>(context,listen: false).uid);
-   snapshot.forEach((element) {
-     List data = element.docs ;
-     for(int a = 0; a < data.length; a++){
-       Map dataa1  = data[a].data() as Map;
-       if (Provider.of<HomeProvider>(context,listen: false).userlocalData.userLogin!.name != dataa["name"]){
-             userData.add({
-               "name": dataa["name"],
-               "image": dataa["pro_pic"],
-               "uid": dataa["uid"],
-               "message": dataa1["message"],
-               "timestamp": dataa1["timestamp"]
-             });
-             notifyListeners();
-       }
-     }
-     notifyListeners();
-   });
-   }
-   });
+  try {
+    userData.clear();
+    Stream<QuerySnapshot<Map<String, dynamic>>> snep = FirebaseFirestore.instance.collection("datingUser").snapshots();
+    snep.listen((element) {
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> data = element.docs;
+      for(int a = 0; a < data.length; a++){
+        Map<String, dynamic> dataa = data[a].data();
+        var currentUid = Provider.of<HomeProvider>(context, listen: false).uid;
+        if (currentUid == null) continue;
+        Stream<QuerySnapshot<Object?>> snapshot = chatservices.getMessage(userId: dataa["uid"], otherUserId: currentUid);
+        snapshot.listen((snapElement) {
+          List snapDocs = snapElement.docs;
+          for(int i = 0; i < snapDocs.length; i++){
+            Map dataa1 = snapDocs[i].data() as Map;
+            var currentName = Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin?.name;
+            if (currentName != null && currentName != dataa["name"]){
+              userData.add({
+                "name": dataa["name"],
+                "image": dataa["pro_pic"],
+                "uid": dataa["uid"],
+                "message": dataa1["message"],
+                "timestamp": dataa1["timestamp"]
+              });
+              notifyListeners();
+            }
+          }
+          isLoadingchat = false;
+          notifyListeners();
+        }, onError: (err) {
+          print("Chat messages stream error: $err");
+          isLoadingchat = false;
+          notifyListeners();
+        });
+      }
+      isLoadingchat = false;
+      notifyListeners();
+    }, onError: (err) {
+      print("DatingUser stream error: $err");
+      isLoadingchat = false;
+      notifyListeners();
+    });
+  } catch (e) {
+    print("Error in demo1: $e");
+    isLoadingchat = false;
+    notifyListeners();
+  }
 }
 
   final bool _emojiShowing = false;

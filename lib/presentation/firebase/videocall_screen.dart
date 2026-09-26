@@ -4,6 +4,7 @@ import 'package:agora_rtc_engine/agora_rtc_engine.dart'
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dating/core/config.dart';
 import 'package:dating/presentation/firebase/vc_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/ui.dart';
@@ -27,7 +28,9 @@ class _VideoCallState extends State<VideoCall> {
   void initState() {
     super.initState();
     vcProvider = Provider.of<VcProvider>(context,listen: false);
-    vcProvider.initAgora(agoraVcKey, agoraVcKey, widget.channel,context);
+    if (!kIsWeb) {
+      vcProvider.initAgora(agoraVcKey, agoraVcKey, widget.channel,context);
+    }
     streamSubscription =  FirebaseFirestore.instance.collection("chat_rooms").doc(widget.channel).collection("isVcAvailable").doc(widget.channel).snapshots().listen((event) {
       Map data = event.data()!;
       print("xxxxxxxxxxxxxx${data}");
@@ -42,15 +45,41 @@ class _VideoCallState extends State<VideoCall> {
   @override
   void dispose() {
     super.dispose();
-    isvc(widget.channel,false);
-    vcProvider.disposee();
+    if (!kIsWeb) {
+      isvc(widget.channel,false);
+      vcProvider.disposee();
+      vcProvider.localUserJoined = false;
+      vcProvider.muteUnmute = false;
+    }
     streamSubscription.cancel();
-    vcProvider.localUserJoined = false;
-    vcProvider.muteUnmute = false;
   }
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.videocam_off, size: 64, color: Colors.grey),
+              const SizedBox(height: 16),
+              Text(
+                'Video/Audio calls are available in the mobile app.',
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Back'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     vcProvider = Provider.of<VcProvider>(context);
     return Scaffold(
       body: Stack(

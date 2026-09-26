@@ -4,9 +4,25 @@ class Config {
 
   static String? projectID = "redbus-3ec46";
 
-  static const String baseUrl = "https://gomeet.cscodetech.cloud/";
+  // API Base URLs — environment-driven with fallback to localhost for development
+  // Production: Set API_BASE_URL and API_BASE_URL_API via build flags
+  //   flutter build web --dart-define=API_BASE_URL=https://api.gomeet.com/
+  //   flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8000/
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://3.108.154.25/api/',
+  );
 
-  static const String baseUrlApi = "https://gomeet.cscodetech.cloud/api";
+  static const String baseUrlApi = String.fromEnvironment(
+    'API_BASE_URL_API',
+    defaultValue: 'http://3.108.154.25/api',
+  );
+
+  // OneSignal Key — environment-driven with fallback for development
+  static const String oneSignelKey = String.fromEnvironment(
+    'ONESIGNAL_KEY',
+    defaultValue: '94b2b6c5-fabb-4454-a2b7-75cf75b84789',
+  );
 
   static const Map<String, dynamic> header = {
     "Content-Type": "application/json"
@@ -64,5 +80,6 @@ class Config {
   static const String referansearnapi = "/getdata.php";
   static const String paystackapi = "paystack/index.php";
 
-  static String oneSignel = "94b2b6c5-fabb-4454-a2b7-75cf75b84789";
+  // Legacy alias for backwards compatibility
+  static String get oneSignel => oneSignelKey;
 }

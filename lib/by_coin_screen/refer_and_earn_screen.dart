@@ -118,7 +118,7 @@ class _Refer_And_EarnState extends State<Refer_And_Earn> {
                     RichText(text: TextSpan(
                         children: [
                           TextSpan(text: AppLocalizations.of(context)?.translate("Invite all your friend to ") ?? "Invite all your friend to ",style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 20,fontWeight: FontWeight.bold)),
-                          TextSpan(text: AppLocalizations.of(context)?.translate("GoMeet") ?? "GoMeet",style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 20,color: AppColors.appColor,fontWeight: FontWeight.bold)),
+                          TextSpan(text: AppLocalizations.of(context)?.translate("LoveCloud") ?? "LoveCloud",style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 20,color: AppColors.appColor,fontWeight: FontWeight.bold)),
                         ]
                     )),
                     const SizedBox(height: 15,),

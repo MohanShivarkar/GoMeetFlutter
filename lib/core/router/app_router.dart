@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 // ── Core & shell screens ──
 import '../../features/shell/screens/not_found_screen.dart';
-import '../../features/shell/screens/core_pwa_home_screen.dart';
+import '../../presentation/screens/pwa/core_pwa_home_screen.dart';
 
 // ── Auth screens (p2-auth-email-google) ──
 import '../../features/auth/screens/sign_in_screen.dart';

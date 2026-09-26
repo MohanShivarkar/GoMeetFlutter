@@ -1,34 +1,35 @@
 {
-  "name": "GoMeet",
-  "short_name": "GoMeet",
-  "description": "Swipe, match, and chat — no app install needed.",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#0F0F1A",
-  "theme_color": "#FF4458",
-  "orientation": "portrait-primary",
-  "icons": [
-    {
-      "src": "icons/Icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/Icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/Icon-maskable-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "icons/Icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ]
+    "name": "LoveCloud",
+    "short_name": "LoveCloud",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#0F0E14",
+    "theme_color": "#FF4458",
+    "description": "LoveCloud - Match, Chat & Date.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
 }

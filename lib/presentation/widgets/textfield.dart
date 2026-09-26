@@ -41,7 +41,6 @@ class TextFieldPro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-
       onTap: ontapp ?? () {},
       maxLines: maxline ?? 1,
       obscureText: obscureText ?? false,
@@ -50,11 +49,14 @@ class TextFieldPro extends StatelessWidget {
       inputFormatters: format ?? [],
       onChanged: onChangee,
       readOnly: readOnly ?? false,
+      autocorrect: false,
+      enableSuggestions: false,
+      autofillHints: const [],
       style: Theme.of(context).textTheme.bodyMedium,
       controller: controller,
       textAlign: textalingn ?? TextAlign.center,
       textAlignVertical: TextAlignVertical.center,
-      keyboardType: inputType ?? TextInputType.name,
+      keyboardType: inputType ?? TextInputType.text,
       decoration: InputDecoration(
         fillColor: Theme.of(context).cardColor,
           filled: true,

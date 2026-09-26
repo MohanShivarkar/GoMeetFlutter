@@ -84,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextFieldPro(
                         textalingn: TextAlign.start,
                         prefixIconIconPath: "assets/icons/envelope.svg",
+                        inputType: TextInputType.text,
                         controller: onBordingProvider.emailLogin,
                         hintText: AppLocalizations.of(context)?.translate("Email or MobileNumber") ?? "Email or MobileNumber"
                     ),

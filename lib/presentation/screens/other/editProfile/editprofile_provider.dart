@@ -1,5 +1,6 @@
-import 'package:dating/core/ui.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:typed_data';
+import 'package:dating/core/ui.dart';
 import 'package:dating/data/models/relationgoalmodel.dart';
 import 'package:dating/data/models/religionmodel.dart';
 import 'package:dating/data/models/usermodel.dart';
@@ -41,6 +42,7 @@ class EditProfileProvider extends ChangeNotifier {
   List searchForReligion = [];
   List networkOldImage = [];
   List<XFile> newImage = [];
+  List<Uint8List> newImageBytes = [];
 
   int selectReligion = -1;
   int selectRelationShip = -1;
@@ -186,9 +188,6 @@ class EditProfileProvider extends ChangeNotifier {
 
   String vericitionId = "";
   String otp = "";
-
-  /// Stores the [ConfirmationResult] returned by [signInWithPhoneNumber] on web.
-  /// Used in [otpBottomSheet] to confirm the SMS code via [ConfirmationResult.confirm].
   ConfirmationResult? webConfirmationResult;
 
   otpBottomSheet(context) {
@@ -244,10 +243,8 @@ class EditProfileProvider extends ChangeNotifier {
                         try {
                           UserCredential value;
                           if (kIsWeb && webConfirmationResult != null) {
-                            // Web: use ConfirmationResult.confirm() set by PhoneAuthWebService
                             value = await webConfirmationResult!.confirm(otp);
                           } else {
-                            // Mobile: build credential from verificationId
                             PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: vericitionId, smsCode: otp);
                             value = await FirebaseAuth.instance.signInWithCredential(credential);
                           }
@@ -329,18 +326,32 @@ class EditProfileProvider extends ChangeNotifier {
   }
 
   removeNewImage(index) {
-    newImage.removeAt(index);
+    if (index >= 0 && index < newImage.length) {
+      newImage.removeAt(index);
+    }
+    if (index >= 0 && index < newImageBytes.length) {
+      newImageBytes.removeAt(index);
+    }
     notifyListeners();
   }
 
-  addNewImage(vale) {
-    newImage.add(vale);
-    notifyListeners();
+  addNewImage(vale) async {
+    if (vale != null) {
+      newImage.add(vale);
+      try {
+        Uint8List bytes = await (vale as XFile).readAsBytes();
+        newImageBytes.add(bytes);
+      } catch (e) {
+        print("Error reading picked image bytes: $e");
+      }
+      notifyListeners();
+    }
   }
 
   updateNameFiled({required TextEditingController controller, value}) {
-    controller.text = value;
-    notifyListeners();
+    if (controller.text != value) {
+      controller.text = value ?? "";
+    }
   }
 
  Future dataTransfer(context)  async {
@@ -349,21 +360,24 @@ class EditProfileProvider extends ChangeNotifier {
     languageList.clear();
     interestList.clear();
     newImage.clear();
-    name.text = userData.userLogin!.name ?? "";
-    bio.text = userData.userLogin!.profileBio ?? "";
-    email.text = userData.userLogin!.email ?? "";
-    bdatePicker = userData.userLogin!.birthDate;
-    languageList = userData.userLogin!.language.toString().split(",");
-    interestList = userData.userLogin!.interest.toString().split(",");
-    selectReligion = int.parse(userData.userLogin!.religion!);
-    selectRelationShip = int.parse(userData.userLogin!.relationGoal!);
-    networkOldImage = userData.userLogin!.otherPic!.split("\$;");
-    gender = maleFemaleOtherIndex(userData.userLogin!.gender!);
-    searchPreference = maleFemaleBothIndex(userData.userLogin!.searchPreference!);
-    mobileNumber.text = userData.userLogin!.mobile!;
-    ccode = userData.userLogin!.ccode!.replaceAll("+", "");
-    password.text = userData.userLogin!.password!;
-    radius = double.parse(userData.userLogin!.radiusSearch ?? '10');
+    newImageBytes.clear();
+    var u = userData.userLogin;
+    if (u == null) return;
+    name.text = u.name ?? "";
+    bio.text = u.profileBio ?? "";
+    email.text = u.email ?? "";
+    bdatePicker = u.birthDate;
+    languageList = (u.language != null && u.language!.isNotEmpty) ? u.language!.split(",") : [];
+    interestList = (u.interest != null && u.interest!.isNotEmpty) ? u.interest!.split(",") : [];
+    selectReligion = int.tryParse(u.religion ?? '1') ?? 1;
+    selectRelationShip = int.tryParse(u.relationGoal ?? '1') ?? 1;
+    networkOldImage = (u.otherPic != null && u.otherPic!.isNotEmpty) ? u.otherPic!.split("\$;") : [];
+    gender = maleFemaleOtherIndex(u.gender ?? "MALE");
+    searchPreference = maleFemaleBothIndex(u.searchPreference ?? "BOTH");
+    mobileNumber.text = u.mobile ?? "";
+    ccode = (u.ccode ?? "+91").replaceAll("+", "");
+    password.text = u.password ?? "";
+    radius = double.tryParse(u.radiusSearch ?? '50') ?? 50.0;
   }
 
   int maleFemaleBothIndex(String value) {
@@ -408,8 +422,8 @@ class EditProfileProvider extends ChangeNotifier {
         profileBio:bio.text,
         intrest: interestList.join(","),
         language: languageList.join(","),
-        lat: Provider.of<HomeProvider>(context, listen: false).lat.toString(),
-        long: Provider.of<HomeProvider>(context, listen: false).long.toString(),
+        lat: (Provider.of<HomeProvider>(context, listen: false).lat ?? 19.0760).toString(),
+        long: (Provider.of<HomeProvider>(context, listen: false).long ?? 72.8777).toString(),
         religon: selectReligion.toString(),
         imlist: networkOldImage.isEmpty ?  "0": networkOldImage.join("\$;"),
         uid: Provider.of<HomeProvider>(context, listen: false).uid.toString(),

@@ -27,7 +27,7 @@ class NotificationService {
   }) async {
     const androidDetails = AndroidNotificationDetails(
       'gomeet_channel',
-      'GoMeet Notifications',
+      'LoveCloud Notifications',
       channelDescription: 'Match and message notifications',
       importance: Importance.high,
       priority: Priority.high,

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:dating/Logic/cubits/editProfile_cubit/editprofile_cubit.dart';
 import 'package:dating/Logic/cubits/editProfile_cubit/editprofile_state.dart';
 import 'package:dating/Logic/cubits/onBording_cubit/onbording_cubit.dart';
@@ -358,9 +359,11 @@ class _EditProfileState extends State<EditProfile> {
                                               borderRadius:
                                               BorderRadius.circular(12),
                                               image: DecorationImage(
-                                                  image: FileImage(File(editProvider
-                                                      .newImage[a].path
-                                                      .toString())),
+                                                  image: (kIsWeb
+                                                      ? (a < editProvider.newImageBytes.length
+                                                          ? MemoryImage(editProvider.newImageBytes[a])
+                                                          : NetworkImage(editProvider.newImage[a].path))
+                                                      : FileImage(File(editProvider.newImage[a].path))) as ImageProvider,
                                                   fit: BoxFit.cover)),
                                         ),
                                         Positioned(
@@ -388,9 +391,75 @@ class _EditProfileState extends State<EditProfile> {
                                     ),
                                   InkWell(
                                     onTap: () async {
-                                      final XFile? image = await editProvider.picker
-                                          .pickImage(source: ImageSource.gallery);
-                                      editProvider.addNewImage(image);
+                                      showModalBottomSheet(
+                                        context: context,
+                                        backgroundColor: Theme.of(context).cardColor,
+                                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+                                        builder: (context) => SafeArea(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(20),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  AppLocalizations.of(context)?.translate("Add Photo") ?? "Add Photo",
+                                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                                                ),
+                                                const SizedBox(height: 16),
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: ElevatedButton.icon(
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: AppColors.appColor,
+                                                          foregroundColor: Colors.white,
+                                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                        ),
+                                                        onPressed: () async {
+                                                          Navigator.pop(context);
+                                                          try {
+                                                            final XFile? image = await editProvider.picker.pickImage(source: ImageSource.gallery);
+                                                            if (image != null) editProvider.addNewImage(image);
+                                                          } catch (e) {
+                                                            Fluttertoast.showToast(msg: "Gallery: $e");
+                                                          }
+                                                        },
+                                                        icon: const Icon(Icons.photo_library),
+                                                        label: Text(AppLocalizations.of(context)?.translate("Gallery") ?? "Gallery"),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 12),
+                                                    Expanded(
+                                                      child: ElevatedButton.icon(
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: AppColors.appColor,
+                                                          foregroundColor: Colors.white,
+                                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                        ),
+                                                        onPressed: () async {
+                                                          Navigator.pop(context);
+                                                          try {
+                                                            final XFile? image = await editProvider.picker.pickImage(
+                                                              source: kIsWeb ? ImageSource.gallery : ImageSource.camera,
+                                                            );
+                                                            if (image != null) editProvider.addNewImage(image);
+                                                          } catch (e) {
+                                                            Fluttertoast.showToast(msg: "Camera: $e");
+                                                          }
+                                                        },
+                                                        icon: const Icon(Icons.camera_alt),
+                                                        label: Text(AppLocalizations.of(context)?.translate("Camera") ?? "Camera"),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(

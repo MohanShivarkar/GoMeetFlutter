@@ -104,7 +104,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Join GoMeet and start connecting',
+                    'Join LoveCloud and start connecting',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 15, color: Color(0xFF9E9EAE)),
                   ),

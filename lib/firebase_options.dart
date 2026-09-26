@@ -48,30 +48,17 @@ class DefaultFirebaseOptions {
 
   /// Web platform Firebase configuration.
   ///
-  /// Values confirmed from Firebase project `redbus-3ec46`:
+  /// Values confirmed from Firebase project `lovecloud-3c7a2`:
   ///   apiKey, authDomain, projectId, storageBucket, messagingSenderId —
-  ///   all sourced from google-services.json / standard Firebase project format.
-  ///
-  /// ⚠️  ACTION REQUIRED before going live:
-  ///   Replace [appId] with the real web app registration ID from:
-  ///   Firebase Console → Project Settings → General → Your Apps → Web App
-  ///   (format: "1:319710447950:web:XXXXXXXXXXXXXXXX")
-  ///
-  ///   Replace [measurementId] with the Analytics stream ID from the same page
-  ///   (format: "G-XXXXXXXXXX"). If Analytics is not enabled, remove this field.
+  ///   all sourced from Firebase Console → Project Settings → Your Apps → Web App.
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDiwebltRgWVv7i_i5ReeoY1K3UKwwF2FU',
-    authDomain: 'redbus-3ec46.firebaseapp.com',
-    projectId: 'redbus-3ec46',
-    storageBucket: 'redbus-3ec46.appspot.com',
-    messagingSenderId: '319710447950',
-    // Web App ID sourced from Firebase Console → Project Settings → Your Apps.
-    // Format: "1:PROJECT_NUMBER:web:HEX_SUFFIX"
-    appId: '1:319710447950:web:4552bb9d524b911ba2f61f',
-    // measurementId intentionally omitted: Firebase Analytics has not yet
-    // been configured for the web app registration. When a real G-XXXXXXXXXX
-    // Measurement ID is available (Firebase Console → Analytics → Data streams),
-    // add it here. Omitting the field disables Analytics without any error.
+    apiKey: 'AIzaSyAjRdNTYEppYYlYy2GyyJqEYMUmDuus9V8',
+    authDomain: 'lovecloud-3c7a2.firebaseapp.com',
+    projectId: 'lovecloud-3c7a2',
+    storageBucket: 'lovecloud-3c7a2.firebasestorage.app',
+    messagingSenderId: '484185378389',
+    appId: '1:484185378389:web:352ede962d04d1395dcedc',
+    measurementId: 'G-263BRWV5DJ',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
