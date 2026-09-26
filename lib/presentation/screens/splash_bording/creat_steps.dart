@@ -96,15 +96,13 @@ class _CreatStepsState extends State<CreatSteps> {
 
                 if(onbordingCubit.smaTypeApiModel?.otpAuth == "Yes" ){
 
-                  // if(onbordingCubit.smaTypeApiModel?.smsType == "Firebase"){
-                  //
-                  //   BlocProvider.of<OnbordingCubit>(context).mobileCheckApi(number: onBordingProvider.mobileNumber.text, ccode: onBordingProvider.ccode).then((value) {
-                  //     if (value == "true") {
-                  //       BlocProvider.of<OnbordingCubit>(context).sendOtpFunction(number: "+${onBordingProvider.ccode} ${onBordingProvider.mobileNumber.text}", context: context,isForgot: false);
-                  //     }
-                  //   });
-                  //
-                  // }
+                  if (onbordingCubit.smaTypeApiModel?.smsType == "Firebase") {
+                    BlocProvider.of<OnbordingCubit>(context).mobileCheckApi(number: onBordingProvider.mobileNumber.text, ccode: onBordingProvider.ccode).then((value) {
+                      if (value == "true") {
+                        BlocProvider.of<OnbordingCubit>(context).sendOtpFunction(number: "+${onBordingProvider.ccode}${onBordingProvider.mobileNumber.text}", context: context, isForgot: false);
+                      }
+                    });
+                  }
                    if (onbordingCubit.smaTypeApiModel?.smsType == "Msg91") {
                     print("******* Msg91 *******");
 
@@ -1580,7 +1578,7 @@ class _CreatStepsState extends State<CreatSteps> {
                               color: onBordingProvider.images.isEmpty
                                   ? AppColors.appColor
                                   : Theme.of(context).dividerTheme.color!),
-                          image: onBordingProvider.images.isNotEmpty
+                          image: onBordingProvider.imageBytes.isNotEmpty
                               ? DecorationImage(
                                   image: MemoryImage(
                                     onBordingProvider.imageBytes.first,
