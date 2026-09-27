@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LoveCloud - Onboarding / Introduction Screen Design Directions</title>
+  <title>LoveCloud - Complete Onboarding Flows (3 Options × 4 Screens = 12 Screens)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -14,6 +14,7 @@
       --warm-glow: #FFA07A;
       --obsidian: #0B0D14;
       --surface: #141622;
+      --surface-card: #1A1D2D;
       --border: rgba(255, 255, 255, 0.1);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,33 +23,28 @@
       background: #08090E;
       color: #FFFFFF;
       min-height: 100vh;
-      padding: 40px 20px 80px;
+      padding: 30px 16px 80px;
     }
     .header {
       max-width: 1200px;
-      margin: 0 auto 36px;
+      margin: 0 auto 30px;
       text-align: center;
     }
     .badge {
       display: inline-block;
-      padding: 6px 16px;
+      padding: 6px 18px;
       border-radius: 999px;
-      background: rgba(255, 68, 88, 0.15);
-      border: 1px solid rgba(255, 68, 88, 0.35);
-      color: var(--sunset-coral);
+      background: rgba(255, 153, 51, 0.15);
+      border: 1px solid rgba(255, 153, 51, 0.4);
+      color: #FF9933;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 1px;
       text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-    .badge-india {
-      background: rgba(255, 153, 51, 0.15);
-      border-color: rgba(255, 153, 51, 0.4);
-      color: #FF9933;
+      margin-bottom: 14px;
     }
     h1 {
-      font-size: 38px;
+      font-size: 36px;
       font-weight: 800;
       letter-spacing: -0.5px;
       margin-bottom: 12px;
@@ -57,369 +53,420 @@
       -webkit-text-fill-color: transparent;
     }
     p.subtitle {
-      font-size: 16px;
+      font-size: 15px;
       color: #9E9AA8;
-      max-width: 820px;
+      max-width: 850px;
       margin: 0 auto;
       line-height: 1.6;
     }
 
-    /* Comparison Audit Box */
-    .audit-container {
-      max-width: 1100px;
-      margin: 0 auto 50px;
-      background: rgba(20, 22, 34, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 20px;
-      padding: 24px 30px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30px;
-    }
-    .audit-col h3 {
-      font-size: 16px;
-      font-weight: 800;
-      margin-bottom: 12px;
+    /* Option Navigation Jump Bar */
+    .nav-bar {
+      max-width: 900px;
+      margin: 24px auto 40px;
       display: flex;
-      align-items: center;
-      gap: 8px;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
-    .audit-col.current h3 { color: #FF6B6B; }
-    .audit-col.redesign h3 { color: #51CF66; }
-    .audit-list {
-      list-style: none;
+    .nav-btn {
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #FFF;
       font-size: 13px;
-      color: #B5B2C0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      line-height: 1.5;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s ease;
     }
-    .audit-list li {
-      display: flex;
-      gap: 8px;
-    }
-
-    /* Options Grid */
-    .options-grid {
-      max-width: 1300px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-      gap: 32px;
-      justify-items: center;
+    .nav-btn:hover, .nav-btn.active {
+      background: linear-gradient(135deg, var(--flame-rose), var(--sunset-coral));
+      border-color: transparent;
+      box-shadow: 0 6px 20px rgba(255, 68, 88, 0.4);
     }
 
-    .option-card {
+    /* Option Section Containers */
+    .option-section {
+      max-width: 1400px;
+      margin: 0 auto 70px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 24px;
+      border-radius: 28px;
+      padding: 32px 24px;
+    }
+    .option-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 20px;
+    }
+    .option-title-group h2 {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .option-pill-tag {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .tag-light { background: #E8F0FE; color: #1967D2; }
+    .tag-dark { background: rgba(255, 68, 88, 0.2); color: #FF758C; }
+    .tag-warm { background: rgba(255, 153, 51, 0.2); color: #FF9933; }
+    .option-desc {
+      font-size: 14px;
+      color: #A09DB0;
+      max-width: 780px;
+      line-height: 1.5;
+    }
+
+    /* Script Grid Box below each Option */
+    .script-box {
+      margin-top: 36px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
       padding: 24px;
-      width: 100%;
-      max-width: 400px;
+    }
+    .script-box h3 {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #FFD080;
+    }
+    .script-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 1024px) {
+      .script-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .script-grid { grid-template-columns: 1fr; }
+    }
+    .script-step-card {
+      background: rgba(20, 22, 34, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .step-num {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--sunset-coral);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+    .step-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .step-sub {
+      font-size: 12px;
+      color: #9E9AA8;
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+    .step-meta {
+      font-size: 11px;
+      color: #7A7688;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 8px;
+    }
+    .step-meta strong { color: #D5D2E0; }
+
+    /* 4-Screen Row Grid */
+    .screens-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      justify-items: center;
+    }
+    @media (max-width: 1200px) {
+      .screens-row { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    }
+    @media (max-width: 640px) {
+      .screens-row { grid-template-columns: 1fr; }
+    }
+
+    /* Screen Card Wrapper */
+    .screen-col {
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      width: 100%;
+      max-width: 310px;
     }
-    .option-card:hover {
-      border-color: rgba(255, 68, 88, 0.5);
-      transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(255, 68, 88, 0.15);
+    .screen-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: #B5B2C0;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    .option-card.recommended {
-      border-color: var(--flame-rose);
-      box-shadow: 0 0 0 1px var(--flame-rose), 0 16px 40px rgba(255, 68, 88, 0.2);
-    }
-    .tag-badge {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: linear-gradient(135deg, var(--flame-rose), var(--sunset-coral));
+    .screen-label span {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--flame-rose);
       color: #FFF;
       font-size: 11px;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 999px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .tag-badge.india {
-      background: linear-gradient(135deg, #FF9933, #FF4458);
-    }
-
-    .card-title {
-      font-size: 20px;
-      font-weight: 800;
-      margin-bottom: 6px;
-      align-self: flex-start;
-    }
-    .card-desc {
-      font-size: 13px;
-      color: #9E9AA8;
-      margin-bottom: 20px;
-      line-height: 1.5;
-      align-self: flex-start;
-      min-height: 52px;
+      text-align: center;
+      line-height: 20px;
     }
 
     /* Phone Mockup Frame */
     .phone-mockup {
-      width: 320px;
-      height: 640px;
-      border-radius: 46px;
-      border: 8px solid #222533;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.85), inset 0 0 0 2px rgba(255,255,255,0.08);
+      width: 295px;
+      height: 600px;
+      border-radius: 40px;
+      border: 7px solid #222533;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.85), inset 0 0 0 2px rgba(255,255,255,0.06);
       position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
     }
 
-    /* Option 1 Phone Mockup (Urban Chic - Light) */
-    .phone-opt1 {
-      background: #FAF8F5;
-      color: #1A1C24;
-      background-image: url('assets/onboard_opt1.jpg');
-      background-size: cover;
-      background-position: center top;
-    }
-
-    /* Option 2 Phone Mockup (Midnight Obsidian - Dark) */
-    .phone-opt2 {
-      background: #0B0D14;
-      color: #FFFFFF;
-      background-image: url('assets/onboard_opt2.jpg');
-      background-size: cover;
-      background-position: center top;
-    }
-
-    /* Option 3 Phone Mockup (Duo Overlapping Match Cards) */
-    .phone-opt3 {
-      background: linear-gradient(180deg, #FBF8F5 0%, #FFF3EC 60%, #FFFFFF 100%);
-      color: #1A1C24;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* iOS Status Bar Simulation */
+    /* Status Bar */
     .status-bar {
-      height: 40px;
-      padding: 10px 20px 0;
+      height: 38px;
+      padding: 10px 18px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: relative;
-      z-index: 10;
-      font-size: 12px;
+      z-index: 20;
+      font-size: 11px;
       font-weight: 700;
     }
-    .status-bar.dark-text { color: #1A1C24; }
-    .status-bar.light-text { color: #FFFFFF; }
+    .status-dark { color: #151821; }
+    .status-light { color: #FFFFFF; }
     .dynamic-island {
-      width: 80px;
-      height: 20px;
+      width: 76px;
+      height: 18px;
       background: #000;
-      border-radius: 20px;
+      border-radius: 18px;
       position: absolute;
       left: 50%;
       top: 8px;
       transform: translateX(-50%);
     }
 
-    /* Option 3 Custom Interactive Stage */
-    .card-stage-opt3 {
+    /* Stage Canvas for Graphics */
+    .canvas-stage {
       position: relative;
       flex: 1;
-      margin: 10px 14px 0;
+      width: 100%;
+      overflow: hidden;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
     }
 
-    .match-card {
-      position: absolute;
-      width: 175px;
-      height: 235px;
-      border-radius: 22px;
-      background-size: cover;
-      background-position: center;
-      box-shadow: 0 14px 30px rgba(0,0,0,0.18);
-      border: 4px solid #FFFFFF;
+    /* THEME 1: URBAN METRO CHIC */
+    .phone-light { background: #FAF8F5; color: #151821; }
+    .card-light {
+      background: #FFFFFF;
+      border-radius: 20px;
+      box-shadow: 0 14px 34px rgba(20, 22, 34, 0.12);
+      border: 3px solid #FFFFFF;
       overflow: hidden;
+      position: absolute;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       padding: 10px;
-      color: #FFF;
       box-sizing: border-box;
+      background-size: cover;
+      background-position: center;
     }
-    .match-card::before {
+    .card-light::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 60%);
+      background: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 55%);
       z-index: 1;
     }
-    .match-card-content {
+    .card-info {
       position: relative;
       z-index: 2;
+      color: #FFFFFF;
     }
-    .card-top {
-      top: 25px;
-      right: 18px;
-      transform: rotate(7deg);
-      background-image: url('assets/auth_option5.jpg');
-      z-index: 2;
-    }
-    .card-bottom {
-      top: 65px;
-      left: 18px;
-      transform: rotate(-8deg);
-      background-image: url('assets/auth_option6.jpg');
-      z-index: 1;
-    }
-    .profile-name {
+    .card-info .name {
       font-size: 13px;
       font-weight: 800;
       display: flex;
       align-items: center;
       gap: 4px;
     }
-    .verified-icon {
-      color: #3897F0;
-      font-size: 11px;
+    .verified-tick {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      background: #1D9BF0;
+      color: #FFF;
+      border-radius: 50%;
+      font-size: 9px;
+      text-align: center;
+      line-height: 14px;
+      font-weight: 900;
     }
-    .profile-loc {
+    .card-info .loc {
       font-size: 10px;
       opacity: 0.9;
+      margin-top: 1px;
     }
 
-    /* Floating Pills */
-    .float-pill {
+    /* Floating Interest Pills */
+    .pill-tag {
       position: absolute;
-      background: rgba(22, 17, 36, 0.9);
-      color: #FFFFFF;
-      font-size: 10px;
-      font-weight: 700;
       padding: 5px 11px;
       border-radius: 999px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.18);
-      z-index: 5;
+      font-size: 10px;
+      font-weight: 700;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+      z-index: 10;
       display: flex;
       align-items: center;
       gap: 4px;
-      border: 1px solid rgba(255,255,255,0.15);
+      white-space: nowrap;
     }
-    .pill-1 { top: 12px; left: 16px; transform: rotate(-5deg); }
-    .pill-2 { bottom: 65px; right: 12px; transform: rotate(4deg); }
-    .pill-3 { bottom: 18px; left: 24px; transform: rotate(-3deg); }
-
-    /* Center Badge between Match Cards */
-    .match-badge-center {
-      position: absolute;
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
+    .pill-dark-violet {
+      background: #181528;
+      color: #FFFFFF;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .pill-neon-glow {
+      background: rgba(14, 16, 26, 0.9);
+      color: #FFF;
+      border: 1px solid rgba(255, 68, 88, 0.5);
+      box-shadow: 0 4px 14px rgba(255, 68, 88, 0.35);
+    }
+    .pill-warm-sunset {
       background: #FFFFFF;
-      box-shadow: 0 8px 24px rgba(255, 68, 88, 0.45);
-      z-index: 4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      top: 110px;
-      left: 130px;
-      border: 2px solid #FF4458;
-    }
-    .match-badge-center img {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      display: block;
+      color: #B53A00;
+      border: 1px solid rgba(255, 153, 51, 0.35);
+      box-shadow: 0 4px 14px rgba(255, 153, 51, 0.2);
     }
 
-    /* Doodle Elements */
-    .doodle {
+    /* 3D Emoji Stickers */
+    .emoji-sticker {
       position: absolute;
-      z-index: 3;
-      pointer-events: none;
-      opacity: 0.75;
+      font-size: 26px;
+      z-index: 12;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.2));
     }
 
-    /* Bottom Control Bar in Mockup */
-    .bottom-onboard {
-      padding: 16px 20px 24px;
+    /* Doodle SVGs */
+    .doodle-svg {
+      position: absolute;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    /* Bottom Control Bar */
+    .bottom-bar {
+      padding: 12px 18px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      z-index: 10;
-      background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.95) 40%, #FFFFFF 100%);
+      gap: 8px;
+      z-index: 20;
     }
-    .bottom-onboard.dark {
-      background: linear-gradient(180deg, rgba(11,13,20,0) 0%, rgba(11,13,20,0.95) 40%, #0B0D14 100%);
+    .bar-light {
+      background: linear-gradient(180deg, rgba(250,248,245,0) 0%, rgba(250,248,245,0.96) 30%, #FAF8F5 100%);
     }
-    .indicator-bar {
+    .bar-dark {
+      background: linear-gradient(180deg, rgba(11,13,20,0) 0%, rgba(11,13,20,0.96) 30%, #0B0D14 100%);
+    }
+    .bar-warm {
+      background: linear-gradient(180deg, rgba(255,248,243,0) 0%, rgba(255,248,243,0.96) 30%, #FFF8F3 100%);
+    }
+
+    /* Indicators */
+    .dots-row {
       display: flex;
       gap: 6px;
       align-items: center;
       margin-bottom: 2px;
     }
-    .dot {
+    .dot-item {
       width: 6px;
       height: 6px;
       border-radius: 999px;
-      background: rgba(0,0,0,0.2);
+      background: rgba(0,0,0,0.18);
     }
-    .dot.active {
+    .dot-item.dark { background: rgba(255,255,255,0.22); }
+    .dot-item.active {
       width: 22px;
-      background: #7C4DFF;
-    }
-    .dot.active.rose {
       background: var(--flame-rose);
     }
-    .dot.dark-mode {
-      background: rgba(255,255,255,0.25);
-    }
-    .dot.dark-mode.active {
-      background: var(--flame-rose);
-    }
+    .dot-item.active.violet { background: #7C4DFF; }
+    .dot-item.active.orange { background: #FF9933; }
 
-    .onboard-title {
-      font-size: 17px;
+    .slide-headline {
+      font-size: 14px;
       font-weight: 800;
       text-align: center;
       line-height: 1.3;
-      color: #0E1017;
+      padding: 0 4px;
     }
-    .onboard-title.dark {
-      color: #FFFFFF;
+    .slide-sub {
+      font-size: 11px;
+      text-align: center;
+      line-height: 1.35;
+      padding: 0 4px;
+      opacity: 0.75;
     }
+    .text-light { color: #11131A; }
+    .text-dark { color: #FFFFFF; }
 
-    .btn-row {
+    .action-row {
       display: flex;
       width: 100%;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       margin-top: 4px;
     }
-    .skip-link {
+    .skip-btn {
       flex: 1;
       text-align: center;
       font-size: 13px;
       font-weight: 700;
-      color: #555A6E;
+      color: #6A6E80;
       cursor: pointer;
     }
-    .skip-link.dark {
-      color: #9E9AA8;
-    }
-    .next-pill-btn {
+    .skip-btn.dark { color: #9E9AA8; }
+    .next-btn {
       flex: 1.2;
-      height: 44px;
+      height: 40px;
       border-radius: 999px;
       background: linear-gradient(135deg, var(--flame-rose) 0%, var(--sunset-coral) 100%);
       color: #FFFFFF;
@@ -428,222 +475,830 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 20px rgba(255, 68, 88, 0.35);
+      box-shadow: 0 6px 18px rgba(255, 68, 88, 0.4);
       border: none;
       cursor: pointer;
     }
+    .next-btn.orange {
+      background: linear-gradient(135deg, #FF9933 0%, #FF4458 100%);
+      box-shadow: 0 6px 18px rgba(255, 153, 51, 0.4);
+    }
 
-    .key-points {
-      margin-top: 18px;
-      width: 100%;
-      list-style: none;
-      font-size: 12px;
-      color: #B5B2C0;
+    /* THEME 2: MIDNIGHT OBSIDIAN */
+    .phone-dark { background: #0B0D14; color: #FFFFFF; }
+    .card-dark {
+      border-radius: 20px;
+      border: 2px solid rgba(255, 68, 88, 0.6);
+      box-shadow: 0 0 25px rgba(255, 68, 88, 0.25), 0 14px 34px rgba(0,0,0,0.7);
+      overflow: hidden;
+      position: absolute;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      justify-content: flex-end;
+      padding: 10px;
+      box-sizing: border-box;
+      background-size: cover;
+      background-position: center;
     }
-    .key-points li {
+    .card-dark::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(11,13,20,0.85) 0%, rgba(11,13,20,0.1) 60%);
+      z-index: 1;
+    }
+
+    /* THEME 3: WARM SUNSET */
+    .phone-warm {
+      background: linear-gradient(180deg, #FFF9F5 0%, #FFF1E6 100%);
+      color: #1F1916;
+    }
+    .card-warm {
+      background: #FFFFFF;
+      border-radius: 20px;
+      border: 3px solid #FFF;
+      box-shadow: 0 14px 32px rgba(220, 100, 30, 0.15);
+      overflow: hidden;
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 10px;
+      box-sizing: border-box;
+      background-size: cover;
+      background-position: center;
+    }
+    .card-warm::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(40,15,5,0.75) 0%, rgba(0,0,0,0) 55%);
+      z-index: 1;
+    }
+
+    /* Center Match Squircle Badge */
+    .match-center-badge {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: #FFFFFF;
+      box-shadow: 0 8px 24px rgba(255, 68, 88, 0.45);
+      z-index: 15;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      border: 2px solid var(--flame-rose);
     }
-    .key-points li::before {
-      content: "✓";
-      color: var(--flame-rose);
-      font-weight: 900;
-    }
-    .option-card.recommended .key-points li::before {
-      color: #FF9933;
+    .match-center-badge img {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: block;
     }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <div class="badge badge-india">Specialist Graphic Design Review • Onboarding Flow</div>
-    <h1>LoveCloud Introduction / Walkthrough Screens</h1>
+    <div class="badge">Specialist Graphic Design System • 12 Screens with India Scripts</div>
+    <h1>LoveCloud Onboarding Flow (3 Options × 4 Screens)</h1>
     <p class="subtitle">
-      Comprehensive upgrade of the card-stack & doodle concept. Replaces generic Southeast Asian stock models ("3 Thai land") with high-fashion Indian singles, refined typography, and verified dating cues aligned with LoveCloud branding.
-    </p>
-  </div>
-
-  <!-- AUDIT BREAKDOWN -->
-  <div class="audit-container">
-    <div class="audit-col current">
-      <h3>⚠️ Current Template Shortcomings</h3>
-      <ul class="audit-list">
-        <li>❌ <strong>Foreign Stock Models:</strong> Mismatched international models with dummy text ("Lissa Moni 22, 3 Thai land", "Jenny Lopez").</li>
-        <li>❌ <strong>Cultural Mismatch:</strong> Fails to evoke trust or resonance with Indian singles in Mumbai, Delhi, Bengaluru.</li>
-        <li>❌ <strong>Generic Violet Palette:</strong> Disconnected from the official LoveCloud Flame Rose & Sunset Coral identity.</li>
-        <li>❌ <strong>Static Graphic Images:</strong> Text is baked into bitmap image files instead of dynamic responsive widgets.</li>
-      </ul>
-    </div>
-    <div class="audit-col redesign">
-      <h3>✨ Specialist Designer Solutions</h3>
-      <ul class="audit-list">
-        <li>✅ <strong>Indian Urban Singles:</strong> Verified profiles featuring relatable Indian professionals ("Ananya • Bandra", "Kabir • Bengaluru", "Rhea • Delhi").</li>
-        <li>✅ <strong>Curated Indian Interests:</strong> Floating tags tailored to modern Indian lifestyle (`Coffee ☕`, `Rooftops 🌃`, `Chai ☕`, `Weekend Treks 🏔️`).</li>
-        <li>✅ <strong>LoveCloud Brand Integration:</strong> Seamlessly incorporates the official Option 1 squircle badge and vibrant gradient.</li>
-        <li>✅ <strong>High-Trust Cues:</strong> Prominent blue verification ticks `✓` to address safety skepticism in the Indian market.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- 3 DESIGN OPTIONS GRID -->
-  <div class="options-grid">
-
-    <!-- Option 1: Urban Metro Chic (Light Aesthetic) -->
-    <div class="option-card recommended">
-      <div class="tag-badge india">Option 1 • Recommended</div>
-      <div class="card-title">Option 1: Urban Metro Chic (Light)</div>
-      <div class="card-desc">
-        Crisp porcelain backdrop with layered elevated profile cards. Features stylish Mumbai/Bengaluru singles, 3D star-eyes emoji, verified blue badge, and clean hand-drawn line doodles.
-      </div>
-
-      <div class="phone-mockup phone-opt1">
-        <!-- Rendered with live generated Indian UI artwork -->
-      </div>
-
-      <ul class="key-points">
-        <li><strong>Profile:</strong> Ananya, 24 • Bandra, Mumbai (Verified `✓`)</li>
-        <li><strong>Tags:</strong> `Coffee ☕`, `Indie Music 🎸`, `Travel ✈️`, `Dog Lover 🐕`</li>
-        <li><strong>Style:</strong> Clean, high-energy, friendly; appeals broadly to 18-28 Gen-Z & young professionals</li>
-        <li><strong>Brand Match:</strong> Flame Rose CTA button with clean organic doodles</li>
-      </ul>
-    </div>
-
-    <!-- Option 2: Midnight Obsidian & Neon Glow (Dark Aesthetic) -->
-    <div class="option-card">
-      <div class="tag-badge">Option 2 • Luxury Dark</div>
-      <div class="card-title">Option 2: Midnight Neon Obsidian</div>
-      <div class="card-desc">
-        Deep obsidian black mode matching the Auth Screen. Dynamic tilted card with glowing neon rose border, featuring a charismatic Bengaluru young professional and glowing 3D reaction stickers.
-      </div>
-
-      <div class="phone-mockup phone-opt2">
-        <!-- Rendered with live generated dark Indian UI artwork -->
-      </div>
-
-      <ul class="key-points">
-        <li><strong>Profile:</strong> Kabir, 26 • Indiranagar, Bengaluru (Verified `✓`)</li>
-        <li><strong>Tags:</strong> `Rooftops 🌃`, `Techno 🎧`, `Fitness 🏋️`</li>
-        <li><strong>Style:</strong> Ultra-luxury Raya/Tinder Platinum aesthetic; 100% theme consistency with Auth screen</li>
-        <li><strong>Visual Impact:</strong> Luminous glowing borders and fiery heart reaction</li>
-      </ul>
-    </div>
-
-    <!-- Option 3: Soulful Golden Hour Match (Warm Duo Aesthetic) -->
-    <div class="option-card">
-      <div class="tag-badge india">Option 3 • Match Moment</div>
-      <div class="card-title">Option 3: Soulful Duo Match Moment</div>
-      <div class="card-desc">
-        Captures the magical "It’s a Match" slide. Two overlapping tilted profile cards with the official LoveCloud squircle badge anchored between them, celebrating Indian companionship.
-      </div>
-
-      <div class="phone-mockup phone-opt3">
-        <div class="status-bar dark-text">
-          <span>9:41</span>
-          <div class="dynamic-island"></div>
-          <span>●●●</span>
-        </div>
-
-        <div class="card-stage-opt3">
-          <!-- Floating Interest Pills -->
-          <div class="float-pill pill-1">Chai Lover ☕</div>
-          <div class="float-pill pill-2">Weekend Treks 🏔️</div>
-          <div class="float-pill pill-3">Dog Parent 🐕</div>
-
-          <!-- Bottom Card: Arjun (Male Profile) -->
-          <div class="match-card card-bottom">
-            <div class="match-card-content">
-              <div class="profile-name">Arjun, 27 <span class="verified-icon">●</span></div>
-              <div class="profile-loc">📍 Cyber City, Gurgaon</div>
-            </div>
-          </div>
-
-          <!-- Official LoveCloud Squircle Emblem in Center -->
-          <div class="match-badge-center">
-            <img src="assets/lovecloud_badge.png" alt="LoveCloud Emblem" />
-          </div>
-
-          <!-- Top Card: Rhea (Female Profile) -->
-          <div class="match-card card-top">
-            <div class="match-card-content">
-              <div class="profile-name">Rhea, 24 <span class="verified-icon">●</span></div>
-              <div class="profile-loc">📍 South Delhi</div>
-            </div>
-          </div>
-
-          <!-- SVG Doodle Sparkle Accents -->
-          <svg class="doodle" style="top: 8px; right: 28px; width: 32px; height: 32px;" viewBox="0 0 24 24" fill="none" stroke="#FF4458" stroke-width="2">
-            <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-          </svg>
-          <svg class="doodle" style="bottom: 20px; right: 22px; width: 28px; height: 28px;" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </div>
-
-        <div class="bottom-onboard">
-          <div class="indicator-bar">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot active rose"></div>
-          </div>
-          <div class="onboard-title">It’s a Match: Discover Your Forever</div>
-          <div class="btn-row">
-            <div class="skip-link">Skip</div>
-            <button class="next-pill-btn">Let's Start</button>
-          </div>
-        </div>
-      </div>
-
-      <ul class="key-points">
-        <li><strong>Profiles:</strong> Rhea (24, South Delhi) & Arjun (27, Gurgaon)</li>
-        <li><strong>Tags:</strong> `Chai Lover ☕`, `Weekend Treks 🏔️`, `Dog Parent 🐕`</li>
-        <li><strong>Core Hook:</strong> Celebrates mutual discovery & long-term commitment</li>
-        <li><strong>Official Emblem:</strong> LoveCloud squircle badge connects both profiles</li>
-      </ul>
-    </div>
-
-  </div>
-
-  <!-- COMPREHENSIVE 4-SLIDE SCRIPT RECOMMENDATION FOR INDIA -->
-  <div style="max-width: 1100px; margin: 60px auto 0; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 30px;">
-    <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 16px; color: #FF9933;">
-      🇮🇳 Recommended 4-Slide Progressive Onboarding Script for India Launch
-    </h3>
-    <p style="font-size: 14px; color: #9E9AA8; margin-bottom: 24px; line-height: 1.6;">
-      To maximize completion rate and eliminate drop-off, the copy and visuals should progress logically from discovery to safety to mutual celebration:
+      Full 12-screen matrix matching the exact 4-step progressive app flow. Each option features a tailored, high-converting copy script specifically designed for Indian market psychology, verified safety cues, and LoveCloud branding.
     </p>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px;">
-      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px;">
-        <div style="font-size: 11px; font-weight: 800; color: var(--sunset-coral); text-transform: uppercase; margin-bottom: 6px;">Slide 1 • Discovery</div>
-        <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Find Your Spark</div>
-        <p style="font-size: 12px; color: #8F8B99; line-height: 1.4;">Meet verified singles, creatives, and young professionals in your city who match your wavelength.</p>
-      </div>
-
-      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px;">
-        <div style="font-size: 11px; font-weight: 800; color: var(--sunset-coral); text-transform: uppercase; margin-bottom: 6px;">Slide 2 • Connection</div>
-        <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Connect Over Passions</div>
-        <p style="font-size: 12px; color: #8F8B99; line-height: 1.4;">Bond over shared passions—from late-night chai runs and rooftop cafes to travel and fitness.</p>
-      </div>
-
-      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px;">
-        <div style="font-size: 11px; font-weight: 800; color: var(--sunset-coral); text-transform: uppercase; margin-bottom: 6px;">Slide 3 • Trust & Safety</div>
-        <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">100% Verified Profiles</div>
-        <p style="font-size: 12px; color: #8F8B99; line-height: 1.4;">Zero fake profiles. Safe, secure selfie-verified matchmaking so you can date with absolute confidence.</p>
-      </div>
-
-      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px;">
-        <div style="font-size: 11px; font-weight: 800; color: var(--sunset-coral); text-transform: uppercase; margin-bottom: 6px;">Slide 4 • Match Celebration</div>
-        <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">It’s a Match!</div>
-        <p style="font-size: 12px; color: #8F8B99; line-height: 1.4;">Infinite genuine possibilities. Step inside LoveCloud and discover who is waiting for you.</p>
-      </div>
+    <!-- QUICK JUMP NAVIGATION -->
+    <div class="nav-bar">
+      <a href="#option1" class="nav-btn active">Option 1: Urban Metro Chic (Light)</a>
+      <a href="#option2" class="nav-btn">Option 2: Midnight Obsidian (Dark)</a>
+      <a href="#option3" class="nav-btn">Option 3: Warm Sunset Soulful</a>
     </div>
   </div>
+
+  <!-- ============================================================== -->
+  <!-- OPTION 1: URBAN METRO CHIC (LIGHT THEME - 4 SCREENS)           -->
+  <!-- ============================================================== -->
+  <section class="option-section" id="option1">
+    <div class="option-header">
+      <div class="option-title-group">
+        <h2>Option 1: Urban Metro Chic <span class="option-pill-tag tag-light">Light Porcelain • Recommended</span></h2>
+        <p class="option-desc">
+          <strong>Tone: Fresh, Witty, High-Energy.</strong> Elevated porcelain cards with organic doodles and verified Indian urban profiles. Appeals broadly to Gen-Z & young professionals across Mumbai, Bengaluru, and Pune.
+        </p>
+      </div>
+    </div>
+
+    <div class="screens-row">
+
+      <!-- Opt1 - Screen 1 -->
+      <div class="screen-col">
+        <div class="screen-label"><span>1</span> Discovery</div>
+        <div class="phone-mockup phone-light">
+          <div class="status-bar status-dark">
+            <span>9:41</span>
+            <div class="dynamic-island"></div>
+            <span>●●●</span>
+          </div>
+
+          <div class="canvas-stage">
+            <div class="card-light" style="width: 170px; height: 230px; top: 15px; right: -15px; transform: rotate(14deg); opacity: 0.55; background-image: url('assets/profile_couple.jpg');"></div>
+
+            <div class="card-light" style="width: 200px; height: 270px; top: 35px; left: 32px; transform: rotate(-6deg); z-index: 4; background-image: url('assets/profile_female1.jpg');">
+              <div class="card-info">
+                <div class="name">Ananya, 24 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Bandra, Mumbai • 3 km</div>
+              </div>
+            </div>
+
+            <div class="emoji-sticker" style="top: 135px; left: 16px;">🤩</div>
+            <svg class="doodle-svg" style="top: 18px; left: 110px; width: 44px; height: 44px;" viewBox="0 0 50 50" fill="none" stroke="#222" stroke-width="2.5">
+              <path d="M15 10 C 25 5, 35 15, 25 35 C 22 40, 20 45, 28 48"/>
+              <path d="M22 45 L 28 48 L 29 42"/>
+            </svg>
+          </div>
+
+          <div class="bottom-bar bar-light">
+            <div class="dots-row">
+              <div class="dot-item active violet"></div>
+              <div class="dot-item"></div>
+              <div class="dot-item"></div>
+              <div class="dot-item"></div>
+            </div>
+            <div class="slide-headline text-light">Find Your Spark</div>
+            <div class="slide-sub text-light">Where real connections ignite with verified singles in your city.</div>
+            <div class="action-row">
+              <div class="skip-btn">Skip</div>
+              <button class="next-btn">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opt1 - Screen 2 -->
+      <div class="screen-col">
+        <div class="screen-label"><span>2</span> Interests</div>
+        <div class="phone-mockup phone-light">
+          <div class="status-bar status-dark">
+            <span>9:41</span>
+            <div class="dynamic-island"></div>
+            <span>●●●</span>
+          </div>
+
+          <div class="canvas-stage">
+            <div class="card-light" style="width: 160px; height: 215px; top: 25px; left: 14px; transform: rotate(-9deg); z-index: 2; background-image: url('assets/profile_female1.jpg');">
+              <div class="card-info">
+                <div class="name">Rhea, 23 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Bandra • 4 km</div>
+              </div>
+            </div>
+
+            <div class="card-light" style="width: 170px; height: 235px; top: 60px; right: 14px; transform: rotate(7deg); z-index: 4; background-image: url('assets/auth_option5.jpg');">
+              <div class="card-info">
+                <div class="name">Kabir, 26 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Colaba • 6 km</div>
+              </div>
+            </div>
+
+            <div class="pill-tag pill-dark-violet" style="top: 110px; left: 30px; transform: rotate(-5deg);">Coffee ☕</div>
+            <div class="pill-tag pill-dark-violet" style="bottom: 45px; left: 18px; transform: rotate(4deg);">Indie Music 🎸</div>
+
+            <div class="emoji-sticker" style="top: 30px; right: 80px;">😎</div>
+            <div class="emoji-sticker" style="bottom: 110px; right: 8px;">🥰</div>
+          </div>
+
+          <div class="bottom-bar bar-light">
+            <div class="dots-row">
+              <div class="dot-item"></div>
+              <div class="dot-item active violet"></div>
+              <div class="dot-item"></div>
+              <div class="dot-item"></div>
+            </div>
+            <div class="slide-headline text-light">Connecting Hearts</div>
+            <div class="slide-sub text-light">Bond over what you actually love—from late-night chai to live gigs.</div>
+            <div class="action-row">
+              <div class="skip-btn">Skip</div>
+              <button class="next-btn">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opt1 - Screen 3 -->
+      <div class="screen-col">
+        <div class="screen-label"><span>3</span> Trust & Safety</div>
+        <div class="phone-mockup phone-light">
+          <div class="status-bar status-dark">
+            <span>9:41</span>
+            <div class="dynamic-island"></div>
+            <span>●●●</span>
+          </div>
+
+          <div class="canvas-stage">
+            <div class="card-light" style="width: 160px; height: 220px; top: 40px; left: -30px; transform: rotate(-12deg); opacity: 0.5; background-image: url('assets/profile_female1.jpg');"></div>
+
+            <div class="card-light" style="width: 205px; height: 275px; top: 30px; right: 28px; transform: rotate(5deg); z-index: 4; background-image: url('assets/auth_option6.jpg');">
+              <div class="card-info">
+                <div class="name">Arjun, 27 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Powai, Mumbai • 5 km</div>
+              </div>
+            </div>
+
+            <div class="emoji-sticker" style="top: 85px; left: 45px;">😍</div>
+            <div class="pill-tag pill-dark-violet" style="top: 25px; right: 40px;">Travel ✈️</div>
+
+            <svg class="doodle-svg" style="top: 15px; left: 35px; width: 38px; height: 38px;" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2">
+              <circle cx="12" cy="12" r="5"/>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/>
+            </svg>
+          </div>
+
+          <div class="bottom-bar bar-light">
+            <div class="dots-row">
+              <div class="dot-item"></div>
+              <div class="dot-item"></div>
+              <div class="dot-item active violet"></div>
+              <div class="dot-item"></div>
+            </div>
+            <div class="slide-headline text-light">100% Verified Profiles</div>
+            <div class="slide-sub text-light">Zero fake vibes. Date with confidence and complete privacy.</div>
+            <div class="action-row">
+              <div class="skip-btn">Skip</div>
+              <button class="next-btn">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opt1 - Screen 4 -->
+      <div class="screen-col">
+        <div class="screen-label"><span>4</span> Match Celebration</div>
+        <div class="phone-mockup phone-light">
+          <div class="status-bar status-dark">
+            <span>9:41</span>
+            <div class="dynamic-island"></div>
+            <span>●●●</span>
+          </div>
+
+          <div class="canvas-stage">
+            <div class="pill-tag pill-dark-violet" style="top: 12px; left: 24px;">Dancing 💃</div>
+            <div class="pill-tag pill-dark-violet" style="top: 100px; left: 16px;">Weekend Treks 🏔️</div>
+            <div class="pill-tag pill-dark-violet" style="bottom: 45px; right: 18px;">Dog Lover 🐕</div>
+
+            <div class="card-light" style="width: 170px; height: 230px; top: 65px; left: 20px; transform: rotate(-8deg); z-index: 2; background-image: url('assets/auth_option6.jpg');">
+              <div class="card-info">
+                <div class="name">Arjun, 27 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Mumbai</div>
+              </div>
+            </div>
+
+            <div class="card-light" style="width: 170px; height: 230px; top: 25px; right: 20px; transform: rotate(8deg); z-index: 4; background-image: url('assets/profile_female1.jpg');">
+              <div class="card-info">
+                <div class="name">Ananya, 24 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Bandra</div>
+              </div>
+            </div>
+
+            <div class="match-center-badge" style="top: 110px; left: 120px;">
+              <img src="assets/lovecloud_badge.png" alt="LoveCloud Emblem" />
+            </div>
+
+            <div class="emoji-sticker" style="bottom: 75px; left: 10px;">✨</div>
+            <div class="emoji-sticker" style="top: 35px; right: 10px;">🎉</div>
+          </div>
+
+          <div class="bottom-bar bar-light">
+            <div class="dots-row">
+              <div class="dot-item"></div>
+              <div class="dot-item"></div>
+              <div class="dot-item"></div>
+              <div class="dot-item active violet"></div>
+            </div>
+            <div class="slide-headline text-light">It’s a Match!</div>
+            <div class="slide-sub text-light">Infinite possibilities await. Discover who’s waiting for you.</div>
+            <div class="action-row">
+              <div class="skip-btn">Skip</div>
+              <button class="next-btn">Let's Start</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SCRIPT 1 BREAKDOWN -->
+    <div class="script-box">
+      <h3>🇮🇳 Option 1 Progressive Script Breakdown (Urban Metro Chic)</h3>
+      <div class="script-grid">
+        <div class="script-step-card">
+          <div class="step-num">Slide 1 • Discovery</div>
+          <div class="step-title">Find Your Spark</div>
+          <div class="step-sub">Where real connections ignite with verified singles in your city.</div>
+          <div class="step-meta"><strong>Profile:</strong> Ananya, 24 • Bandra | <strong>Tags:</strong> Coffee ☕, Indie Music 🎸</div>
+        </div>
+        <div class="script-step-card">
+          <div class="step-num">Slide 2 • Interests</div>
+          <div class="step-title">Connecting Hearts</div>
+          <div class="step-sub">Bond over what you actually love—from late-night chai runs to live gigs.</div>
+          <div class="step-meta"><strong>Profiles:</strong> Rhea & Kabir | <strong>Tags:</strong> Late Drives 🚗, Foodie 🍜</div>
+        </div>
+        <div class="script-step-card">
+          <div class="step-num">Slide 3 • Trust & Safety</div>
+          <div class="step-title">100% Verified Profiles</div>
+          <div class="step-sub">Zero fake vibes. Date with confidence, safety, and complete privacy controls.</div>
+          <div class="step-meta"><strong>Profile:</strong> Arjun, 27 • Powai | <strong>Tags:</strong> Verified ✓, Travel ✈️</div>
+        </div>
+        <div class="script-step-card">
+          <div class="step-num">Slide 4 • Celebration</div>
+          <div class="step-title">It’s a Match!</div>
+          <div class="step-sub">Infinite possibilities await. Step into LoveCloud and discover who is waiting.</div>
+          <div class="step-meta"><strong>Duo Match:</strong> LoveCloud Badge | <strong>CTA:</strong> Let's Start</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- OPTION 2: MIDNIGHT OBSIDIAN & NEON GLOW (DARK THEME - 4 SCREENS)-->
+  <!-- ============================================================== -->
+  <section class="option-section" id="option2">
+    <div class="option-header">
+      <div class="option-title-group">
+        <h2>Option 2: Midnight Obsidian & Neon Glow <span class="option-pill-tag tag-dark">Dark Luxury • Seamless Theme</span></h2>
+        <p class="option-desc">
+          <strong>Tone: Sophisticated, Exclusive, High-Aspiration.</strong> Deep obsidian black (`#0B0D14`) that directly matches the Auth Screen. Cards feature glowing Flame Rose neon borders, frosted glass textures, and luminous 3D reactions.
+        </p>
+      </div>
+    </div>
+
+    <div class="screens-row">
+
+      <!-- Opt2 - Screen 1 -->
+      <div class="screen-col">
+        <div class="screen-label"><span>1</span> Curated Discovery</div>
+        <div class="phone-mockup phone-dark">
+          <div class="status-bar status-light">
+            <span>9:41</span>
+            <div class="dynamic-island"></div>
+            <span>●●●</span>
+          </div>
+
+          <div class="canvas-stage">
+            <div class="card-dark" style="width: 170px; height: 230px; top: 15px; right: -15px; transform: rotate(14deg); opacity: 0.4; background-image: url('assets/profile_couple.jpg');"></div>
+
+            <div class="card-dark" style="width: 200px; height: 270px; top: 35px; left: 32px; transform: rotate(-6deg); z-index: 4; background-image: url('assets/auth_option5.jpg');">
+              <div class="card-info">
+                <div class="name">Kabir, 26 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Indiranagar, Bengaluru • 4 km</div>
+              </div>
+            </div>
+
+            <div class="emoji-sticker" style="top: 135px; left: 16px;">😎</div>
+            <svg class="doodle-svg" style="top: 18px; left: 110px; width: 44px; height: 44px;" viewBox="0 0 50 50" fill="none" stroke="#FF4458" stroke-width="2.5">
+              <path d="M15 10 C 25 5, 35 15, 25 35 C 22 40, 20 45, 28 48"/>
+              <path d="M22 45 L 28 48 L 29 42"/>
+            </svg>
+          </div>
+
+          <div class="bottom-bar bar-dark">
+            <div class="dots-row">
+              <div class="dot-item dark active"></div>
+              <div class="dot-item dark"></div>
+              <div class="dot-item dark"></div>
+              <div class="dot-item dark"></div>
+            </div>
+            <div class="slide-headline text-dark">Curated Dating</div>
+            <div class="slide-sub text-dark">Meet ambitious founders, creatives & tastemakers in top metros.</div>
+            <div class="action-row">
+              <div class="skip-btn dark">Skip</div>
+              <button class="next-btn">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opt2 - Screen 2 -->
+      <div class="screen-col">
+        <div class="screen-label"><span>2</span> Deep Chemistry</div>
+        <div class="phone-mockup phone-dark">
+          <div class="status-bar status-light">
+            <span>9:41</span>
+            <div class="dynamic-island"></div>
+            <span>●●●</span>
+          </div>
+
+          <div class="canvas-stage">
+            <div class="card-dark" style="width: 160px; height: 215px; top: 25px; left: 14px; transform: rotate(-9deg); z-index: 2; background-image: url('assets/profile_female1.jpg');">
+              <div class="card-info">
+                <div class="name">Rhea, 24 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Bengaluru • 3 km</div>
+              </div>
+            </div>
+
+            <div class="card-dark" style="width: 170px; height: 235px; top: 60px; right: 14px; transform: rotate(7deg); z-index: 4; background-image: url('assets/auth_option5.jpg');">
+              <div class="card-info">
+                <div class="name">Kabir, 26 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Indiranagar • 4 km</div>
+              </div>
+            </div>
+
+            <div class="pill-tag pill-neon-glow" style="top: 110px; left: 28px; transform: rotate(-5deg);">Rooftops 🌃</div>
+            <div class="pill-tag pill-neon-glow" style="bottom: 45px; left: 18px; transform: rotate(4deg);">Techno 🎧</div>
+
+            <div class="emoji-sticker" style="top: 30px; right: 80px;">🔥</div>
+            <div class="emoji-sticker" style="bottom: 110px; right: 8px;">💖</div>
+          </div>
+
+          <div class="bottom-bar bar-dark">
+            <div class="dots-row">
+              <div class="dot-item dark"></div>
+              <div class="dot-item dark active"></div>
+              <div class="dot-item dark"></div>
+              <div class="dot-item dark"></div>
+            </div>
+            <div class="slide-headline text-dark">Beyond Small Talk</div>
+            <div class="slide-sub text-dark">Connect over shared ambition, late evenings & curated music.</div>
+            <div class="action-row">
+              <div class="skip-btn dark">Skip</div>
+              <button class="next-btn">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opt2 - Screen 3 -->
+      <div class="screen-col">
+        <div class="screen-label"><span>3</span> Privacy & Status</div>
+        <div class="phone-mockup phone-dark">
+          <div class="status-bar status-light">
+            <span>9:41</span>
+            <div class="dynamic-island"></div>
+            <span>●●●</span>
+          </div>
+
+          <div class="canvas-stage">
+            <div class="card-dark" style="width: 160px; height: 220px; top: 40px; left: -30px; transform: rotate(-12deg); opacity: 0.4; background-image: url('assets/profile_female1.jpg');"></div>
+
+            <div class="card-dark" style="width: 205px; height: 275px; top: 30px; right: 28px; transform: rotate(5deg); z-index: 4; background-image: url('assets/auth_option6.jpg');">
+              <div class="card-info">
+                <div class="name">Dev, 27 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Koramangala • 5 km</div>
+              </div>
+            </div>
+
+            <div class="emoji-sticker" style="top: 85px; left: 45px;">😎</div>
+            <div class="pill-tag pill-neon-glow" style="top: 25px; right: 40px;">Fitness 🏋️</div>
+
+            <svg class="doodle-svg" style="top: 15px; left: 35px; width: 38px; height: 38px;" viewBox="0 0 24 24" fill="none" stroke="#FF758C" stroke-width="2">
+              <circle cx="12" cy="12" r="5"/>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/>
+            </svg>
+          </div>
+
+          <div class="bottom-bar bar-dark">
+            <div class="dots-row">
+              <div class="dot-item dark"></div>
+              <div class="dot-item dark"></div>
+              <div class="dot-item dark active"></div>
+              <div class="dot-item dark"></div>
+            </div>
+            <div class="slide-headline text-dark">Private & Discreet</div>
+            <div class="slide-sub text-dark">Incognito controls & 100% selfie verification for high security.</div>
+            <div class="action-row">
+              <div class="skip-btn dark">Skip</div>
+              <button class="next-btn">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opt2 - Screen 4 -->
+      <div class="screen-col">
+        <div class="screen-label"><span>4</span> VIP Match</div>
+        <div class="phone-mockup phone-dark">
+          <div class="status-bar status-light">
+            <span>9:41</span>
+            <div class="dynamic-island"></div>
+            <span>●●●</span>
+          </div>
+
+          <div class="canvas-stage">
+            <div class="pill-tag pill-neon-glow" style="top: 12px; left: 24px;">Cocktails 🍸</div>
+            <div class="pill-tag pill-neon-glow" style="top: 100px; left: 16px;">Late Drives 🚗</div>
+            <div class="pill-tag pill-neon-glow" style="bottom: 45px; right: 18px;">Techno 🎧</div>
+
+            <div class="card-dark" style="width: 170px; height: 230px; top: 65px; left: 20px; transform: rotate(-8deg); z-index: 2; background-image: url('assets/auth_option5.jpg');">
+              <div class="card-info">
+                <div class="name">Kabir, 26 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Bengaluru</div>
+              </div>
+            </div>
+
+            <div class="card-dark" style="width: 170px; height: 230px; top: 25px; right: 20px; transform: rotate(8deg); z-index: 4; background-image: url('assets/profile_female1.jpg');">
+              <div class="card-info">
+                <div class="name">Rhea, 24 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Indiranagar</div>
+              </div>
+            </div>
+
+            <div class="match-center-badge" style="top: 110px; left: 120px; background: #0B0D14; border-color: #FF4458; box-shadow: 0 0 20px #FF4458;">
+              <img src="assets/lovecloud_badge.png" alt="LoveCloud Emblem" />
+            </div>
+
+            <div class="emoji-sticker" style="bottom: 75px; left: 10px;">🔥</div>
+            <div class="emoji-sticker" style="top: 35px; right: 10px;">✨</div>
+          </div>
+
+          <div class="bottom-bar bar-dark">
+            <div class="dots-row">
+              <div class="dot-item dark"></div>
+              <div class="dot-item dark"></div>
+              <div class="dot-item dark"></div>
+              <div class="dot-item dark active"></div>
+            </div>
+            <div class="slide-headline text-dark">It’s a Match!</div>
+            <div class="slide-sub text-dark">Welcome to LoveCloud. Your next unforgettable date begins now.</div>
+            <div class="action-row">
+              <div class="skip-btn dark">Skip</div>
+              <button class="next-btn">Let's Start</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SCRIPT 2 BREAKDOWN -->
+    <div class="script-box">
+      <h3>🇮🇳 Option 2 Progressive Script Breakdown (Midnight Obsidian Luxury)</h3>
+      <div class="script-grid">
+        <div class="script-step-card">
+          <div class="step-num">Slide 1 • Curated Discovery</div>
+          <div class="step-title">Curated Dating</div>
+          <div class="step-sub">Meet ambitious founders, creatives & tastemakers in top metros.</div>
+          <div class="step-meta"><strong>Profile:</strong> Kabir, 26 • Bengaluru | <strong>Tags:</strong> Rooftops 🌃, Techno 🎧</div>
+        </div>
+        <div class="script-step-card">
+          <div class="step-num">Slide 2 • Chemistry</div>
+          <div class="step-title">Beyond Small Talk</div>
+          <div class="step-sub">Connect over shared ambition, late evenings & curated music.</div>
+          <div class="step-meta"><strong>Profiles:</strong> Rhea & Kabir | <strong>Tags:</strong> Cocktails 🍸, Modern Art 🎨</div>
+        </div>
+        <div class="script-step-card">
+          <div class="step-num">Slide 3 • Privacy</div>
+          <div class="step-title">Private & Discreet</div>
+          <div class="step-sub">Incognito controls & 100% selfie verification for high security.</div>
+          <div class="step-meta"><strong>Profile:</strong> Dev, 27 • Koramangala | <strong>Tags:</strong> Private Mode 🔒, Fitness 🏋️</div>
+        </div>
+        <div class="script-step-card">
+          <div class="step-num">Slide 4 • VIP Access</div>
+          <div class="step-title">It’s a Match!</div>
+          <div class="step-sub">Welcome to LoveCloud. Your next unforgettable date begins now.</div>
+          <div class="step-meta"><strong>VIP Badge:</strong> Neon Squircle | <strong>CTA:</strong> Let's Start</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- OPTION 3: WARM SUNSET HERITAGE & SOULFUL (WARM THEME - 4 SCREENS)-->
+  <!-- ============================================================== -->
+  <section class="option-section" id="option3">
+    <div class="option-header">
+      <div class="option-title-group">
+        <h2>Option 3: Warm Sunset Heritage & Soulful Match <span class="option-pill-tag tag-warm">Warm Sunset • Soulmate Intent</span></h2>
+        <p class="option-desc">
+          <strong>Tone: Warm, Sincere, Companionship & Long-Term Compatibility.</strong> Heartwarming champagne & sunset peach palette. Emphasizes genuine compatibility, shared values, and lasting companionship.
+        </p>
+      </div>
+    </div>
+
+    <div class="screens-row">
+
+      <!-- Opt3 - Screen 1 -->
+      <div class="screen-col">
+        <div class="screen-label"><span>1</span> Genuine Intent</div>
+        <div class="phone-mockup phone-warm">
+          <div class="status-bar status-dark">
+            <span>9:41</span>
+            <div class="dynamic-island"></div>
+            <span>●●●</span>
+          </div>
+
+          <div class="canvas-stage">
+            <div class="card-warm" style="width: 170px; height: 230px; top: 15px; right: -15px; transform: rotate(14deg); opacity: 0.55; background-image: url('assets/auth_option4.jpg');"></div>
+
+            <div class="card-warm" style="width: 200px; height: 270px; top: 35px; left: 32px; transform: rotate(-6deg); z-index: 4; background-image: url('assets/auth_option6.jpg');">
+              <div class="card-info">
+                <div class="name">Pooja, 25 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 South Delhi • 2 km</div>
+              </div>
+            </div>
+
+            <div class="emoji-sticker" style="top: 135px; left: 16px;">🥰</div>
+            <svg class="doodle-svg" style="top: 18px; left: 110px; width: 44px; height: 44px;" viewBox="0 0 50 50" fill="none" stroke="#D9531E" stroke-width="2.5">
+              <path d="M15 10 C 25 5, 35 15, 25 35 C 22 40, 20 45, 28 48"/>
+              <path d="M22 45 L 28 48 L 29 42"/>
+            </svg>
+          </div>
+
+          <div class="bottom-bar bar-warm">
+            <div class="dots-row">
+              <div class="dot-item active orange"></div>
+              <div class="dot-item"></div>
+              <div class="dot-item"></div>
+              <div class="dot-item"></div>
+            </div>
+            <div class="slide-headline text-light">Meaningful Dating</div>
+            <div class="slide-sub text-light">Built for singles who value real depth and authentic companionship.</div>
+            <div class="action-row">
+              <div class="skip-btn">Skip</div>
+              <button class="next-btn orange">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opt3 - Screen 2 -->
+      <div class="screen-col">
+        <div class="screen-label"><span>2</span> Shared Values</div>
+        <div class="phone-mockup phone-warm">
+          <div class="status-bar status-dark">
+            <span>9:41</span>
+            <div class="dynamic-island"></div>
+            <span>●●●</span>
+          </div>
+
+          <div class="canvas-stage">
+            <div class="card-warm" style="width: 160px; height: 215px; top: 25px; left: 14px; transform: rotate(-9deg); z-index: 2; background-image: url('assets/auth_option6.jpg');">
+              <div class="card-info">
+                <div class="name">Pooja, 25 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Delhi • 3 km</div>
+              </div>
+            </div>
+
+            <div class="card-warm" style="width: 170px; height: 235px; top: 60px; right: 14px; transform: rotate(7deg); z-index: 4; background-image: url('assets/auth_option4.jpg');">
+              <div class="card-info">
+                <div class="name">Rohan, 27 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Gurgaon • 5 km</div>
+              </div>
+            </div>
+
+            <div class="pill-tag pill-warm-sunset" style="top: 110px; left: 28px; transform: rotate(-5deg);">Chai Lover ☕</div>
+            <div class="pill-tag pill-warm-sunset" style="bottom: 45px; left: 18px; transform: rotate(4deg);">Heritage Walks 🏛️</div>
+
+            <div class="emoji-sticker" style="top: 30px; right: 80px;">💖</div>
+            <div class="emoji-sticker" style="bottom: 110px; right: 8px;">✨</div>
+          </div>
+
+          <div class="bottom-bar bar-warm">
+            <div class="dots-row">
+              <div class="dot-item"></div>
+              <div class="dot-item active orange"></div>
+              <div class="dot-item"></div>
+              <div class="dot-item"></div>
+            </div>
+            <div class="slide-headline text-light">Shared Values</div>
+            <div class="slide-sub text-light">Find alignment on lifestyle, core values & long-term goals.</div>
+            <div class="action-row">
+              <div class="skip-btn">Skip</div>
+              <button class="next-btn orange">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opt3 - Screen 3 -->
+      <div class="screen-col">
+        <div class="screen-label"><span>3</span> Respect & Safety</div>
+        <div class="phone-mockup phone-warm">
+          <div class="status-bar status-dark">
+            <span>9:41</span>
+            <div class="dynamic-island"></div>
+            <span>●●●</span>
+          </div>
+
+          <div class="canvas-stage">
+            <div class="card-warm" style="width: 160px; height: 220px; top: 40px; left: -30px; transform: rotate(-12deg); opacity: 0.5; background-image: url('assets/auth_option6.jpg');"></div>
+
+            <div class="card-warm" style="width: 205px; height: 275px; top: 30px; right: 28px; transform: rotate(5deg); z-index: 4; background-image: url('assets/auth_option4.jpg');">
+              <div class="card-info">
+                <div class="name">Rohan, 27 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Cyber City • 4 km</div>
+              </div>
+            </div>
+
+            <div class="emoji-sticker" style="top: 85px; left: 45px;">🥰</div>
+            <div class="pill-tag pill-warm-sunset" style="top: 25px; right: 40px;">Weekend Treks 🏔️</div>
+
+            <svg class="doodle-svg" style="top: 15px; left: 35px; width: 38px; height: 38px;" viewBox="0 0 24 24" fill="none" stroke="#D9531E" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
+
+          <div class="bottom-bar bar-warm">
+            <div class="dots-row">
+              <div class="dot-item"></div>
+              <div class="dot-item"></div>
+              <div class="dot-item active orange"></div>
+              <div class="dot-item"></div>
+            </div>
+            <div class="slide-headline text-light">Respect First</div>
+            <div class="slide-sub text-light">A safe, gentle and respectful space with zero-pressure dating.</div>
+            <div class="action-row">
+              <div class="skip-btn">Skip</div>
+              <button class="next-btn orange">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opt3 - Screen 4 -->
+      <div class="screen-col">
+        <div class="screen-label"><span>4</span> Soulmate Match</div>
+        <div class="phone-mockup phone-warm">
+          <div class="status-bar status-dark">
+            <span>9:41</span>
+            <div class="dynamic-island"></div>
+            <span>●●●</span>
+          </div>
+
+          <div class="canvas-stage">
+            <div class="pill-tag pill-warm-sunset" style="top: 12px; left: 24px;">Chai Lover ☕</div>
+            <div class="pill-tag pill-warm-sunset" style="top: 100px; left: 16px;">Dog Parent 🐕</div>
+            <div class="pill-tag pill-warm-sunset" style="bottom: 45px; right: 18px;">Cooking 🍳</div>
+
+            <div class="card-warm" style="width: 170px; height: 230px; top: 65px; left: 20px; transform: rotate(-8deg); z-index: 2; background-image: url('assets/auth_option4.jpg');">
+              <div class="card-info">
+                <div class="name">Rohan, 27 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 Gurgaon</div>
+              </div>
+            </div>
+
+            <div class="card-warm" style="width: 170px; height: 230px; top: 25px; right: 20px; transform: rotate(8deg); z-index: 4; background-image: url('assets/auth_option6.jpg');">
+              <div class="card-info">
+                <div class="name">Pooja, 25 <span class="verified-tick">✓</span></div>
+                <div class="loc">📍 South Delhi</div>
+              </div>
+            </div>
+
+            <div class="match-center-badge" style="top: 110px; left: 120px; border-color: #FF9933;">
+              <img src="assets/lovecloud_badge.png" alt="LoveCloud Emblem" />
+            </div>
+
+            <div class="emoji-sticker" style="bottom: 75px; left: 10px;">✨</div>
+            <div class="emoji-sticker" style="top: 35px; right: 10px;">🎉</div>
+          </div>
+
+          <div class="bottom-bar bar-warm">
+            <div class="dots-row">
+              <div class="dot-item"></div>
+              <div class="dot-item"></div>
+              <div class="dot-item"></div>
+              <div class="dot-item active orange"></div>
+            </div>
+            <div class="slide-headline text-light">Find Your Soulmate</div>
+            <div class="slide-sub text-light">Begin a genuine chapter rooted in trust and lifelong companionship.</div>
+            <div class="action-row">
+              <div class="skip-btn">Skip</div>
+              <button class="next-btn orange">Let's Start</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SCRIPT 3 BREAKDOWN -->
+    <div class="script-box">
+      <h3>🇮🇳 Option 3 Progressive Script Breakdown (Warm Sunset Soulful)</h3>
+      <div class="script-grid">
+        <div class="script-step-card">
+          <div class="step-num">Slide 1 • Genuine Intent</div>
+          <div class="step-title">Meaningful Dating</div>
+          <div class="step-sub">Built for singles who value real depth and authentic companionship.</div>
+          <div class="step-meta"><strong>Profile:</strong> Pooja, 25 • Delhi | <strong>Tags:</strong> Chai Lover ☕, Books 📚</div>
+        </div>
+        <div class="script-step-card">
+          <div class="step-num">Slide 2 • Shared Values</div>
+          <div class="step-title">Shared Values</div>
+          <div class="step-sub">Find alignment on lifestyle, core values & long-term goals.</div>
+          <div class="step-meta"><strong>Profiles:</strong> Pooja & Rohan | <strong>Tags:</strong> Heritage 🏛️, Chai ☕</div>
+        </div>
+        <div class="script-step-card">
+          <div class="step-num">Slide 3 • Respect & Safety</div>
+          <div class="step-title">Respect First</div>
+          <div class="step-sub">A safe, gentle and respectful space with zero-pressure dating.</div>
+          <div class="step-meta"><strong>Profile:</strong> Rohan, 27 • Gurgaon | <strong>Tags:</strong> Respect ✓, Treks 🏔️</div>
+        </div>
+        <div class="script-step-card">
+          <div class="step-num">Slide 4 • Soulmate Match</div>
+          <div class="step-title">Find Your Soulmate</div>
+          <div class="step-sub">Begin a genuine chapter rooted in trust and lifelong companionship.</div>
+          <div class="step-meta"><strong>Soulmate Badge:</strong> LoveCloud Squircle | <strong>CTA:</strong> Let's Start</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
 </body>
 </html>
