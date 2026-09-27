@@ -366,8 +366,8 @@ class OnbordingCubit extends Cubit<OnbordingState> {
       }
 
     } catch (e) {
-      Fluttertoast.showToast(msg: "Error: $e");
-      rethrow;
+      print("smstypeapi error: $e");
+      return null;
     }
   }
 

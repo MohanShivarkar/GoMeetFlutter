@@ -36,19 +36,19 @@ class SmaTypeApiModel {
   });
 
   factory SmaTypeApiModel.fromJson(Map<String, dynamic> json) => SmaTypeApiModel(
-    responseCode: json["ResponseCode"],
-    result: json["Result"],
-    responseMsg: json["ResponseMsg"],
-    smsType: json["SMS_TYPE"],
-    admobEnabled: json["Admob_Enabled"],
-    maintainanceEnabled: json["maintainance_Enabled"],
-    socialLoginEnabled: json["Social_login_enabled"],
-    bannerId: json["banner_id"],
-    inId: json["in_id"],
-    otpAuth: json["otp_auth"],
-    giftFun: json["gift_fun"],
-    iosInId: json["ios_in_id"],
-    iosBannerId: json["ios_banner_id"],
+    responseCode: (json["ResponseCode"] ?? json["responseCode"] ?? "").toString(),
+    result: (json["Result"] ?? json["result"] ?? "false").toString(),
+    responseMsg: (json["ResponseMsg"] ?? json["responseMsg"] ?? "").toString(),
+    smsType: (json["SMS_TYPE"] ?? json["sms_type"] ?? "Firebase").toString(),
+    admobEnabled: (json["Admob_Enabled"] ?? json["admob_enabled"] ?? "No").toString(),
+    maintainanceEnabled: (json["maintainance_Enabled"] ?? json["maintainance_enabled"] ?? "No").toString(),
+    socialLoginEnabled: (json["Social_login_enabled"] ?? json["social_login_enabled"] ?? "No").toString(),
+    bannerId: (json["banner_id"] ?? json["bannerId"] ?? "").toString(),
+    inId: (json["in_id"] ?? json["inId"] ?? "").toString(),
+    otpAuth: (json["otp_auth"] ?? json["otpAuth"] ?? "No").toString(),
+    giftFun: (json["gift_fun"] ?? json["giftFun"] ?? "").toString(),
+    iosInId: (json["ios_in_id"] ?? json["iosInId"] ?? "").toString(),
+    iosBannerId: (json["ios_banner_id"] ?? json["iosBannerId"] ?? "").toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -58,7 +58,7 @@ class SmaTypeApiModel {
     "SMS_TYPE": smsType,
     "Admob_Enabled": admobEnabled,
     "maintainance_Enabled": maintainanceEnabled,
-    "Social_login_enabled": socialLoginEnabled,
+    "social_login_enabled": socialLoginEnabled,
     "banner_id": bannerId,
     "in_id": inId,
     "otp_auth": otpAuth,

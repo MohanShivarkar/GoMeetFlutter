@@ -470,6 +470,13 @@ newPassWord(context,mobileNumber,ccode){
   double? long = 72.8777;
 
   getCurrentLatAndLong(context) async {
+    if (kIsWeb) {
+      lat = 19.0760;
+      long = 72.8777;
+      notifyListeners();
+      nextPage(context);
+      return;
+    }
     try {
       LocationPermission permission;
       permission = await Geolocator.checkPermission();
