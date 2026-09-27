@@ -633,10 +633,6 @@ class _ChattingPageState extends State<ChattingPage> {
                   const Spacer(flex: 2),
                   InkWell(
                       onTap: () {
-                        if (foundation.kIsWeb) {
-                          _showDownloadAppDialog(context, "Voice");
-                          return;
-                        }
                         if (state.homeData.audioVideo == "0") {
                           Navigator.pushNamed(context, PremiumScreen.premiumScreenRoute);
                         }
@@ -681,10 +677,6 @@ class _ChattingPageState extends State<ChattingPage> {
                   const Spacer(),
                   InkWell(
                       onTap: () {
-                        if (foundation.kIsWeb) {
-                          _showDownloadAppDialog(context, "Video");
-                          return;
-                        }
                         if (state.homeData.audioVideo == "0") {
                           Navigator.pushNamed(context, PremiumScreen.premiumScreenRoute);
                         }

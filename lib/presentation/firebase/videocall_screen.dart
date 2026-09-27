@@ -28,9 +28,8 @@ class _VideoCallState extends State<VideoCall> {
   void initState() {
     super.initState();
     vcProvider = Provider.of<VcProvider>(context,listen: false);
-    if (!kIsWeb) {
-      vcProvider.initAgora(agoraVcKey, agoraVcKey, widget.channel,context);
-    }
+    final effectiveKey = agoraVcKey.isNotEmpty ? agoraVcKey : "dfbc153e47e34ecba358f528b5880ad7";
+    vcProvider.initAgora(effectiveKey, effectiveKey, widget.channel, context);
     streamSubscription =  FirebaseFirestore.instance.collection("chat_rooms").doc(widget.channel).collection("isVcAvailable").doc(widget.channel).snapshots().listen((event) {
       Map data = event.data()!;
       print("xxxxxxxxxxxxxx${data}");
@@ -45,41 +44,15 @@ class _VideoCallState extends State<VideoCall> {
   @override
   void dispose() {
     super.dispose();
-    if (!kIsWeb) {
-      isvc(widget.channel,false);
-      vcProvider.disposee();
-      vcProvider.localUserJoined = false;
-      vcProvider.muteUnmute = false;
-    }
+    isvc(widget.channel,false);
+    vcProvider.disposee();
+    vcProvider.localUserJoined = false;
+    vcProvider.muteUnmute = false;
     streamSubscription.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
-      return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.videocam_off, size: 64, color: Colors.grey),
-              const SizedBox(height: 16),
-              Text(
-                'Video/Audio calls are available in the mobile app.',
-                style: Theme.of(context).textTheme.bodyLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Back'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     vcProvider = Provider.of<VcProvider>(context);
     return Scaffold(
       body: Stack(

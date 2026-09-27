@@ -24,66 +24,37 @@ class _PickUpAudioCallState extends State<PickUpAudioCall> {
   void initState() {
     super.initState();
     audioCallProvider = Provider.of<AudioCallProvider>(context,listen: false);
-    if (!kIsWeb) {
-      audioCallProvider.updateIsLoading(true);
-      audioCallProvider.setupVoiceSDKEngine(agoraVcKey).then((value) {
-        audioCallProvider.join(widget.channel, agoraVcKey);
-        audioCallProvider.stopwatch = Stopwatch();
-        audioCallProvider.managetimer();
-        audioCallProvider.updateIsLoading(false);
-      });
-    }
+    final effectiveKey = agoraVcKey.isNotEmpty ? agoraVcKey : "dfbc153e47e34ecba358f528b5880ad7";
+    audioCallProvider.updateIsLoading(true);
+    audioCallProvider.setupVoiceSDKEngine(effectiveKey).then((value) {
+      audioCallProvider.join(widget.channel, effectiveKey);
+      audioCallProvider.stopwatch = Stopwatch();
+      audioCallProvider.managetimer();
+      audioCallProvider.updateIsLoading(false);
+    });
 
     FirebaseFirestore.instance.collection("chat_rooms").doc(widget.channel).collection("isVcAvailable").doc(widget.channel).snapshots().listen((event) {
       Map data = event.data()!;
        if(data["Audio"] == false) {
         Navigator.pop(context);
-        if (!kIsWeb) {
-          audioCallProvider.leave();
-          audioCallProvider.stopwatch.reset();
-        }
+        audioCallProvider.leave();
+        audioCallProvider.stopwatch.reset();
       }
     });
   }
 
   @override
   void dispose() async {
-    if (!kIsWeb) {
-      await audioCallProvider.agoraEngine.leaveChannel();
-      audioCallProvider.isJoined = false;
-      audioCallProvider.muteUnmute = false;
-      audioCallProvider.isLoading = false;
-    }
+    await audioCallProvider.agoraEngine.leaveChannel();
+    audioCallProvider.isJoined = false;
+    audioCallProvider.muteUnmute = false;
+    audioCallProvider.isLoading = false;
     isAudio(widget.channel, false);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
-      return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.phone_disabled, size: 64, color: Colors.grey),
-              const SizedBox(height: 16),
-              Text(
-                'Video/Audio calls are available in the mobile app.',
-                style: Theme.of(context).textTheme.bodyLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Back'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     audioCallProvider = Provider.of<AudioCallProvider>(context);
     return Scaffold(
       body: audioCallProvider.isLoading ? Center(child: CircularProgressIndicator(color: AppColors.appColor)) : Container(
