@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoveCloud - Onboarding / Introduction Screen Design Directions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --flame-rose: #FF4458;
+      --sunset-coral: #FF758C;
+      --warm-glow: #FFA07A;
+      --obsidian: #0B0D14;
+      --surface: #141622;
+      --border: rgba(255, 255, 255, 0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: #08090E;
+      color: #FFFFFF;
+      min-height: 100vh;
+      padding: 40px 20px 80px;
+    }
+    .header {
+      max-width: 1200px;
+      margin: 0 auto 36px;
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(255, 68, 88, 0.15);
+      border: 1px solid rgba(255, 68, 88, 0.35);
+      color: var(--sunset-coral);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .badge-india {
+      background: rgba(255, 153, 51, 0.15);
+      border-color: rgba(255, 153, 51, 0.4);
+      color: #FF9933;
+    }
+    h1 {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFD080 50%, var(--sunset-coral) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.subtitle {
+      font-size: 16px;
+      color: #9E9AA8;
+      max-width: 820px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Comparison Audit Box */
+    .audit-container {
+      max-width: 1100px;
+      margin: 0 auto 50px;
+      background: rgba(20, 22, 34, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 24px 30px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+    .audit-col h3 {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .audit-col.current h3 { color: #FF6B6B; }
+    .audit-col.redesign h3 { color: #51CF66; }
+    .audit-list {
+      list-style: none;
+      font-size: 13px;
+      color: #B5B2C0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      line-height: 1.5;
+    }
+    .audit-list li {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Options Grid */
+    .options-grid {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 32px;
+      justify-items: center;
+    }
+
+    .option-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .option-card:hover {
+      border-color: rgba(255, 68, 88, 0.5);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(255, 68, 88, 0.15);
+    }
+    .option-card.recommended {
+      border-color: var(--flame-rose);
+      box-shadow: 0 0 0 1px var(--flame-rose), 0 16px 40px rgba(255, 68, 88, 0.2);
+    }
+    .tag-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: linear-gradient(135deg, var(--flame-rose), var(--sunset-coral));
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .tag-badge.india {
+      background: linear-gradient(135deg, #FF9933, #FF4458);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      align-self: flex-start;
+    }
+    .card-desc {
+      font-size: 13px;
+      color: #9E9AA8;
+      margin-bottom: 20px;
+      line-height: 1.5;
+      align-self: flex-start;
+      min-height: 52px;
+    }
+
+    /* Phone Mockup Frame */
+    .phone-mockup {
+      width: 320px;
+      height: 640px;
+      border-radius: 46px;
+      border: 8px solid #222533;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.85), inset 0 0 0 2px rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Option 1 Phone Mockup (Urban Chic - Light) */
+    .phone-opt1 {
+      background: #FAF8F5;
+      color: #1A1C24;
+      background-image: url('assets/onboard_opt1.jpg');
+      background-size: cover;
+      background-position: center top;
+    }
+
+    /* Option 2 Phone Mockup (Midnight Obsidian - Dark) */
+    .phone-opt2 {
+      background: #0B0D14;
+      color: #FFFFFF;
+      background-image: url('assets/onboard_opt2.jpg');
+      background-size: cover;
+      background-position: center top;
+    }
+
+    /* Option 3 Phone Mockup (Duo Overlapping Match Cards) */
+    .phone-opt3 {
+      background: linear-gradient(180deg, #FBF8F5 0%, #FFF3EC 60%, #FFFFFF 100%);
+      color: #1A1C24;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* iOS Status Bar Simulation */
+    .status-bar {
+      height: 40px;
+      padding: 10px 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .status-bar.dark-text { color: #1A1C24; }
+    .status-bar.light-text { color: #FFFFFF; }
+    .dynamic-island {
+      width: 80px;
+      height: 20px;
+      background: #000;
+      border-radius: 20px;
+      position: absolute;
+      left: 50%;
+      top: 8px;
+      transform: translateX(-50%);
+    }
+
+    /* Option 3 Custom Interactive Stage */
+    .card-stage-opt3 {
+      position: relative;
+      flex: 1;
+      margin: 10px 14px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .match-card {
+      position: absolute;
+      width: 175px;
+      height: 235px;
+      border-radius: 22px;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+      border: 4px solid #FFFFFF;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 10px;
+      color: #FFF;
+      box-sizing: border-box;
+    }
+    .match-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 60%);
+      z-index: 1;
+    }
+    .match-card-content {
+      position: relative;
+      z-index: 2;
+    }
+    .card-top {
+      top: 25px;
+      right: 18px;
+      transform: rotate(7deg);
+      background-image: url('assets/auth_option5.jpg');
+      z-index: 2;
+    }
+    .card-bottom {
+      top: 65px;
+      left: 18px;
+      transform: rotate(-8deg);
+      background-image: url('assets/auth_option6.jpg');
+      z-index: 1;
+    }
+    .profile-name {
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .verified-icon {
+      color: #3897F0;
+      font-size: 11px;
+    }
+    .profile-loc {
+      font-size: 10px;
+      opacity: 0.9;
+    }
+
+    /* Floating Pills */
+    .float-pill {
+      position: absolute;
+      background: rgba(22, 17, 36, 0.9);
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: 999px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .pill-1 { top: 12px; left: 16px; transform: rotate(-5deg); }
+    .pill-2 { bottom: 65px; right: 12px; transform: rotate(4deg); }
+    .pill-3 { bottom: 18px; left: 24px; transform: rotate(-3deg); }
+
+    /* Center Badge between Match Cards */
+    .match-badge-center {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: #FFFFFF;
+      box-shadow: 0 8px 24px rgba(255, 68, 88, 0.45);
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 110px;
+      left: 130px;
+      border: 2px solid #FF4458;
+    }
+    .match-badge-center img {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: block;
+    }
+
+    /* Doodle Elements */
+    .doodle {
+      position: absolute;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0.75;
+    }
+
+    /* Bottom Control Bar in Mockup */
+    .bottom-onboard {
+      padding: 16px 20px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      z-index: 10;
+      background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.95) 40%, #FFFFFF 100%);
+    }
+    .bottom-onboard.dark {
+      background: linear-gradient(180deg, rgba(11,13,20,0) 0%, rgba(11,13,20,0.95) 40%, #0B0D14 100%);
+    }
+    .indicator-bar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.2);
+    }
+    .dot.active {
+      width: 22px;
+      background: #7C4DFF;
+    }
+    .dot.active.rose {
+      background: var(--flame-rose);
+    }
+    .dot.dark-mode {
+      background: rgba(255,255,255,0.25);
+    }
+    .dot.dark-mode.active {
+      background: var(--flame-rose);
+    }
+
+    .onboard-title {
+      font-size: 17px;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.3;
+      color: #0E1017;
+    }
+    .onboard-title.dark {
+      color: #FFFFFF;
+    }
+
+    .btn-row {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .skip-link {
+      flex: 1;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #555A6E;
+      cursor: pointer;
+    }
+    .skip-link.dark {
+      color: #9E9AA8;
+    }
+    .next-pill-btn {
+      flex: 1.2;
+      height: 44px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--flame-rose) 0%, var(--sunset-coral) 100%);
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(255, 68, 88, 0.35);
+      border: none;
+      cursor: pointer;
+    }
+
+    .key-points {
+      margin-top: 18px;
+      width: 100%;
+      list-style: none;
+      font-size: 12px;
+      color: #B5B2C0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .key-points li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .key-points li::before {
+      content: "✓";
+      color: var(--flame-rose);
+      font-weight: 900;
+    }
+    .option-card.recommended .key-points li::before {
+      color: #FF9933;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="badge badge-india">Specialist Graphic Design Review • Onboarding Flow</div>
+    <h1>LoveCloud Introduction / Walkthrough Screens</h1>
+    <p class="subtitle">
+      Comprehensive upgrade of the card-stack & doodle concept. Replaces generic Southeast Asian stock models ("3 Thai land") with high-fashion Indian singles, refined typography, and verified dating cues aligned with LoveCloud branding.
+    </p>
+  </div>
+
+  <!-- AUDIT BREAKDOWN -->
+  <div class="audit-container">
+    <div class="audit-col current">
+      <h3>⚠️ Current Template Shortcomings</h3>
+      <ul class="audit-list">
+        <li>❌ <strong>Foreign Stock Models:</strong> Mismatched international models with dummy text ("Lissa Moni 22, 3 Thai land", "Jenny Lopez").</li>
+        <li>❌ <strong>Cultural Mismatch:</strong> Fails to evoke trust or resonance with Indian singles in Mumbai, Delhi, Bengaluru.</li>
+        <li>❌ <strong>Generic Violet Palette:</strong> Disconnected from the official LoveCloud Flame Rose & Sunset Coral identity.</li>
+        <li>❌ <strong>Static Graphic Images:</strong> Text is baked into bitmap image files instead of dynamic responsive widgets.</li>
+      </ul>
+    </div>
+    <div class="audit-col redesign">
+      <h3>✨ Specialist Designer Solutions</h3>
+      <ul class="audit-list">
+        <li>✅ <strong>Indian Urban Singles:</strong> Verified profiles featuring relatable Indian professionals ("Ananya • Bandra", "Kabir • Bengaluru", "Rhea • Delhi").</li>
+        <li>✅ <strong>Curated Indian Interests:</strong> Floating tags tailored to modern Indian lifestyle (`Coffee ☕`, `Rooftops 🌃`, `Chai ☕`, `Weekend Treks 🏔️`).</li>
+        <li>✅ <strong>LoveCloud Brand Integration:</strong> Seamlessly incorporates the official Option 1 squircle badge and vibrant gradient.</li>
+        <li>✅ <strong>High-Trust Cues:</strong> Prominent blue verification ticks `✓` to address safety skepticism in the Indian market.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 3 DESIGN OPTIONS GRID -->
+  <div class="options-grid">
+
+    <!-- Option 1: Urban Metro Chic (Light Aesthetic) -->
+    <div class="option-card recommended">
+      <div class="tag-badge india">Option 1 • Recommended</div>
+      <div class="card-title">Option 1: Urban Metro Chic (Light)</div>
+      <div class="card-desc">
+        Crisp porcelain backdrop with layered elevated profile cards. Features stylish Mumbai/Bengaluru singles, 3D star-eyes emoji, verified blue badge, and clean hand-drawn line doodles.
+      </div>
+
+      <div class="phone-mockup phone-opt1">
+        <!-- Rendered with live generated Indian UI artwork -->
+      </div>
+
+      <ul class="key-points">
+        <li><strong>Profile:</strong> Ananya, 24 • Bandra, Mumbai (Verified `✓`)</li>
+        <li><strong>Tags:</strong> `Coffee ☕`, `Indie Music 🎸`, `Travel ✈️`, `Dog Lover 🐕`</li>
+        <li><strong>Style:</strong> Clean, high-energy, friendly; appeals broadly to 18-28 Gen-Z & young professionals</li>
+        <li><strong>Brand Match:</strong> Flame Rose CTA button with clean organic doodles</li>
+      </ul>
+    </div>
+
+    <!-- Option 2: Midnight Obsidian & Neon Glow (Dark Aesthetic) -->
+    <div class="option-card">
+      <div class="tag-badge">Option 2 • Luxury Dark</div>
+      <div class="card-title">Option 2: Midnight Neon Obsidian</div>
+      <div class="card-desc">
+        Deep obsidian black mode matching the Auth Screen. Dynamic tilted card with glowing neon rose border, featuring a charismatic Bengaluru young professional and glowing 3D reaction stickers.
+      </div>
+
+      <div class="phone-mockup phone-opt2">
+        <!-- Rendered with live generated dark Indian UI artwork -->
+      </div>
+
+      <ul class="key-points">
+        <li><strong>Profile:</strong> Kabir, 26 • Indiranagar, Bengaluru (Verified `✓`)</li>
+        <li><strong>Tags:</strong> `Rooftops 🌃`, `Techno 🎧`, `Fitness 🏋️`</li>
+        <li><strong>Style:</strong> Ultra-luxury Raya/Tinder Platinum aesthetic; 100% theme consistency with Auth screen</li>
+        <li><strong>Visual Impact:</strong> Luminous glowing borders and fiery heart reaction</li>
+      </ul>
+    </div>
+
+    <!-- Option 3: Soulful Golden Hour Match (Warm Duo Aesthetic) -->
+    <div class="option-card">
+      <div class="tag-badge india">Option 3 • Match Moment</div>
+      <div class="card-title">Option 3: Soulful Duo Match Moment</div>
+      <div class="card-desc">
+        Captures the magical "It’s a Match" slide. Two overlapping tilted profile cards with the official LoveCloud squircle badge anchored between them, celebrating Indian companionship.
+      </div>
+
+      <div class="phone-mockup phone-opt3">
+        <div class="status-bar dark-text">
+          <span>9:41</span>
+          <div class="dynamic-island"></div>
+          <span>●●●</span>
+        </div>
+
+        <div class="card-stage-opt3">
+          <!-- Floating Interest Pills -->
+          <div class="float-pill pill-1">Chai Lover ☕</div>
+          <div class="float-pill pill-2">Weekend Treks 🏔️</div>
+          <div class="float-pill pill-3">Dog Parent 🐕</div>
+
+          <!-- Bottom Card: Arjun (Male Profile) -->
+          <div class="match-card card-bottom">
+            <div class="match-card-content">
+              <div class="profile-name">Arjun, 27 <span class="verified-icon">●</span></div>
+              <div class="profile-loc">📍 Cyber City, Gurgaon</div>
+            </div>
+          </div>
+
+          <!-- Official LoveCloud Squircle Emblem in Center -->
+          <div class="match-badge-center">
+            <img src="assets/lovecloud_badge.png" alt="LoveCloud Emblem" />
+          </div>
+
+          <!-- Top Card: Rhea (Female Profile) -->
+          <div class="match-card card-top">
+            <div class="match-card-content">
+              <div class="profile-name">Rhea, 24 <span class="verified-icon">●</span></div>
+              <div class="profile-loc">📍 South Delhi</div>
+            </div>
+          </div>
+
+          <!-- SVG Doodle Sparkle Accents -->
+          <svg class="doodle" style="top: 8px; right: 28px; width: 32px; height: 32px;" viewBox="0 0 24 24" fill="none" stroke="#FF4458" stroke-width="2">
+            <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+          </svg>
+          <svg class="doodle" style="bottom: 20px; right: 22px; width: 28px; height: 28px;" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </div>
+
+        <div class="bottom-onboard">
+          <div class="indicator-bar">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot active rose"></div>
+          </div>
+          <div class="onboard-title">It’s a Match: Discover Your Forever</div>
+          <div class="btn-row">
+            <div class="skip-link">Skip</div>
+            <button class="next-pill-btn">Let's Start</button>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li><strong>Profiles:</strong> Rhea (24, South Delhi) & Arjun (27, Gurgaon)</li>
+        <li><strong>Tags:</strong> `Chai Lover ☕`, `Weekend Treks 🏔️`, `Dog Parent 🐕`</li>
+        <li><strong>Core Hook:</strong> Celebrates mutual discovery & long-term commitment</li>
+        <li><strong>Official Emblem:</strong> LoveCloud squircle badge connects both profiles</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- COMPREHENSIVE 4-SLIDE SCRIPT RECOMMENDATION FOR INDIA -->
+  <div style="max-width: 1100px; margin: 60px auto 0; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 30px;">
+    <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 16px; color: #FF9933;">
+      🇮🇳 Recommended 4-Slide Progressive Onboarding Script for India Launch
+    </h3>
+    <p style="font-size: 14px; color: #9E9AA8; margin-bottom: 24px; line-height: 1.6;">
+      To maximize completion rate and eliminate drop-off, the copy and visuals should progress logically from discovery to safety to mutual celebration:
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px;">
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px;">
+        <div style="font-size: 11px; font-weight: 800; color: var(--sunset-coral); text-transform: uppercase; margin-bottom: 6px;">Slide 1 • Discovery</div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Find Your Spark</div>
+        <p style="font-size: 12px; color: #8F8B99; line-height: 1.4;">Meet verified singles, creatives, and young professionals in your city who match your wavelength.</p>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px;">
+        <div style="font-size: 11px; font-weight: 800; color: var(--sunset-coral); text-transform: uppercase; margin-bottom: 6px;">Slide 2 • Connection</div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Connect Over Passions</div>
+        <p style="font-size: 12px; color: #8F8B99; line-height: 1.4;">Bond over shared passions—from late-night chai runs and rooftop cafes to travel and fitness.</p>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px;">
+        <div style="font-size: 11px; font-weight: 800; color: var(--sunset-coral); text-transform: uppercase; margin-bottom: 6px;">Slide 3 • Trust & Safety</div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">100% Verified Profiles</div>
+        <p style="font-size: 12px; color: #8F8B99; line-height: 1.4;">Zero fake profiles. Safe, secure selfie-verified matchmaking so you can date with absolute confidence.</p>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px;">
+        <div style="font-size: 11px; font-weight: 800; color: var(--sunset-coral); text-transform: uppercase; margin-bottom: 6px;">Slide 4 • Match Celebration</div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">It’s a Match!</div>
+        <p style="font-size: 12px; color: #8F8B99; line-height: 1.4;">Infinite genuine possibilities. Step inside LoveCloud and discover who is waiting for you.</p>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
