@@ -65,6 +65,8 @@ class OnBordingProvider with ChangeNotifier {
     hobieSearchContoller.clear();
     religionSearchContoller.clear();
     email.clear();
+    images.clear();
+    imageBytes.clear();
   }
 
   int onboradingCurrent = 0;
@@ -139,12 +141,12 @@ class OnBordingProvider with ChangeNotifier {
     if (images.length == index) {
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
-        images.add(image);
         try {
           final bytes = await image.readAsBytes();
+          images.add(image);
           imageBytes.add(bytes);
+          notifyListeners();
         } catch (_) {}
-        notifyListeners();
       }
     }
   }
@@ -280,7 +282,12 @@ newPassWord(context,mobileNumber,ccode){
 
 
   removeImages(int index) {
-    images.removeAt(index);
+    if (index >= 0 && index < images.length) {
+      images.removeAt(index);
+    }
+    if (index >= 0 && index < imageBytes.length) {
+      imageBytes.removeAt(index);
+    }
     notifyListeners();
   }
 

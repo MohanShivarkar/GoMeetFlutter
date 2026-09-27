@@ -1564,21 +1564,24 @@ class _CreatStepsState extends State<CreatSteps> {
           Row(children: [
             Expanded(
               flex: 2,
-              child: InkWell(
-                onTap: () async {
-                  onBordingProvider.pickupImage(0);
-                },
-                child: Stack(
-                  alignment: Alignment.topRight,
-                  children: [
-                    Container(
+              child: Stack(
+                alignment: Alignment.topRight,
+                children: [
+                  InkWell(
+                    onTap: () async {
+                      if (onBordingProvider.images.isEmpty) {
+                        onBordingProvider.pickupImage(0);
+                      }
+                    },
+                    child: Container(
                       height: MediaQuery.of(context).size.height / 3.5,
                       decoration: BoxDecoration(
                           border: Border.all(
                               color: onBordingProvider.images.isEmpty
                                   ? AppColors.appColor
                                   : Theme.of(context).dividerTheme.color!),
-                          image: onBordingProvider.imageBytes.isNotEmpty
+                          image: onBordingProvider.images.isNotEmpty &&
+                                  onBordingProvider.imageBytes.isNotEmpty
                               ? DecorationImage(
                                   image: MemoryImage(
                                     onBordingProvider.imageBytes.first,
@@ -1601,36 +1604,35 @@ class _CreatStepsState extends State<CreatSteps> {
                             )
                           : null,
                     ),
-                    onBordingProvider.images.isEmpty
-                        ? const SizedBox()
-                        : Positioned(
-                            top: 10,
-                            right: 10,
-                            child: InkWell(
-                              onTap: () {
-                                onBordingProvider.removeImages(0);
-                              },
-                              child: Container(
-                                height: 30,
-                                width: 30,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Theme.of(context).cardColor,
-                                ),
-                                child: Center(
-                                  child: SvgPicture.asset(
-                                    "assets/icons/times.svg",
-                                    height: 20,
-                                    width: 20,
-                                    colorFilter:  ColorFilter.mode(
-                                        Theme.of(context).indicatorColor, BlendMode.srcIn),
-                                  ),
-                                ),
-                              ),
+                  ),
+                  if (onBordingProvider.images.isNotEmpty)
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: InkWell(
+                        onTap: () {
+                          onBordingProvider.removeImages(0);
+                        },
+                        child: Container(
+                          height: 30,
+                          width: 30,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Theme.of(context).cardColor,
+                          ),
+                          child: Center(
+                            child: SvgPicture.asset(
+                              "assets/icons/times.svg",
+                              height: 20,
+                              width: 20,
+                              colorFilter: ColorFilter.mode(
+                                  Theme.of(context).indicatorColor, BlendMode.srcIn),
                             ),
                           ),
-                  ],
-                ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
             Expanded(
@@ -1641,17 +1643,19 @@ class _CreatStepsState extends State<CreatSteps> {
                     children: [
                       InkWell(
                         onTap: () async {
-                          onBordingProvider.pickupImage(1);
+                          if (onBordingProvider.images.length == 1) {
+                            onBordingProvider.pickupImage(1);
+                          }
                         },
                         child: Container(
                             height: MediaQuery.of(context).size.height / 7,
                             decoration: BoxDecoration(
-
                                 border: Border.all(
                                     color: onBordingProvider.images.length == 1
                                         ? AppColors.appColor
                                         : Theme.of(context).dividerTheme.color!),
-                                image: onBordingProvider.images.length >= 2
+                                image: onBordingProvider.images.length >= 2 &&
+                                        onBordingProvider.imageBytes.length >= 2
                                     ? DecorationImage(
                                         image: MemoryImage(
                                           onBordingProvider.imageBytes[1],
@@ -1677,41 +1681,42 @@ class _CreatStepsState extends State<CreatSteps> {
                                   )
                                 : null),
                       ),
-                      onBordingProvider.images.length >= 2
-                          ? Positioned(
-                              top: 10,
-                              right: 10,
-                              child: InkWell(
-                                onTap: () {
-                                  onBordingProvider.removeImages(1);
-                                },
-                                child: Container(
-                                  height: 23,
-                                  width: 23,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: Theme.of(context).dividerTheme.color!,
-                                  ),
-                                  child: Center(
-                                    child: SvgPicture.asset(
-                                      "assets/icons/times.svg",
-                                      height: 12,
-                                      width: 12,
-                                      colorFilter:  ColorFilter.mode(
-                                          Theme.of(context).indicatorColor, BlendMode.srcIn),
-                                    ),
-                                  ),
+                      if (onBordingProvider.images.length >= 2)
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: InkWell(
+                            onTap: () {
+                              onBordingProvider.removeImages(1);
+                            },
+                            child: Container(
+                              height: 23,
+                              width: 23,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Theme.of(context).dividerTheme.color!,
+                              ),
+                              child: Center(
+                                child: SvgPicture.asset(
+                                  "assets/icons/times.svg",
+                                  height: 12,
+                                  width: 12,
+                                  colorFilter: ColorFilter.mode(
+                                      Theme.of(context).indicatorColor, BlendMode.srcIn),
                                 ),
                               ),
-                            )
-                          : const SizedBox()
+                            ),
+                          ),
+                        )
                     ],
                   ),
                   Stack(
                     children: [
                       InkWell(
                         onTap: () async {
-                          onBordingProvider.pickupImage(2);
+                          if (onBordingProvider.images.length == 2) {
+                            onBordingProvider.pickupImage(2);
+                          }
                         },
                         child: Container(
                           height: MediaQuery.of(context).size.height / 7,
@@ -1720,7 +1725,8 @@ class _CreatStepsState extends State<CreatSteps> {
                                 color: onBordingProvider.images.length == 2
                                     ? AppColors.appColor
                                     : Theme.of(context).dividerTheme.color!),
-                            image: onBordingProvider.images.length >= 3
+                            image: onBordingProvider.images.length >= 3 &&
+                                    onBordingProvider.imageBytes.length >= 3
                                 ? DecorationImage(
                                     image: MemoryImage(
                                       onBordingProvider.imageBytes[2],
@@ -1746,34 +1752,33 @@ class _CreatStepsState extends State<CreatSteps> {
                               : null,
                         ),
                       ),
-                      onBordingProvider.images.length >= 3
-                          ? Positioned(
-                              top: 10,
-                              right: 10,
-                              child: InkWell(
-                                onTap: () {
-                                  onBordingProvider.removeImages(2);
-                                },
-                                child: Container(
-                                  height: 23,
-                                  width: 23,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: Theme.of(context).cardColor,
-                                  ),
-                                  child: Center(
-                                    child: SvgPicture.asset(
-                                      "assets/icons/times.svg",
-                                      height: 12,
-                                      width: 12,
-                                      colorFilter: ColorFilter.mode(
-                                          Theme.of(context).indicatorColor, BlendMode.srcIn),
-                                    ),
-                                  ),
+                      if (onBordingProvider.images.length >= 3)
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: InkWell(
+                            onTap: () {
+                              onBordingProvider.removeImages(2);
+                            },
+                            child: Container(
+                              height: 23,
+                              width: 23,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Theme.of(context).cardColor,
+                              ),
+                              child: Center(
+                                child: SvgPicture.asset(
+                                  "assets/icons/times.svg",
+                                  height: 12,
+                                  width: 12,
+                                  colorFilter: ColorFilter.mode(
+                                      Theme.of(context).indicatorColor, BlendMode.srcIn),
                                 ),
                               ),
-                            )
-                          : const SizedBox()
+                            ),
+                          ),
+                        )
                     ],
                   ),
                 ],
@@ -1787,7 +1792,9 @@ class _CreatStepsState extends State<CreatSteps> {
                   children: [
                     InkWell(
                       onTap: () async {
-                        onBordingProvider.pickupImage(3);
+                        if (onBordingProvider.images.length == 3) {
+                          onBordingProvider.pickupImage(3);
+                        }
                       },
                       child: Container(
                         height: MediaQuery.of(context).size.height / 7,
@@ -1798,7 +1805,8 @@ class _CreatStepsState extends State<CreatSteps> {
                                   : Theme.of(context).dividerTheme.color!),
                           borderRadius: const BorderRadius.only(
                               bottomLeft: Radius.circular(20)),
-                          image: onBordingProvider.images.length >= 4
+                          image: onBordingProvider.images.length >= 4 &&
+                                  onBordingProvider.imageBytes.length >= 4
                               ? DecorationImage(
                                   image: MemoryImage(
                                     onBordingProvider.imageBytes[3],
@@ -1824,34 +1832,33 @@ class _CreatStepsState extends State<CreatSteps> {
                             : null,
                       ),
                     ),
-                    onBordingProvider.images.length >= 4
-                        ? Positioned(
-                            top: 10,
-                            right: 10,
-                            child: InkWell(
-                              onTap: () {
-                                onBordingProvider.removeImages(3);
-                              },
-                              child: Container(
-                                height: 23,
-                                width: 23,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Theme.of(context).cardColor,
-                                ),
-                                child: Center(
-                                  child: SvgPicture.asset(
-                                    "assets/icons/times.svg",
-                                    height: 12,
-                                    width: 12,
-                                    colorFilter: ColorFilter.mode(
-                                        Theme.of(context).indicatorColor, BlendMode.srcIn),
-                                  ),
-                                ),
+                    if (onBordingProvider.images.length >= 4)
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: InkWell(
+                          onTap: () {
+                            onBordingProvider.removeImages(3);
+                          },
+                          child: Container(
+                            height: 23,
+                            width: 23,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Theme.of(context).cardColor,
+                            ),
+                            child: Center(
+                              child: SvgPicture.asset(
+                                "assets/icons/times.svg",
+                                height: 12,
+                                width: 12,
+                                colorFilter: ColorFilter.mode(
+                                    Theme.of(context).indicatorColor, BlendMode.srcIn),
                               ),
                             ),
-                          )
-                        : const SizedBox()
+                          ),
+                        ),
+                      )
                   ],
                 ),
               ),
@@ -1860,7 +1867,9 @@ class _CreatStepsState extends State<CreatSteps> {
                   children: [
                     InkWell(
                       onTap: () async {
-                        onBordingProvider.pickupImage(4);
+                        if (onBordingProvider.images.length == 4) {
+                          onBordingProvider.pickupImage(4);
+                        }
                       },
                       child: Container(
                         height: MediaQuery.of(context).size.height / 7,
@@ -1869,7 +1878,8 @@ class _CreatStepsState extends State<CreatSteps> {
                               color: onBordingProvider.images.length == 4
                                   ? AppColors.appColor
                                   : Theme.of(context).dividerTheme.color!),
-                          image: onBordingProvider.images.length >= 5
+                          image: onBordingProvider.images.length >= 5 &&
+                                  onBordingProvider.imageBytes.length >= 5
                               ? DecorationImage(
                                   image: MemoryImage(
                                     onBordingProvider.imageBytes[4],
@@ -1884,7 +1894,7 @@ class _CreatStepsState extends State<CreatSteps> {
                                   width: 30,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
-                                    color:Theme.of(context).cardColor,
+                                    color: Theme.of(context).cardColor,
                                   ),
                                   child: const Icon(
                                     Icons.add,
@@ -1895,34 +1905,33 @@ class _CreatStepsState extends State<CreatSteps> {
                             : null,
                       ),
                     ),
-                    onBordingProvider.images.length >= 5
-                        ? Positioned(
-                            top: 10,
-                            right: 10,
-                            child: InkWell(
-                              onTap: () {
-                                onBordingProvider.removeImages(4);
-                              },
-                              child: Container(
-                                height: 23,
-                                width: 23,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Theme.of(context).cardColor,
-                                ),
-                                child: Center(
-                                  child: SvgPicture.asset(
-                                    "assets/icons/times.svg",
-                                    height: 12,
-                                    width: 12,
-                                    colorFilter:  ColorFilter.mode(
-                                        Theme.of(context).indicatorColor, BlendMode.srcIn),
-                                  ),
-                                ),
+                    if (onBordingProvider.images.length >= 5)
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: InkWell(
+                          onTap: () {
+                            onBordingProvider.removeImages(4);
+                          },
+                          child: Container(
+                            height: 23,
+                            width: 23,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Theme.of(context).cardColor,
+                            ),
+                            child: Center(
+                              child: SvgPicture.asset(
+                                "assets/icons/times.svg",
+                                height: 12,
+                                width: 12,
+                                colorFilter: ColorFilter.mode(
+                                    Theme.of(context).indicatorColor, BlendMode.srcIn),
                               ),
                             ),
-                          )
-                        : const SizedBox()
+                          ),
+                        ),
+                      )
                   ],
                 ),
               ),
@@ -1931,7 +1940,9 @@ class _CreatStepsState extends State<CreatSteps> {
                   children: [
                     InkWell(
                       onTap: () async {
-                        onBordingProvider.pickupImage(5);
+                        if (onBordingProvider.images.length == 5) {
+                          onBordingProvider.pickupImage(5);
+                        }
                       },
                       child: Container(
                         height: MediaQuery.of(context).size.height / 7,
@@ -1942,7 +1953,8 @@ class _CreatStepsState extends State<CreatSteps> {
                                   : Theme.of(context).dividerTheme.color!),
                           borderRadius: const BorderRadius.only(
                               bottomRight: Radius.circular(20)),
-                          image: onBordingProvider.images.length >= 6
+                          image: onBordingProvider.images.length >= 6 &&
+                                  onBordingProvider.imageBytes.length >= 6
                               ? DecorationImage(
                                   image: MemoryImage(
                                     onBordingProvider.imageBytes[5],
@@ -1968,34 +1980,33 @@ class _CreatStepsState extends State<CreatSteps> {
                             : null,
                       ),
                     ),
-                    onBordingProvider.images.length >= 6
-                        ? Positioned(
-                            top: 10,
-                            right: 10,
-                            child: InkWell(
-                              onTap: () {
-                                onBordingProvider.removeImages(5);
-                              },
-                              child: Container(
-                                height: 23,
-                                width: 23,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Theme.of(context).cardColor,
-                                ),
-                                child: Center(
-                                  child: SvgPicture.asset(
-                                    "assets/icons/times.svg",
-                                    height: 12,
-                                    width: 12,
-                                    colorFilter: ColorFilter.mode(
-                                        Theme.of(context).indicatorColor, BlendMode.srcIn),
-                                  ),
-                                ),
+                    if (onBordingProvider.images.length >= 6)
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: InkWell(
+                          onTap: () {
+                            onBordingProvider.removeImages(5);
+                          },
+                          child: Container(
+                            height: 23,
+                            width: 23,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Theme.of(context).cardColor,
+                            ),
+                            child: Center(
+                              child: SvgPicture.asset(
+                                "assets/icons/times.svg",
+                                height: 12,
+                                width: 12,
+                                colorFilter: ColorFilter.mode(
+                                    Theme.of(context).indicatorColor, BlendMode.srcIn),
                               ),
                             ),
-                          )
-                        : const SizedBox()
+                          ),
+                        ),
+                      )
                   ],
                 ),
               ),
