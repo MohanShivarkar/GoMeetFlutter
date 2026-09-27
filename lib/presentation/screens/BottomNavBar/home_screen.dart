@@ -26,6 +26,7 @@ import '../other/editProfile/editprofile.dart';
 import '../other/profileAbout/detailprovider.dart';
 import '../other/profileAbout/detailscreen.dart';
 import '../splash_bording/onBordingProvider/onbording_provider.dart';
+import '../other/profileScreen/profile_page.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String homeScrennRoute = "/homeScreen";
@@ -205,62 +206,75 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 const Spacer(),
                 Row(
                   children: [
-                    avatarUrl != null ? Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              image: NetworkImage(avatarUrl),
-                              fit: BoxFit.cover
-                          ),
-                      ),
-                    ) : Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(child: Text(_safeInitial((() {
-                        try {
-                          return homeProvider.userlocalData.userLogin?.name?.toString();
-                        } catch (_) {
-                          return null;
-                        }
-                      })()),style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)),
-                    ),
-                    const SizBoxW(size: 0.02),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-
-                          RichText(
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          text: TextSpan(
-                                  children: [
-                                  TextSpan(text: AppLocalizations.of(context)?.translate("Hello") ?? "Hello",style: Theme.of(context).textTheme.bodySmall,),
-                                  TextSpan(text: " 👋",style: Theme.of(context).textTheme.bodySmall,),
-                           ])
-                          ),
-
-                          Text(
-                            _safeName((() {
-                              try {
-                                return homeProvider.userlocalData.userLogin?.name?.toString();
-                              } catch (_) {
-                                return null;
-                              }
-                            })()),
-                            style: Theme.of(context).textTheme.headlineSmall,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-
-                        ],
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {
+                          try {
+                            Provider.of<HomeProvider>(context, listen: false).setSelectPage(4);
+                          } catch (_) {}
+                          Navigator.pushNamed(context, ProfilePage.profilePageRoute);
+                        },
+                        child: Row(
+                          children: [
+                            avatarUrl != null ? Container(
+                              height: 50,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                      image: NetworkImage(avatarUrl),
+                                      fit: BoxFit.cover
+                                  ),
+                              ),
+                            ) : Container(
+                              height: 50,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withOpacity(0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(child: Text(_safeInitial((() {
+                                try {
+                                  return homeProvider.userlocalData.userLogin?.name?.toString();
+                                } catch (_) {
+                                  return null;
+                                }
+                              })()),style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)),
+                            ),
+                            const SizBoxW(size: 0.02),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  RichText(
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(text: AppLocalizations.of(context)?.translate("Hello") ?? "Hello",style: Theme.of(context).textTheme.bodySmall,),
+                                        TextSpan(text: " 👋",style: Theme.of(context).textTheme.bodySmall,),
+                                      ],
+                                    ),
+                                  ),
+                                  Text(
+                                    _safeName((() {
+                                      try {
+                                        return homeProvider.userlocalData.userLogin?.name?.toString();
+                                      } catch (_) {
+                                        return null;
+                                      }
+                                    })()),
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
 

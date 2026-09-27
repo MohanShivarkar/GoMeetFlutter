@@ -12,11 +12,14 @@ import 'package:dating/presentation/screens/auth/login_screen.dart';
 import 'package:dating/presentation/screens/splash_bording/onbording_screens.dart';
 import 'package:dating/presentation/screens/splash_bording/recover_email.dart';
 import 'package:dating/presentation/screens/splash_bording/splash_screen.dart';
+import 'package:dating/presentation/screens/other/profileScreen/profile_page.dart';
 import 'package:flutter/cupertino.dart';
 
 class Routes {
   static Route? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case ProfilePage.profilePageRoute:
+        return CupertinoPageRoute(builder: (context) => const ProfilePage());
       case SplashScreen.splashScreenRoute:
         return CupertinoPageRoute(builder: (context) => const HomeScreen());
         case OnBoardingScreen.onBoardingScreenRoute:
