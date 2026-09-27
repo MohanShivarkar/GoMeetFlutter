@@ -21,6 +21,8 @@ import '../../Logic/cubits/Home_cubit/home_cubit.dart';
 import '../../Logic/cubits/Home_cubit/homestate.dart';
 import '../../core/config.dart';
 import '../../core/ui.dart';
+import '../../data/localdatabase.dart';
+import '../../data/models/usermodel.dart';
 import '../screens/BottomNavBar/bottombar.dart';
 import '../screens/BottomNavBar/home_screen.dart';
 import '../screens/other/premium/premium_provider.dart';
