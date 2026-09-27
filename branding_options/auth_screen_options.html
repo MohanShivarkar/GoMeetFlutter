@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoveCloud Auth Screen - Designer Directions (6 Options)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --flame-rose: #FF4458;
+      --sunset-coral: #FF758C;
+      --warm-glow: #FFA07A;
+      --obsidian: #0B0D14;
+      --surface: #141622;
+      --border: rgba(255, 255, 255, 0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: #08090E;
+      color: #FFFFFF;
+      min-height: 100vh;
+      padding: 40px 20px 80px;
+    }
+    .header {
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(255, 68, 88, 0.15);
+      border: 1px solid rgba(255, 68, 88, 0.35);
+      color: var(--sunset-coral);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .badge-india {
+      background: rgba(255, 153, 51, 0.15);
+      border-color: rgba(255, 153, 51, 0.4);
+      color: #FF9933;
+    }
+    h1 {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #E0DDE6 50%, var(--sunset-coral) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.subtitle {
+      font-size: 16px;
+      color: #9E9AA8;
+      max-width: 780px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .options-grid {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 32px;
+      justify-items: center;
+    }
+
+    .option-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .option-card:hover {
+      border-color: rgba(255, 68, 88, 0.5);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(255, 68, 88, 0.15);
+    }
+    .option-card.recommended {
+      border-color: var(--flame-rose);
+      box-shadow: 0 0 0 1px var(--flame-rose), 0 16px 40px rgba(255, 68, 88, 0.2);
+    }
+    .option-card.india-highlight {
+      border-color: rgba(255, 153, 51, 0.5);
+      box-shadow: 0 0 0 1px rgba(255, 153, 51, 0.25), 0 16px 40px rgba(255, 153, 51, 0.12);
+    }
+    .option-card.india-highlight:hover {
+      border-color: #FF9933;
+      box-shadow: 0 16px 40px rgba(255, 153, 51, 0.25);
+    }
+
+    .tag-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: linear-gradient(135deg, var(--flame-rose), var(--sunset-coral));
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .tag-badge.india {
+      background: linear-gradient(135deg, #FF9933, #FF4458);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      align-self: flex-start;
+    }
+    .card-desc {
+      font-size: 13px;
+      color: #9E9AA8;
+      margin-bottom: 20px;
+      line-height: 1.5;
+      align-self: flex-start;
+      min-height: 52px;
+    }
+
+    /* Phone Mockup Frame */
+    .phone-mockup {
+      width: 320px;
+      height: 640px;
+      border-radius: 46px;
+      border: 8px solid #222533;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.85), inset 0 0 0 2px rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .phone-opt1 { background-image: url('assets/auth_option1.jpg'); }
+    .phone-opt2 { background-image: url('assets/auth_option2.jpg'); }
+    .phone-opt3 { background-image: url('assets/auth_option3.jpg'); }
+    .phone-opt4 { background-image: url('assets/auth_option4.jpg'); }
+    .phone-opt5 { background-image: url('assets/auth_option5.jpg'); }
+    .phone-opt6 { background-image: url('assets/auth_option6.jpg'); }
+
+    /* iOS Status Bar Simulation */
+    .status-bar {
+      height: 44px;
+      padding: 12px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+      font-size: 12px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+    .dynamic-island {
+      width: 88px;
+      height: 22px;
+      background: #000;
+      border-radius: 20px;
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      transform: translateX(-50%);
+    }
+
+    .vignette-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 190px;
+      background: linear-gradient(180deg, rgba(11, 13, 20, 0.90) 0%, rgba(11, 13, 20, 0.55) 55%, rgba(11, 13, 20, 0) 100%);
+      pointer-events: none;
+    }
+    .vignette-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 260px;
+      background: linear-gradient(0deg, #0B0D14 0%, rgba(11, 13, 20, 0.88) 55%, rgba(11, 13, 20, 0) 100%);
+      pointer-events: none;
+    }
+
+    .phone-content {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px 20px 24px;
+    }
+
+    /* Style A: Modern Horizontal Floating Pill Lockup */
+    .logo-lockup-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 18px 8px 10px;
+      background: rgba(14, 17, 24, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+      align-self: center;
+      margin-top: 6px;
+    }
+    .logo-badge-pill {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      box-shadow: 0 4px 14px rgba(255, 68, 88, 0.4);
+      object-fit: cover;
+      display: block;
+    }
+    .logo-brand-pill {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      color: #FFFFFF;
+      line-height: 1.1;
+    }
+    .logo-brand-pill span {
+      color: var(--sunset-coral);
+    }
+    .logo-sub-pill {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: rgba(255, 255, 255, 0.65);
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+
+    /* Style B: Refined Centered Stack Lockup */
+    .logo-lockup-centered {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      align-self: center;
+      margin-top: 6px;
+    }
+    .logo-badge-centered {
+      width: 58px;
+      height: 58px;
+      border-radius: 17px;
+      box-shadow: 0 8px 26px rgba(255, 68, 88, 0.45);
+      object-fit: cover;
+      display: block;
+    }
+    .logo-brand-centered {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #FFFFFF;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      text-align: center;
+      line-height: 1.1;
+    }
+    .logo-brand-centered span {
+      color: var(--sunset-coral);
+    }
+    .logo-sub-centered {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: rgba(255, 255, 255, 0.7);
+      text-transform: uppercase;
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    /* Bottom Actions */
+    .bottom-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .action-prompt {
+      font-size: 14px;
+      color: #FFFFFF;
+      font-weight: 600;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+      text-align: center;
+    }
+    .cta-btn {
+      width: 100%;
+      height: 50px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--flame-rose) 0%, var(--sunset-coral) 100%);
+      color: #FFFFFF;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(255, 68, 88, 0.4);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .login-link {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
+      text-decoration: none;
+    }
+    .login-link strong {
+      color: #FFFFFF;
+      font-weight: 700;
+    }
+
+    .key-points {
+      margin-top: 18px;
+      width: 100%;
+      list-style: none;
+      font-size: 12px;
+      color: #B5B2C0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .key-points li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .key-points li::before {
+      content: "✓";
+      color: var(--flame-rose);
+      font-weight: 900;
+    }
+    .option-card.india-highlight .key-points li::before {
+      color: #FF9933;
+    }
+
+    /* Section Divider for India Editions */
+    .section-divider {
+      max-width: 1200px;
+      margin: 80px auto 40px;
+      text-align: center;
+      padding-top: 50px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .section-divider h2 {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFD080 50%, #FF9933 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================== -->
+  <!-- SECTION 1: GLOBAL PREMIUM OPTIONS (1, 2, 3)    -->
+  <!-- ============================================== -->
+
+  <div class="header">
+    <div class="badge">Specialist Graphic Design Review (6 Total Options)</div>
+    <h1>LoveCloud Auth Screen - Designer Directions</h1>
+    <p class="subtitle">
+      All options feature the finalized Option 1 squircle emblem and proper top status bar breathing room. Options 1-3 showcase international luxury dating aesthetics; Options 4-6 are curated specifically for India launch mentality.
+    </p>
+  </div>
+
+  <div class="options-grid">
+
+    <!-- Option 1 -->
+    <div class="option-card recommended">
+      <div class="tag-badge">Option 1</div>
+      <div class="card-title">Option 1: Midnight Twilight Rooftop</div>
+      <div class="card-desc">
+        Moody, cinematic rooftop couple against dusk city lights. Sleek horizontal floating pill lockup leaves the couple's faces unobstructed.
+      </div>
+
+      <div class="phone-mockup phone-opt1">
+        <div class="status-bar">
+          <span>9:41</span>
+          <div class="dynamic-island"></div>
+          <span>●●●</span>
+        </div>
+        <div class="vignette-top"></div>
+        <div class="vignette-bottom"></div>
+        <div class="phone-content">
+          <div class="logo-lockup-pill">
+            <img src="assets/lovecloud_badge.png" class="logo-badge-pill" alt="LoveCloud Emblem" />
+            <div>
+              <div class="logo-brand-pill">Love<span>Cloud</span></div>
+              <div class="logo-sub-pill">Infinite Match</div>
+            </div>
+          </div>
+
+          <div class="bottom-actions">
+            <div class="action-prompt">Let's dive in into your account!</div>
+            <div class="cta-btn">Continue with Email/Mobile Number</div>
+            <div class="login-link">I have an account? <strong>Login</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>Horizontal pill lockup: Leaves couple visible, doesn't crowd header</li>
+        <li>Deep twilight contrast: Official Option 1 emblem pops vibrantly</li>
+        <li>Ultra-luxury standard (Raya / Tinder Platinum feel)</li>
+      </ul>
+    </div>
+
+    <!-- Option 2 -->
+    <div class="option-card">
+      <div class="tag-badge">Option 2</div>
+      <div class="card-title">Option 2: Cozy Evening Date & Bokeh</div>
+      <div class="card-desc">
+        Candid, joyful couple laughing over dinner on a warm evening terrace. Dark awning canopy naturally frames the centered LoveCloud emblem.
+      </div>
+
+      <div class="phone-mockup phone-opt2">
+        <div class="status-bar">
+          <span>9:41</span>
+          <div class="dynamic-island"></div>
+          <span>●●●</span>
+        </div>
+        <div class="vignette-top"></div>
+        <div class="vignette-bottom"></div>
+        <div class="phone-content">
+          <div class="logo-lockup-centered">
+            <img src="assets/lovecloud_badge.png" class="logo-badge-centered" alt="LoveCloud Emblem" />
+            <div>
+              <div class="logo-brand-centered">Love<span>Cloud</span></div>
+              <div class="logo-sub-centered">Infinite Match</div>
+            </div>
+          </div>
+
+          <div class="bottom-actions">
+            <div class="action-prompt">Let's dive in into your account!</div>
+            <div class="cta-btn">Continue with Email/Mobile Number</div>
+            <div class="login-link">I have an account? <strong>Login</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>Candid, joyful real-world dating emotion (warm bokeh & smiles)</li>
+        <li>Dark awning top provides built-in contrast for the logo</li>
+        <li>Centered emblem with refined typography hierarchy</li>
+      </ul>
+    </div>
+
+    <!-- Option 3 -->
+    <div class="option-card">
+      <div class="tag-badge">Option 3</div>
+      <div class="card-title">Option 3: Beach Romance & Frosted Pill</div>
+      <div class="card-desc">
+        Cinematic sunset beach couple with the official LoveCloud emblem anchored inside a horizontal frosted glass floating pill.
+      </div>
+
+      <div class="phone-mockup phone-opt3">
+        <div class="status-bar">
+          <span>9:41</span>
+          <div class="dynamic-island"></div>
+          <span>●●●</span>
+        </div>
+        <div class="vignette-top" style="height: 150px;"></div>
+        <div class="vignette-bottom"></div>
+        <div class="phone-content">
+          <div class="logo-lockup-pill">
+            <img src="assets/lovecloud_badge.png" class="logo-badge-pill" alt="LoveCloud Emblem" />
+            <div>
+              <div class="logo-brand-pill">Love<span>Cloud</span></div>
+              <div class="logo-sub-pill">Infinite Match</div>
+            </div>
+          </div>
+
+          <div class="bottom-actions">
+            <div class="action-prompt">Let's dive in into your account!</div>
+            <div class="cta-btn">Continue with Email/Mobile Number</div>
+            <div class="login-link">I have an account? <strong>Login</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>Warm, emotional golden hour beach backlight</li>
+        <li>Frosted glass pill guarantees 100% emblem and text contrast</li>
+        <li>Balanced top-to-bottom layout with zero clutter</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ============================================== -->
+  <!-- SECTION 2: INDIA LAUNCH EDITIONS (4, 5, 6)     -->
+  <!-- ============================================== -->
+
+  <div class="section-divider">
+    <div class="badge badge-india">🇮🇳 Specially Curated for India Launch</div>
+    <h2>India Market Cultural & Lifestyle Directions</h2>
+    <p class="subtitle">
+      Rooted in Indian dating mentality: High-aspiration romance, urban cosmopolitan date spots (Mumbai/Bengaluru/Delhi), and deeply emotional, trustworthy companionship.
+    </p>
+  </div>
+
+  <div class="options-grid">
+
+    <!-- Option 4: Royal Heritage Evening Romance -->
+    <div class="option-card india-highlight">
+      <div class="tag-badge india">Option 4 • Royal Romance</div>
+      <div class="card-title">Option 4: Royal Heritage Evening</div>
+      <div class="card-desc">
+        Illuminated palace courtyard at dusk with glowing lanterns and royal Indian archways. High-fashion ethnic elegance evoking deep cultural romance and aspiration.
+      </div>
+
+      <div class="phone-mockup phone-opt4">
+        <div class="status-bar">
+          <span>9:41</span>
+          <div class="dynamic-island"></div>
+          <span>●●●</span>
+        </div>
+        <div class="vignette-top"></div>
+        <div class="vignette-bottom"></div>
+        <div class="phone-content">
+          <div class="logo-lockup-pill">
+            <img src="assets/lovecloud_badge.png" class="logo-badge-pill" alt="LoveCloud Emblem" />
+            <div>
+              <div class="logo-brand-pill">Love<span>Cloud</span></div>
+              <div class="logo-sub-pill">Infinite Match</div>
+            </div>
+          </div>
+
+          <div class="bottom-actions">
+            <div class="action-prompt">Find your soulmate today</div>
+            <div class="cta-btn">Continue with Email/Mobile Number</div>
+            <div class="login-link">Already registered? <strong>Login</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li><strong>Aspirational Heritage:</strong> Palace courtyard & lanterns signal high pedigree</li>
+        <li><strong>Cultural Resonance:</strong> Elegant Indo-western attire appeals to wedding/dating overlap</li>
+        <li><strong>Emblem Contrast:</strong> Warm lantern glow highlights the LoveCloud squircle badge</li>
+      </ul>
+    </div>
+
+    <!-- Option 5: Urban Cosmopolitan Rooftop Date -->
+    <div class="option-card india-highlight">
+      <div class="tag-badge india">Option 5 • Urban Date</div>
+      <div class="card-title">Option 5: Cosmopolitan Rooftop Date</div>
+      <div class="card-desc">
+        Trendy rooftop lounge in Bandra/Koramangala at twilight. Chic young Indian couple laughing over drinks with fairy lights and sparkling city skyline.
+      </div>
+
+      <div class="phone-mockup phone-opt5">
+        <div class="status-bar">
+          <span>9:41</span>
+          <div class="dynamic-island"></div>
+          <span>●●●</span>
+        </div>
+        <div class="vignette-top"></div>
+        <div class="vignette-bottom"></div>
+        <div class="phone-content">
+          <div class="logo-lockup-pill">
+            <img src="assets/lovecloud_badge.png" class="logo-badge-pill" alt="LoveCloud Emblem" />
+            <div>
+              <div class="logo-brand-pill">Love<span>Cloud</span></div>
+              <div class="logo-sub-pill">Infinite Match</div>
+            </div>
+          </div>
+
+          <div class="bottom-actions">
+            <div class="action-prompt">Spark genuine conversations</div>
+            <div class="cta-btn">Continue with Email/Mobile Number</div>
+            <div class="login-link">Already registered? <strong>Login</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li><strong>Modern Indian Gen-Z / Millennial:</strong> Relatable, stylish real-world date vibe</li>
+        <li><strong>Rooftop Skyline Atmosphere:</strong> Deep twilight sky provides clean logo canvas</li>
+        <li><strong>High Engagement Chemistry:</strong> Spontaneous candid laughter builds instant trust</li>
+      </ul>
+    </div>
+
+    <!-- Option 6: Marine Drive Golden Hour Stroll -->
+    <div class="option-card india-highlight">
+      <div class="tag-badge india">Option 6 • Soulful Bond</div>
+      <div class="card-title">Option 6: Marine Drive Golden Hour</div>
+      <div class="card-desc">
+        Intimate sunset stroll along an iconic Indian waterfront promenade. Couple holding hands and smiling warmly, embodying long-term emotional trust and companionship.
+      </div>
+
+      <div class="phone-mockup phone-opt6">
+        <div class="status-bar">
+          <span>9:41</span>
+          <div class="dynamic-island"></div>
+          <span>●●●</span>
+        </div>
+        <div class="vignette-top"></div>
+        <div class="vignette-bottom"></div>
+        <div class="phone-content">
+          <div class="logo-lockup-centered">
+            <img src="assets/lovecloud_badge.png" class="logo-badge-centered" alt="LoveCloud Emblem" />
+            <div>
+              <div class="logo-brand-centered">Love<span>Cloud</span></div>
+              <div class="logo-sub-centered">Infinite Match</div>
+            </div>
+          </div>
+
+          <div class="bottom-actions">
+            <div class="action-prompt">Connect with someone special</div>
+            <div class="cta-btn">Continue with Email/Mobile Number</div>
+            <div class="login-link">Already registered? <strong>Login</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li><strong>Emotional Authenticity:</strong> Timeless Indian golden hour romance (Marine Drive/Udaipur)</li>
+        <li><strong>Meaningful Connection:</strong> Focuses on trust, warmth, and real companionship</li>
+        <li><strong>Centered Logo Stack:</strong> Clean sky gradient at top naturally holds the brand mark</li>
+      </ul>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoveCloud -- Brand Identity & Theme Concepts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0D0E15;
+      --bg-surface: #141622;
+      --bg-card: rgba(26, 29, 45, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --text-dim: #6B7280;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 50px; }
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    header p { font-size: 17px; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 24px;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255, 68, 88, 0.5);
+    }
+    .img-box {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #000;
+      overflow: hidden;
+    }
+    .img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .card:hover .img-box img {
+      transform: scale(1.03);
+    }
+    .card-body { padding: 22px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .opt-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #FF758C;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .desc { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.5; }
+    .swatches { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
+    .swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    .meta-row {
+      font-size: 12px;
+      color: var(--text-dim);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>LoveCloud Brand Identity Concepts</h1>
+      <p>Select your preferred brand direction for the application logo, color palette, and interface theme.</p>
+    </header>
+
+    <div class="grid">
+      <!-- Option 1 -->
+      <div class="card">
+        <div class="img-box">
+          <img src="option1_sunset_rose.jpg" alt="Option 1">
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="opt-tag">Option 01 • Active Baseline</div>
+            <div class="title">Sunset Blush & Flame Rose</div>
+            <div class="desc">Vibrant intertwined heart-cloud silhouette on deep obsidian. High-energy, passionate, and modern (Tinder / Hinge hybrid).</div>
+            <div class="swatches">
+              <div class="swatch" style="background: #FF4458;" title="Flame Rose #FF4458"></div>
+              <div class="swatch" style="background: #FF758C;" title="Sunset Coral #FF758C"></div>
+              <div class="swatch" style="background: #FFA07A;" title="Warm Glow #FFA07A"></div>
+              <div class="swatch" style="background: #0E1118;" title="Obsidian #0E1118"></div>
+            </div>
+          </div>
+          <div class="meta-row">
+            <span>Audience: 18–35 Singles</span>
+            <span>Style: Modern Vector</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 2 -->
+      <div class="card">
+        <div class="img-box">
+          <img src="option2_cyber_velvet.jpg" alt="Option 2">
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="opt-tag">Option 02 • High-End VIP</div>
+            <div class="title">Cyber Velvet & Neon Romance</div>
+            <div class="desc">Continuous glowing neon glass ribbon forming an infinity heart inside cloud perimeter. Exclusive Raya / VIP club aesthetic.</div>
+            <div class="swatches">
+              <div class="swatch" style="background: #F43F5E;" title="Electric Crimson #F43F5E"></div>
+              <div class="swatch" style="background: #7C3AED;" title="Royal Violet #7C3AED"></div>
+              <div class="swatch" style="background: #EC4899;" title="Neon Magenta #EC4899"></div>
+              <div class="swatch" style="background: #0B0D17;" title="Midnight #0B0D17"></div>
+            </div>
+          </div>
+          <div class="meta-row">
+            <span>Audience: Luxury / VIP</span>
+            <span>Style: Neon Glassmorphism</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 3 -->
+      <div class="card">
+        <div class="img-box">
+          <img src="option3_golden_hour.jpg" alt="Option 3">
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="opt-tag">Option 03 • Timeless Elegance</div>
+            <div class="title">Golden Hour & Champagne Rose</div>
+            <div class="desc">Interlocking brushed champagne gold and rose gold rings in cloud arches. Mature, executive, long-term matchmaking aesthetic.</div>
+            <div class="swatches">
+              <div class="swatch" style="background: #D4AF37;" title="Champagne Gold #D4AF37"></div>
+              <div class="swatch" style="background: #B76E79;" title="Rose Gold #B76E79"></div>
+              <div class="swatch" style="background: #9E0836;" title="Velvet Wine #9E0836"></div>
+              <div class="swatch" style="background: #0F172A;" title="Navy Slate #0F172A"></div>
+            </div>
+          </div>
+          <div class="meta-row">
+            <span>Audience: Mature / Professionals</span>
+            <span>Style: Metallic Fine Jewelry</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 4 -->
+      <div class="card">
+        <div class="img-box">
+          <img src="option4_pastel_aura.jpg" alt="Option 4">
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="opt-tag">Option 04 • Playful & Friendly</div>
+            <div class="title">Cloud Nine Pastel Aura</div>
+            <div class="desc">Tactile 3D pillowy cloud with an illuminated glowing cutout heart center. Wholesome, friendly, low-pressure Gen-Z / Bumble vibe.</div>
+            <div class="swatches">
+              <div class="swatch" style="background: #FF8E72;" title="Peach Sorbet #FF8E72"></div>
+              <div class="swatch" style="background: #A78BFA;" title="Lavender Sky #A78BFA"></div>
+              <div class="swatch" style="background: #F472B6;" title="Bubblegum #F472B6"></div>
+              <div class="swatch" style="background: #FAF8F5;" title="Soft Cream #FAF8F5"></div>
+            </div>
+          </div>
+          <div class="meta-row">
+            <span>Audience: Gen-Z / Wholesome</span>
+            <span>Style: 3D Claymorphism</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
