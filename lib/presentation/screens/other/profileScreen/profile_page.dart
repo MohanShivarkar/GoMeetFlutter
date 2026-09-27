@@ -38,6 +38,7 @@ import '../../../../by_coin_screen/mygift.dart';
 import '../../../../by_coin_screen/refer_and_earn_screen.dart';
 import '../../../../core/config.dart';
 import '../../../../core/google_ads.dart';
+import '../../../../core/app_download_helper.dart';
 import '../../../../data/localdatabase.dart';
 import '../../../../language/localization/app_localization.dart';
 import '../../../../wallete_code/wallet_provider.dart';
@@ -550,6 +551,62 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ),
                             const SizBoxH(size: 0.01),
+                            if (kIsWeb)
+                              Container(
+                                margin: const EdgeInsets.only(top: 8, bottom: 12),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFF1E162B), Color(0xFF2B1829)],
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: const Color(0xFFFF9933).withOpacity(0.4)),
+                                ),
+                                padding: const EdgeInsets.all(14),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      height: 42,
+                                      width: 42,
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(colors: [Color(0xFFFF9933), Color(0xFFFF4458)]),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Icon(Icons.install_mobile_rounded, color: Colors.white, size: 22),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            "LoveCloud Mobile App",
+                                            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            "Get native HD voice & video calls.",
+                                            style: TextStyle(fontSize: 11, color: Colors.white.withOpacity(0.72)),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        AppDownloadHelper.downloadApk(url: '/app/lovecloud.apk', filename: 'lovecloud.apk');
+                                        Fluttertoast.showToast(msg: "Downloading LoveCloud Android APK...");
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFFFF9933),
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                      ),
+                                      child: const Text("Get APK", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+                                    ),
+                                  ],
+                                ),
+                              ),
                           onbordingCubit.smaTypeApiModel?.giftFun == "Enabled" ?  ListView.builder(
                             clipBehavior: Clip.none,
                               physics: const NeverScrollableScrollPhysics(),

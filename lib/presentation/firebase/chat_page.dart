@@ -30,6 +30,7 @@ import '../screens/other/premium/premium_provider.dart';
 import '../screens/other/profileAbout/detailprovider.dart';
 import '../screens/other/profileAbout/detailscreen.dart';
 import 'package:flutter/foundation.dart' as foundation;
+import '../../core/app_download_helper.dart';
 
 import '../widgets/main_button.dart';
 
@@ -109,6 +110,112 @@ class _ChattingPageState extends State<ChattingPage> {
   void dispose() {
     super.dispose();
   }
+
+  void _showDownloadAppDialog(BuildContext context, String callType) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: const Color(0xFF161224),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: Colors.white.withOpacity(0.12)),
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+        titlePadding: EdgeInsets.zero,
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(colors: [Color(0xFFFF9933), Color(0xFFFF4458)]),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(callType == "Video" ? Icons.videocam_rounded : Icons.phone_in_talk_rounded, color: Colors.white, size: 24),
+              const SizedBox(width: 10),
+              Text(
+                "$callType Calling",
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 6),
+            Text(
+              "Crystal-clear $callType calls with background notifications are powered by the native LoveCloud mobile app.",
+              style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.85), height: 1.4),
+            ),
+            const SizedBox(height: 18),
+            Container(
+              width: double.infinity,
+              height: 46,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: [Color(0xFFFF9933), Color(0xFFFF5252)]),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFF5252).withOpacity(0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  AppDownloadHelper.downloadApk(url: '/app/lovecloud.apk', filename: 'lovecloud.apk');
+                  Navigator.pop(dialogCtx);
+                  Fluttertoast.showToast(msg: "Downloading LoveCloud Android APK...");
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                ),
+                icon: const Icon(Icons.android_rounded, color: Colors.white, size: 20),
+                label: const Text(
+                  "Download Android App (APK)",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.06),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.apple_rounded, color: Colors.white70, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "iOS / iPhone: Safari > Share > Add to Home Screen (or TestFlight Beta)",
+                      style: TextStyle(fontSize: 11, color: Colors.white.withOpacity(0.7)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: Text("Close", style: TextStyle(color: Colors.white.withOpacity(0.7))),
+          ),
+        ],
+      ),
+    );
+  }
+
   var selectedRadioTile;
   String rejectmsg = "";
 
@@ -527,30 +634,7 @@ class _ChattingPageState extends State<ChattingPage> {
                   InkWell(
                       onTap: () {
                         if (foundation.kIsWeb) {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              backgroundColor: Theme.of(context).cardColor,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: Row(
-                                children: [
-                                  Icon(Icons.phone_in_talk, color: AppColors.appColor),
-                                  const SizedBox(width: 8),
-                                  const Text("Voice Call", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                              content: const Text(
-                                "Voice calling is optimized for the LoveCloud Mobile App.\n\nPlease experience real-time calling via our Android or iOS mobile apps.",
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text("Understood", style: TextStyle(color: AppColors.appColor, fontWeight: FontWeight.bold)),
-                                )
-                              ],
-                            ),
-                          );
+                          _showDownloadAppDialog(context, "Voice");
                           return;
                         }
                         if (state.homeData.audioVideo == "0") {
@@ -598,30 +682,7 @@ class _ChattingPageState extends State<ChattingPage> {
                   InkWell(
                       onTap: () {
                         if (foundation.kIsWeb) {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              backgroundColor: Theme.of(context).cardColor,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: Row(
-                                children: [
-                                  Icon(Icons.videocam, color: AppColors.appColor),
-                                  const SizedBox(width: 8),
-                                  const Text("Video Call", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                              content: const Text(
-                                "Video calling is optimized for the LoveCloud Mobile App.\n\nPlease experience HD video calling via our Android or iOS mobile apps.",
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text("Understood", style: TextStyle(color: AppColors.appColor, fontWeight: FontWeight.bold)),
-                                )
-                              ],
-                            ),
-                          );
+                          _showDownloadAppDialog(context, "Video");
                           return;
                         }
                         if (state.homeData.audioVideo == "0") {

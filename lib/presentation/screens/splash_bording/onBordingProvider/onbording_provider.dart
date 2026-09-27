@@ -78,20 +78,32 @@ class OnBordingProvider with ChangeNotifier {
   }
   List onBordingData = [
     {
-      "title": "Find Your Spark: Where Connections Ignite.",
-      "image": "assets/Image/onborading3.png",
+      "title": "Meaningful Dating",
+      "subtitle": "Built for singles who value real depth, shared values, and authentic companionship.",
+      "image": "assets/Image/onboard_opt3_1.jpg",
+      "tag1": "Chai Lover ☕",
+      "tag2": "Heritage Walks 🏛️",
     },
     {
-      "title": "Connecting Hearts, One Swipe at a Time",
-      "image": "assets/Image/onborading1.png",
+      "title": "Shared Values & Passions",
+      "subtitle": "Connect over what matters most—from late chai chats to weekend travels.",
+      "image": "assets/Image/onboard_opt3_2.jpg",
+      "tag1": "Late Drives 🚗",
+      "tag2": "Indie Music 🎸",
     },
     {
-      "title": "Discover, Connect, Love: Your Journey Starts Here",
-      "image": "assets/Image/onborading2.png",
+      "title": "100% Verified Profiles",
+      "subtitle": "Zero fake vibes. Date with confidence, safety, and complete privacy controls.",
+      "image": "assets/Image/onboard_opt3_3.jpg",
+      "tag1": "Selfie Verified ✓",
+      "tag2": "Safe Dating 🛡️",
     },
     {
-      "title": "It’s match",
-      "image": "assets/Image/onborading4.png",
+      "title": "Your Soulmate Awaits",
+      "subtitle": "Infinite possibilities await. Step into LoveCloud and begin your story today.",
+      "image": "assets/Image/onboard_opt3_4.jpg",
+      "tag1": "It's a Match! 🎉",
+      "tag2": "LoveCloud 💖",
     }
   ];
 

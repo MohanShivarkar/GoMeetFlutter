@@ -1,0 +1,68 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: Build Release APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build Android Release APK
+        run: flutter build apk --release
+
+      - name: Rename APK Artifact
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/lovecloud.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lovecloud-release-apk
+          path: build/app/outputs/flutter-apk/lovecloud.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master'
+        with:
+          tag_name: latest
+          name: "LoveCloud Latest Android Build"
+          body: |
+            ## LoveCloud Android Release APK
+            Automated production build from commit `${{ github.sha }}`.
+            
+            - **Download Direct**: [lovecloud.apk](https://github.com/${{ github.repository }}/releases/download/latest/lovecloud.apk)
+            - **Platform**: Android 7.0+ (API 24+)
+            - **Calling Engine**: Agora RTC Native Enabled (Audio & Video)
+          files: build/app/outputs/flutter-apk/lovecloud.apk
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
