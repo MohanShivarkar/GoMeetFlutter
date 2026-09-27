@@ -26,6 +26,7 @@ import 'package:dating/presentation/screens/pwa/core_pwa_home_screen.dart';
 import 'package:dating/presentation/screens/splash_bording/onBordingProvider/onbording_provider.dart';
 import 'package:dating/wallete_code/wallet_provider.dart';
 import 'package:dating/by_coin_screen/coin_provider.dart';
+import 'package:dating/data/localdatabase.dart';
 import 'package:dating/features/shell/widgets/offline_banner.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,6 +43,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   usePathUrlStrategy();
+
+  // Run persistent storage migrations before bootstrapping providers
+  await StorageMigrationService.runMigrations();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

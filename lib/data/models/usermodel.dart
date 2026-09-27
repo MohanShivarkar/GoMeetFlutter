@@ -17,12 +17,27 @@ class UserModel {
     this.responseMsg,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    userLogin: json["UserLogin"] == null ? null : UserLogin.fromJson(json["UserLogin"]),
-    responseCode: json["ResponseCode"],
-    result: json["Result"],
-    responseMsg: json["ResponseMsg"],
-  );
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic>? loginMap;
+    if (json["UserLogin"] is Map) {
+      loginMap = Map<String, dynamic>.from(json["UserLogin"]);
+    } else if (json["UserLogn"] is Map) {
+      loginMap = Map<String, dynamic>.from(json["UserLogn"]);
+    } else if (json["user_login"] is Map) {
+      loginMap = Map<String, dynamic>.from(json["user_login"]);
+    } else if (json["userLogin"] is Map) {
+      loginMap = Map<String, dynamic>.from(json["userLogin"]);
+    } else if (json.containsKey("id") || json.containsKey("mobile") || json.containsKey("email")) {
+      loginMap = json;
+    }
+
+    return UserModel(
+      userLogin: loginMap == null ? null : UserLogin.fromJson(loginMap),
+      responseCode: json["ResponseCode"]?.toString(),
+      result: json["Result"]?.toString(),
+      responseMsg: json["ResponseMsg"]?.toString(),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     "UserLogin": userLogin?.toJson(),
@@ -102,38 +117,38 @@ class UserLogin {
   });
 
   factory UserLogin.fromJson(Map<String, dynamic> json) => UserLogin(
-    id: json["id"],
-    name: json["name"],
-    mobile: json["mobile"],
-    password: json["password"],
-    rdate: json["rdate"] == null ? null : DateTime.parse(json["rdate"]),
-    status: json["status"],
-    ccode: json["ccode"],
-    code: json["code"],
+    id: json["id"]?.toString(),
+    name: json["name"]?.toString(),
+    mobile: json["mobile"]?.toString(),
+    password: json["password"]?.toString(),
+    rdate: json["rdate"] == null ? null : DateTime.tryParse(json["rdate"].toString()),
+    status: json["status"]?.toString(),
+    ccode: json["ccode"]?.toString(),
+    code: json["code"]?.toString(),
     refercode: json["refercode"],
-    wallet: json["wallet"],
-    email: json["email"],
-    gender: json["gender"],
-    lats: json["lats"],
-    longs: json["longs"],
-    profileBio: json["profile_bio"],
+    wallet: json["wallet"]?.toString(),
+    email: json["email"]?.toString(),
+    gender: json["gender"]?.toString(),
+    lats: json["lats"]?.toString(),
+    longs: json["longs"]?.toString(),
+    profileBio: json["profile_bio"]?.toString(),
     profilePic: json["profile_pic"],
-    birthDate: json["birth_date"] == null ? null : DateTime.parse(json["birth_date"]),
-    searchPreference: json["search_preference"],
-    radiusSearch: json["radius_search"],
-    relationGoal: json["relation_goal"],
-    interest: json["interest"],
-    language: json["language"],
-    religion: json["religion"],
-    otherPic: json["other_pic"],
-    planId: json["plan_id"],
-    planStartDate: json["plan_start_date"] == null ? null : DateTime.parse(json["plan_start_date"]),
-    planEndDate: json["plan_end_date"] == null ? null : DateTime.parse(json["plan_end_date"]),
-    isSubscribe: json["is_subscribe"],
-    historyId: json["history_id"],
-    height: json["height"],
+    birthDate: json["birth_date"] == null ? null : DateTime.tryParse(json["birth_date"].toString()),
+    searchPreference: json["search_preference"]?.toString(),
+    radiusSearch: json["radius_search"]?.toString(),
+    relationGoal: json["relation_goal"]?.toString(),
+    interest: json["interest"]?.toString(),
+    language: json["language"]?.toString(),
+    religion: json["religion"]?.toString(),
+    otherPic: json["other_pic"]?.toString(),
+    planId: json["plan_id"]?.toString(),
+    planStartDate: json["plan_start_date"] == null ? null : DateTime.tryParse(json["plan_start_date"].toString()),
+    planEndDate: json["plan_end_date"] == null ? null : DateTime.tryParse(json["plan_end_date"].toString()),
+    isSubscribe: json["is_subscribe"]?.toString(),
+    historyId: json["history_id"]?.toString(),
+    height: json["height"]?.toString(),
     identityPicture: json["identity_picture"],
-    isVerify: json["is_verify"],
+    isVerify: json["is_verify"]?.toString(),
   );
 
   Map<String, dynamic> toJson() => {
