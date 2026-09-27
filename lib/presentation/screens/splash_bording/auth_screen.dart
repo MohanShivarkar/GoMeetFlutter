@@ -6,7 +6,6 @@ import 'package:dating/presentation/screens/splash_bording/creat_steps.dart';
 import 'package:dating/presentation/screens/auth/login_screen.dart';
 import 'package:dating/presentation/screens/splash_bording/onBordingProvider/onbording_provider.dart';
 import 'package:dating/presentation/screens/BottomNavBar/home_screen.dart';
-import 'package:dating/presentation/widgets/loginwith_button.dart';
 import 'package:dating/presentation/widgets/main_button.dart';
 import 'package:dating/presentation/widgets/sizeboxx.dart';
 import 'package:flutter/gestures.dart';
@@ -14,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Logic/cubits/onBording_cubit/onbording_cubit.dart';
 import '../../../language/localization/app_localization.dart';
@@ -31,17 +29,11 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    setOnbordingFalse();
     BlocProvider.of<OnbordingCubit>(context).smstypeapi(context);
     super.initState();
   }
 
   late OnbordingCubit onbordingCubit;
-
-  setOnbordingFalse() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    preferences.setBool("Onbording", false);
-  }
 
   @override
   Widget build(BuildContext context) {

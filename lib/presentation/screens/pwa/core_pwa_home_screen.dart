@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:dating/data/localdatabase.dart';
 import 'package:dating/presentation/screens/BottomNavBar/home_screen.dart';
 import 'package:dating/presentation/screens/splash_bording/auth_screen.dart';
+import 'package:dating/presentation/screens/splash_bording/onbording_screens.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 class CorePwaHomeScreen extends StatefulWidget {
@@ -25,11 +27,11 @@ class _CorePwaHomeScreenState extends State<CorePwaHomeScreen> {
 
   Future<Map<String, dynamic>?> _loadSession() async {
     final raw = await Preferences.fetchUserDetails();
-    if (raw == null || raw.toString().isEmpty) {
+    if (raw.isEmpty) {
       return null;
     }
 
-    final decoded = jsonDecode(raw.toString());
+    final decoded = jsonDecode(raw);
     if (decoded is Map<String, dynamic>) {
       return decoded;
     }
@@ -43,9 +45,22 @@ class _CorePwaHomeScreenState extends State<CorePwaHomeScreen> {
       return;
     }
 
+    if (session != null) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        HomeScreen.homeScrennRoute,
+        (route) => false,
+      );
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final bool onBording = prefs.getBool("Onbording") ?? true;
+    if (!mounted) return;
+
     Navigator.pushNamedAndRemoveUntil(
       context,
-      session == null ? AuthScreen.authScreenRoute : HomeScreen.homeScrennRoute,
+      onBording ? OnBoardingScreen.onBoardingScreenRoute : AuthScreen.authScreenRoute,
       (route) => false,
     );
   }
