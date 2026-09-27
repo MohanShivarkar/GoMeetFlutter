@@ -56,16 +56,15 @@ class HomeProvider extends ChangeNotifier {
   bool isLoad = false;
 
   Future giftbuyApi({context,required String coin,required String receiver_id,required String gift_img}) async{
-
-
     if(isLoad){
       return;
     }else{
       isLoad = true;
     }
 
+    final currentUid = (Provider.of<HomeProvider>(context,listen: false).uid ?? "").toString();
     Map data = {
-      "sender_id" : Provider.of<HomeProvider>(context,listen: false).uid,
+      "sender_id" : currentUid,
       "coin" : coin,
       "receiver_id" : receiver_id,
       "gift_img"  : gift_img
@@ -75,8 +74,6 @@ class HomeProvider extends ChangeNotifier {
       var response = await _api.sendRequest.post("${Config.baseUrlApi}${Config.giftbuyapi}",data: data);
       if(response.statusCode == 200){
         if(response.data["Result"] == "true"){
-          isLoad = false;
-
           Fluttertoast.showToast(msg: response.data["ResponseMsg"]);
           return response.data;
         }else{
@@ -85,6 +82,9 @@ class HomeProvider extends ChangeNotifier {
       }
     }catch(e){
       Fluttertoast.showToast(msg: e.toString());
+    } finally {
+      isLoad = false;
+      notifyListeners();
     }
   }
 

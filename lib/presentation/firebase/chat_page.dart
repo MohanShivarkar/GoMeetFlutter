@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print, prefer_typing_uninitialized_variables
 
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dating/language/localization/app_localization.dart';
 import 'package:dating/presentation/firebase/chat_service.dart';
@@ -228,16 +229,36 @@ class _ChattingPageState extends State<ChattingPage> {
 
                                               homeProvider.giftbuyApi(context: context,coin: sum1.toString(), receiver_id: "${widget.resiverUserId}", gift_img: imagelist.join(",")).then((value) {
                                                 Navigator.pop(context);
-                                                sum1 == 0 ?
-                                                state.homeData.coin = state.homeData.coin
-                                                    : state.homeData.coin = value['coin'];
+                                                if (value != null && value['Result'] == 'true') {
+                                                  sum1 == 0 ?
+                                                  state.homeData.coin = state.homeData.coin
+                                                      : state.homeData.coin = value['coin'];
 
-                                                showModalBottomSheet(
-                                                  context: context,
-                                                  constraints: const BoxConstraints(maxHeight: 250),
-                                                  isScrollControlled: true,
-                                                  builder: (context) {
-                                                    return StatefulBuilder(builder: (context, setState) {
+                                                  // Send gift message to chat room
+                                                  try {
+                                                    Provider.of<ChatServices>(context, listen: false).sendMessage(
+                                                      receiverId: widget.resiverUserId.toString(),
+                                                      messeage: "🎁 Sent a gift",
+                                                      context: context,
+                                                    );
+                                                  } catch (_) {}
+
+                                                  selectedItems.clear();
+                                                  imagelist.clear();
+                                                  coinlist.clear();
+                                                  sum1 = 0;
+
+                                                  showModalBottomSheet(
+                                                    context: context,
+                                                    constraints: const BoxConstraints(maxHeight: 280),
+                                                    isScrollControlled: true,
+                                                    builder: (bottomSheetContext) {
+                                                      Timer(const Duration(milliseconds: 2200), () {
+                                                        if (bottomSheetContext.mounted) {
+                                                          Navigator.pop(bottomSheetContext);
+                                                        }
+                                                      });
+
                                                       return ClipRRect(
                                                         borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                                                         child: Scaffold(
@@ -261,25 +282,39 @@ class _ChattingPageState extends State<ChattingPage> {
                                                                     const Spacer(),
                                                                   ],
                                                                 ),
-                                                                const SizedBox(height: 40,),
+                                                                const SizedBox(height: 25,),
                                                                 Row(
                                                                   children: [
                                                                     const Spacer(),
-                                                                    Lottie.asset("assets/lottie/giftsend.json",height: 100),
+                                                                    Lottie.asset("assets/lottie/giftsend.json",height: 90, repeat: false),
                                                                     const Spacer(),
                                                                   ],
                                                                 ),
-                                                                const SizedBox(height: 30,),
-                                                                Text("You`ve sent a gift to ${widget.resiverUseremail}",style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),)
+                                                                const SizedBox(height: 15,),
+                                                                Text("You've sent a gift to ${widget.resiverUseremail}",style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),),
+                                                                const SizedBox(height: 15,),
+                                                                InkWell(
+                                                                  onTap: () {
+                                                                    Navigator.pop(bottomSheetContext);
+                                                                  },
+                                                                  child: Container(
+                                                                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
+                                                                    decoration: BoxDecoration(
+                                                                      color: AppColors.appColor,
+                                                                      borderRadius: BorderRadius.circular(20),
+                                                                    ),
+                                                                    child: const Text("Done", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                                                  ),
+                                                                ),
                                                               ],
                                                             ),
                                                           ),
                                                         ),
                                                       );
-                                                    },);
-                                                  },);
-
-                                              },);
+                                                    },
+                                                  );
+                                                }
+                                              });
                                             }
 
                                           },
