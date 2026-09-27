@@ -55,6 +55,12 @@ class _CorePwaHomeScreenState extends State<CorePwaHomeScreen> {
     }
 
     final prefs = await SharedPreferences.getInstance();
+    final uri = Uri.base;
+    final bool forceReset = uri.queryParameters.containsKey('reset') || uri.queryParameters.containsKey('v');
+    if (forceReset) {
+      await prefs.remove("Onbording");
+    }
+
     final bool onBording = prefs.getBool("Onbording") ?? true;
     if (!mounted) return;
 
