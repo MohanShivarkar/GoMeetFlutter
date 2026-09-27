@@ -307,35 +307,38 @@ void _scrollToLastMessage() {
     );
   }
 
-  void sendMessage({required String resiverUserId,required String fmctoken,required context}) async {
-    try{
-      CollectionReference collectionReference = FirebaseFirestore.instance.collection('datingUser');
-      if (controller.text.isNotEmpty) {
-        collectionReference.doc(resiverUserId).get().then((value) async {
-          try{
-            print("try condition");
-            var fields;
-            fields = value.data();
-            if (fields["isOnline"] == false) {
-               sendPushMessage(controller.text, Provider.of<HomeProvider>(context,listen: false).userlocalData.userLogin!.name ?? "", fmctoken,context);
-            } else {
-              print("user online");
-            }
-            final message = controller.text;
-            controller.clear();
-            FocusScope.of(context).unfocus();
-            await chatservices.sendMessage(receiverId: resiverUserId, messeage: message, context: context);
-          }catch(e){
-            print("catch condition");
-            Fluttertoast.showToast(msg: AppLocalizations.of(context)?.translate("User could be offline or might have uninstalled the app.") ?? "User could be offline or might have uninstalled the app.");
-          }
+  void sendMessage({required String resiverUserId, required String fmctoken, required BuildContext context}) async {
+    final message = controller.text.trim();
+    if (message.isEmpty) return;
 
-        });
-      }
-    } catch(e){
-       Fluttertoast.showToast(msg: AppLocalizations.of(context)?.translate("User could be offline or might have uninstalled the app.") ?? "User could be offline or might have uninstalled the app.");
+    controller.clear();
+    FocusScope.of(context).unfocus();
+
+    // 1. Send message to Firestore chat room immediately via Provider
+    try {
+      final chatService = Provider.of<ChatServices>(context, listen: false);
+      await chatService.sendMessage(receiverId: resiverUserId, messeage: message, context: context);
+    } catch (e) {
+      print("Chat service send error: $e");
     }
 
+    // 2. Non-blocking push notification check
+    try {
+      CollectionReference collectionReference = FirebaseFirestore.instance.collection('datingUser');
+      final value = await collectionReference.doc(resiverUserId).get().timeout(const Duration(seconds: 3));
+      if (value.exists && value.data() != null) {
+        final fields = value.data() as Map<String, dynamic>;
+        if (fields["isOnline"] == false) {
+          final senderName = Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin?.name ?? "Someone";
+          final token = fields["token"]?.toString() ?? fmctoken;
+          if (token.isNotEmpty) {
+            sendPushMessage(message, senderName, token, context);
+          }
+        }
+      }
+    } catch (e) {
+      print("Push notification background check: $e");
+    }
   }
 
   void scrollDown() {

@@ -53,14 +53,41 @@ class _ChattingPageState extends State<ChattingPage> {
     print("+++++++++++++RRRRRRR++++++++++++++++++++++${widget.resiverUserId}");
     print("-------------SSSSSSS-----------------------------${Provider.of<HomeProvider>(context, listen: false).uid}");
     chattingProvider = Provider.of<ChattingProvider>(context, listen: false);
-
-    Provider.of<ChatServices>(context, listen: false).getMessageNew(userId: Provider.of<HomeProvider>(context, listen: false).uid, otherUserId: widget.resiverUserId);
-
     detailProvider = Provider.of<DetailProvider>(context, listen: false);
 
-    chattingProvider.isMeassageAvalable(widget.resiverUserId);
-    chattingProvider.updateUid(Provider.of<HomeProvider>(context, listen: false).uid);
-    Provider.of<PremiumProvider>(context,listen: false).planDataApi(context,widget.resiverUserId);
+    final homeProv = Provider.of<HomeProvider>(context, listen: false);
+    String myUid = (homeProv.uid ?? "").toString();
+    if (myUid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
+      myUid = homeProv.userlocalData.userLogin!.id.toString();
+    }
+
+    if (myUid.isNotEmpty) {
+      Provider.of<ChatServices>(context, listen: false).getMessageNew(
+        userId: myUid,
+        otherUserId: widget.resiverUserId.toString(),
+      );
+      chattingProvider.updateUid(myUid);
+    } else {
+      Preferences.fetchUserDetails().then((raw) {
+        if (raw.isNotEmpty) {
+          try {
+            final userModel = userModelFromJson(raw);
+            final fetchedId = (userModel.userLogin?.id ?? "").toString();
+            if (fetchedId.isNotEmpty) {
+              homeProv.uid = fetchedId;
+              Provider.of<ChatServices>(context, listen: false).getMessageNew(
+                userId: fetchedId,
+                otherUserId: widget.resiverUserId.toString(),
+              );
+              chattingProvider.updateUid(fetchedId);
+            }
+          } catch (_) {}
+        }
+      });
+    }
+
+    chattingProvider.isMeassageAvalable(widget.resiverUserId.toString());
+    Provider.of<PremiumProvider>(context, listen: false).planDataApi(context, widget.resiverUserId.toString());
 
 
 
