@@ -33,6 +33,9 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  go_router: ^14.2.0
+  flutter_web_plugins:
+    sdk: flutter
   flutter_bloc: ^8.1.3
   flutter_svg: ^2.0.9
 #  google_maps_flutter: ^2.5.3
@@ -93,6 +96,7 @@ dependencies:
   googleapis_auth: ^1.4.1
   timeago:
   flutter_swipe_detector: ^2.0.0
+  connectivity_plus: ^5.0.2       # offline banner (p2-offline-banner)
 
 
 

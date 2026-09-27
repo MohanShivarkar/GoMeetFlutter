@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   static Color appColor = const Color(0xFFFF4458); // LoveCloud Flame Rose
+  static Color sunsetCoral = const Color(0xFFFF758C); // Sunset Coral / Blush
+  static Color warmGlow = const Color(0xFFFFA07A); // Warm Glow Accent
   static Color appBgColorlite = const Color(0xffffffff);
-  static Color appBgColordart = const Color(0xff0F0E14); // Sleek modern dark mode
+  static Color appBgColordart = const Color(0xff0E1118); // Deep Obsidian
   static Color textLight = const Color(0xff10192D);
   static Color text1Light = const Color(0xff8E9BAE);
   static Color textDark = const Color(0xffF8FAFC);
@@ -13,9 +15,21 @@ class AppColors {
   static Color white = const Color(0xffffffff);
   static Color black = const Color(0xff0F172A);
   static Color borderColor = const Color(0xffEAEAEA);
-  static Color darkBorderColor = const Color(0xff2B283A);
-  static Color darkBgColor = const Color(0xff161520);
-  static Color darkContainer = const Color(0xff1E1C29);
+  static Color darkBorderColor = const Color(0xff222538);
+  static Color darkBgColor = const Color(0xff141622); // Surface
+  static Color darkContainer = const Color(0xff1A1D2D); // Card surface
+
+  static const LinearGradient primaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFF4458), Color(0xFFFF758C)],
+  );
+
+  static const LinearGradient sunsetGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFF4458), Color(0xFFFF758C), Color(0xFFFFA07A)],
+  );
 }
 
 class Themes {

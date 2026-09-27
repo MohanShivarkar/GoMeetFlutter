@@ -3,7 +3,7 @@
     "short_name": "LoveCloud",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0F0E14",
+    "background_color": "#0E1118",
     "theme_color": "#FF4458",
     "description": "LoveCloud - Match, Chat & Date.",
     "orientation": "portrait-primary",
