@@ -54,47 +54,64 @@ class _MessageBubbleState extends State<MessageBubble> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final otherBgColor = isDark ? const Color(0xFF262433) : Colors.grey.shade200;
+    final otherTextColor = isDark ? Colors.white : Colors.black87;
+    final otherTimeColor = isDark ? Colors.white60 : Colors.black54;
+
     return Align(
-      alignment:
-      widget.isMe ? Alignment.topLeft : Alignment.topRight,
+      alignment: widget.isMe ? Alignment.topRight : Alignment.topLeft,
       child: Container(
         decoration: BoxDecoration(
-          color: widget.isMe ? Colors.grey.shade100 : AppColors.appColor,
-          // border: Border.all(color: widget.isMe ? notifier.border : Colors.transparent),
+          color: widget.isMe ? AppColors.appColor : otherBgColor,
           borderRadius: widget.isMe
               ? const BorderRadius.only(
-            topRight: Radius.circular(13),
-            bottomRight: Radius.circular(13),
-            topLeft: Radius.circular(13),
-          )
+                  topRight: Radius.circular(4),
+                  bottomRight: Radius.circular(14),
+                  topLeft: Radius.circular(14),
+                  bottomLeft: Radius.circular(14),
+                )
               : const BorderRadius.only(
-            topRight: Radius.circular(13),
-            bottomLeft: Radius.circular(13),
-            topLeft: Radius.circular(13),
-          ),
+                  topRight: Radius.circular(14),
+                  bottomRight: Radius.circular(14),
+                  topLeft: Radius.circular(4),
+                  bottomLeft: Radius.circular(14),
+                ),
         ),
-        margin: const EdgeInsets.only(
-            top: 10, right: 10, left: 10),
-        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: widget.isMe
-              ? CrossAxisAlignment.start
-              : CrossAxisAlignment.end,
+          crossAxisAlignment: widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             Text(
-                widget.message.message,
-                style: TextStyle(
-                    fontSize: 16,
-                    // fontFamily: FontFamily.gilroyExtraBold,
-                    color: widget.isMe ? AppColors.black : AppColors.white)),
-            const SizedBox(height: 5),
-            Text(
-                DateFormat('hh:mm a').format(DateTime.fromMicrosecondsSinceEpoch(widget.message.timestamp.microsecondsSinceEpoch)).toString(),
-              style:  TextStyle(
-                color: widget.isMe ? AppColors.black : AppColors.white,
-                fontSize: 10,
-              ),),
+              widget.message.message,
+              style: TextStyle(
+                fontSize: 15,
+                color: widget.isMe ? Colors.white : otherTextColor,
+                height: 1.3,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  DateFormat('hh:mm a').format(DateTime.fromMicrosecondsSinceEpoch(widget.message.timestamp.microsecondsSinceEpoch)),
+                  style: TextStyle(
+                    color: widget.isMe ? Colors.white70 : otherTimeColor,
+                    fontSize: 10,
+                  ),
+                ),
+                if (widget.isMe) ...[
+                  const SizedBox(width: 4),
+                  widget.message.isRead
+                      ? const Icon(Icons.done_all_rounded, size: 14, color: Color(0xFF4FC3F7))
+                      : const Icon(Icons.done_rounded, size: 14, color: Colors.white70),
+                ],
+              ],
+            ),
           ],
         ),
       ),

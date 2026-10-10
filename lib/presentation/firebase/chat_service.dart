@@ -189,6 +189,16 @@ class ChatServices extends ChangeNotifier {
           _loading = false;
           notifyListeners();
           scrollDown();
+
+          // Auto-mark incoming unread messages as read
+          for (final doc in snapshot.docs) {
+            final data = doc.data();
+            final reciverId = (data['reciverId'] ?? data['receiverId'] ?? '').toString();
+            final isRead = data['isRead'] == true;
+            if (reciverId == userId && !isRead) {
+              doc.reference.update({'isRead': true}).catchError((_) {});
+            }
+          }
         },
         onError: (err) {
           print("Firestore getMessageNew error: $err");
@@ -230,6 +240,7 @@ class Message {
   final String reciverId;
   final String message;
   final Timestamp timestamp;
+  final bool isRead;
 
   const Message({
     required this.senderId,
@@ -237,6 +248,7 @@ class Message {
     required this.reciverId,
     required this.timestamp,
     required this.message,
+    this.isRead = false,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -256,6 +268,7 @@ class Message {
       timestamp: ts,
       message: (json['message'] ?? '').toString(),
       senderName: (json['senderName'] ?? '').toString(),
+      isRead: json['isRead'] == true,
     );
   }
 
@@ -265,6 +278,7 @@ class Message {
     'timestamp': timestamp,
     'message': message,
     'senderName': senderName,
+    'isRead': isRead,
   };
 }
 
