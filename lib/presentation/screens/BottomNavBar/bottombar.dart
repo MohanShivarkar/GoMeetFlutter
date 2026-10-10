@@ -1,6 +1,10 @@
-// ignore_for_file: deprecated_member_use, avoid_unnecessary_containers
-
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dating/core/ui.dart';
+import 'package:dating/data/localdatabase.dart';
+import 'package:dating/data/models/usermodel.dart';
+import 'package:dating/main.dart';
+import 'package:dating/presentation/firebase/pickup_callpage.dart';
 import 'package:dating/presentation/screens/BottomNavBar/match/browes.dart';
 import 'package:dating/presentation/screens/BottomNavBar/chats.dart';
 import 'package:dating/presentation/screens/BottomNavBar/homeProvider/homeprovier.dart';
@@ -60,16 +64,81 @@ class _BottomBarState extends State<BottomBar> {
   ];
 
   late HomeProvider homeProvider;
+  StreamSubscription? _callSubscription;
+  bool _isIncomingCallActive = false;
 
+  void _listenForCalls(String uid) {
+    if (uid.isEmpty) return;
+    _callSubscription?.cancel();
+    _callSubscription = FirebaseFirestore.instance
+        .collection("user_calls")
+        .doc(uid)
+        .snapshots()
+        .listen((snapshot) {
+      if (!mounted || snapshot.data() == null) return;
+      final data = snapshot.data()!;
+      final status = data["status"]?.toString() ?? "";
+      if (status == "ringing" && !_isIncomingCallActive) {
+        _isIncomingCallActive = true;
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(
+            builder: (ctx) => PickUpCall(
+              userData: {
+                "id": data["callerId"]?.toString() ?? "",
+                "name": data["callerName"]?.toString() ?? "User",
+                "senderName": data["callerName"]?.toString() ?? "User",
+                "propic": data["callerPic"]?.toString() ?? "",
+                "Audio": data["channel"]?.toString() ?? "",
+                "vcId": data["channel"]?.toString() ?? "",
+              },
+              isAudio: data["callType"] == "audio",
+            ),
+          ),
+        ).then((_) {
+          _isIncomingCallActive = false;
+          FirebaseFirestore.instance
+              .collection("user_calls")
+              .doc(uid)
+              .set({"status": "idle"}, SetOptions(merge: true));
+        });
+      }
+    });
+  }
 
- @override
+  @override
+  void dispose() {
+    _callSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
       }
-      Provider.of<HomeProvider>(context, listen: false).setSelectPage(0);
+      final homeProv = Provider.of<HomeProvider>(context, listen: false);
+      homeProv.setSelectPage(0);
+      String uid = (homeProv.uid ?? "").toString();
+      if (uid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
+        uid = homeProv.userlocalData.userLogin!.id.toString();
+      }
+      if (uid.isNotEmpty) {
+        _listenForCalls(uid);
+      } else {
+        Preferences.fetchUserDetails().then((raw) {
+          if (raw.isNotEmpty) {
+            try {
+              final userModel = userModelFromJson(raw);
+              final fetchedId = (userModel.userLogin?.id ?? "").toString();
+              if (fetchedId.isNotEmpty) {
+                _listenForCalls(fetchedId);
+              }
+            } catch (_) {}
+          }
+        });
+      }
     });
   }
 

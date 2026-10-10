@@ -61,25 +61,21 @@ updateIsSearch(){
 List searchIndexList = [];
 List<Map> searchiteams = [];
 
-searchIteam(s){
-
+searchIteam(s) {
   searchIndexList = [];
-
+  final query = (s ?? "").toString().trim().toLowerCase();
+  if (query.isEmpty) {
+    notifyListeners();
+    return;
+  }
   for (int i = 0; i < searchiteams.length; i++) {
-    if (searchiteams[i]["name"].toLowerCase().contains(s.toLowerCase())) {
-      final ids = searchiteams.map<String>((e) => e['uid']!).toSet();
-
-      searchiteams.retainWhere((Map x) {
-        return ids.remove(x['uid']);
-      });
-
-  notifyListeners();
+    final name = (searchiteams[i]["name"] ?? "").toString().toLowerCase();
+    final msg = (searchiteams[i]["message"] ?? "").toString().toLowerCase();
+    if (name.contains(query) || msg.contains(query)) {
       searchIndexList.add(i);
-    } else {
-      notifyListeners();
     }
   }
-
+  notifyListeners();
 }
 
 
@@ -227,35 +223,47 @@ void _scrollToLastMessage() {
   }
 
 
-  Widget buildMessageList({required String resiverUserId,required context}) =>
-      Consumer<ChatServices>(
-        builder: (context, value, child) =>
-        value.loading
-            ? Center(child: CircularProgressIndicator(color: AppColors.appColor))
-            : value.messages.isEmpty
-            ? const Expanded(
-          child: Text('Say Hello!',
-          ),
-        )
-            : ListView.builder(
-              controller: Provider.of<ChatServices>(context, listen: false).scrollController,
-              itemCount: value.messages.length,
-              physics: BouncingScrollPhysics(),
-              itemBuilder: (context, index) {
-                // final isTextMessage = value.messages[index].messageType == MessageType.text;
-                final isMe = resiverUserId != value.messages[index].senderId;
-                return Column(
-                  children: [
-                    MessageBubble(
-                      isMe: isMe,
-                      message: value.messages[index],
+  Widget buildMessageList({required String resiverUserId, required context}) {
+    final homeProv = Provider.of<HomeProvider>(context, listen: false);
+    String myUid = (homeProv.uid ?? "").toString();
+    if (myUid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
+      myUid = homeProv.userlocalData.userLogin!.id.toString();
+    }
+    return Consumer<ChatServices>(
+      builder: (context, value, child) => value.loading
+          ? Center(child: CircularProgressIndicator(color: AppColors.appColor))
+          : value.messages.isEmpty
+              ? Center(
+                  child: Text(
+                    'Say Hello!',
+                    style: TextStyle(
+                      color: Theme.of(context).indicatorColor.withOpacity(0.6),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
-                    SizedBox(height: 10),
-                  ],
-                );
-              },
-            ),
-      );
+                  ),
+                )
+              : ListView.builder(
+                  controller: Provider.of<ChatServices>(context, listen: false).scrollController,
+                  itemCount: value.messages.length,
+                  physics: const BouncingScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final msg = value.messages[index];
+                    final isMe = (myUid.isNotEmpty && msg.senderId == myUid) ||
+                        (resiverUserId.isNotEmpty && msg.reciverId == resiverUserId && msg.senderId != resiverUserId);
+                    return Column(
+                      children: [
+                        MessageBubble(
+                          isMe: isMe,
+                          message: msg,
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    );
+                  },
+                ),
+    );
+  }
 
   // final ScrollController scrollController = ScrollController(initialScrollOffset: 50.0);
 

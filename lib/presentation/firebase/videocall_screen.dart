@@ -31,6 +31,7 @@ class _VideoCallState extends State<VideoCall> {
     final effectiveKey = agoraVcKey.isNotEmpty ? agoraVcKey : "dfbc153e47e34ecba358f528b5880ad7";
     vcProvider.initAgora(effectiveKey, effectiveKey, widget.channel, context);
     streamSubscription =  FirebaseFirestore.instance.collection("chat_rooms").doc(widget.channel).collection("isVcAvailable").doc(widget.channel).snapshots().listen((event) {
+      if (!mounted || event.data() == null) return;
       Map data = event.data()!;
       print("xxxxxxxxxxxxxx${data}");
 

@@ -34,6 +34,7 @@ class _PickUpCallState extends State<PickUpCall> {
     dataids =  widget.isAudio ? "Audio": "isVc";
     widget.isAudio ? isAudio(widget.userData[ids], null) : isvc(widget.userData[ids],true);
      FirebaseFirestore.instance.collection("chat_rooms").doc(widget.userData[ids]).collection("isVcAvailable").doc(widget.userData[ids]).snapshots().listen((event) {
+        if (!mounted || event.data() == null) return;
         Map data = event.data()!;
 
         if(data[dataids] == false){
@@ -57,6 +58,10 @@ class _PickUpCallState extends State<PickUpCall> {
   @override
   Widget build(BuildContext context) {
     vcProvider = Provider.of<VcProvider>(context);
+    final hasPropic = widget.userData["propic"] != null &&
+        widget.userData["propic"].toString().isNotEmpty &&
+        widget.userData["propic"].toString() != "null";
+    final callerName = widget.userData["name"] ?? "User";
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -88,12 +93,14 @@ class _PickUpCallState extends State<PickUpCall> {
               height: 180,width: 180,
               decoration: BoxDecoration(
               shape: BoxShape.circle,
-              image: DecorationImage(image: NetworkImage("${Config.baseUrl}${widget.userData["propic"]}"),fit: BoxFit.cover),
+              image: hasPropic
+                  ? DecorationImage(image: NetworkImage("${Config.baseUrl}${widget.userData["propic"]}"), fit: BoxFit.cover)
+                  : const DecorationImage(image: AssetImage("assets/Image/05.png"), fit: BoxFit.cover),
             ),),
             const SizBoxH(size: 0.03),
-            Text(widget.userData["name"],style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: Colors.white),),
+            Text(callerName,style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: Colors.white),),
             const SizedBox(height: 10,),
-            Text("In Coming ${widget.isAudio ? "Audio":"Video"} Call From ${widget.userData["name"]}",style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),),
+            Text("In Coming ${widget.isAudio ? "Audio":"Video"} Call From $callerName",style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),),
             const Spacer(flex: 2),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -104,6 +111,7 @@ class _PickUpCallState extends State<PickUpCall> {
 
                     vcProvider.updateIschatPage(false);
                     widget.isAudio ? isAudio(widget.userData[ids], false) : isvc(widget.userData[ids], false);
+                    Navigator.pop(context);
 
                   },
 

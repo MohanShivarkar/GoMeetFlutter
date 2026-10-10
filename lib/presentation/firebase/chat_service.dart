@@ -99,6 +99,25 @@ class ChatServices extends ChangeNotifier {
           .collection("message")
           .add(newMessage.toJson());
 
+      // Update room metadata and ensure user entry in datingUser so chats persist
+      try {
+        await firebaseStorage.collection("chat_rooms").doc(chatRoomId).set({
+          "participants": ids,
+          "lastMessage": messeage,
+          "timestamp": timestamp,
+        }, SetOptions(merge: true));
+
+        final myPic = homeProv.userlocalData.userLogin?.otherPic ?? (homeProv.userlocalData.userLogin?.profilePic?.toString() ?? "");
+        await firebaseStorage.collection("datingUser").doc(currentUserId).set({
+          "uid": currentUserId,
+          "name": currentUserName,
+          "pro_pic": myPic,
+          "isOnline": true,
+        }, SetOptions(merge: true));
+      } catch (err) {
+        print("Room meta sync error: $err");
+      }
+
       scrollDown();
     } catch (e) {
       print("ChatServices.sendMessage error: $e");

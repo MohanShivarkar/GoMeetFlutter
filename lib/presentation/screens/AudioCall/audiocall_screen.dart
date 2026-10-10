@@ -34,6 +34,7 @@ class _PickUpAudioCallState extends State<PickUpAudioCall> {
     });
 
     FirebaseFirestore.instance.collection("chat_rooms").doc(widget.channel).collection("isVcAvailable").doc(widget.channel).snapshots().listen((event) {
+      if (!mounted || event.data() == null) return;
       Map data = event.data()!;
        if(data["Audio"] == false) {
         Navigator.pop(context);
@@ -56,6 +57,8 @@ class _PickUpAudioCallState extends State<PickUpAudioCall> {
   @override
   Widget build(BuildContext context) {
     audioCallProvider = Provider.of<AudioCallProvider>(context);
+    final pic = (widget.userData["propic"] ?? widget.userData["pro_pic"] ?? "").toString();
+    final name = (widget.userData["senderName"] ?? widget.userData["name"] ?? "User").toString();
     return Scaffold(
       body: audioCallProvider.isLoading ? Center(child: CircularProgressIndicator(color: AppColors.appColor)) : Container(
         decoration: const BoxDecoration(gradient: LinearGradient(
@@ -82,9 +85,12 @@ class _PickUpAudioCallState extends State<PickUpAudioCall> {
               const Spacer(),
               CircleAvatar(
                 radius: 70,
-                backgroundImage: NetworkImage("${Config.baseUrl}${widget.userData["propic"]}"),),
+                backgroundImage: (pic.isNotEmpty && pic != "null")
+                    ? NetworkImage("${Config.baseUrl}$pic")
+                    : const AssetImage("assets/Image/05.png") as ImageProvider,
+              ),
               const SizedBox(height: 10,),
-              Text("${widget.userData["senderName"]}", style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: Colors.white),),
+              Text(name, style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: Colors.white),),
               const SizedBox(height: 5,),
               Text(audioCallProvider.returnFormattedText(),style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.white),),
               const Spacer(),

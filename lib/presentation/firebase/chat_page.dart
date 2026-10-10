@@ -71,6 +71,23 @@ class _ChattingPageState extends State<ChattingPage> {
         otherUserId: widget.resiverUserId.toString(),
       );
       chattingProvider.updateUid(myUid);
+
+      // Ensure both users exist in datingUser for permanent chat visibility
+      try {
+        FirebaseFirestore.instance.collection("datingUser").doc(myUid).set({
+          "uid": myUid,
+          "name": homeProv.userlocalData.userLogin?.name ?? "User",
+          "pro_pic": homeProv.userlocalData.userLogin?.otherPic ?? (homeProv.userlocalData.userLogin?.profilePic?.toString() ?? ""),
+          "isOnline": true,
+        }, SetOptions(merge: true));
+
+        FirebaseFirestore.instance.collection("datingUser").doc(widget.resiverUserId.toString()).set({
+          "uid": widget.resiverUserId.toString(),
+          "name": widget.resiverUseremail,
+          "pro_pic": widget.proPic,
+          "isOnline": true,
+        }, SetOptions(merge: true));
+      } catch (_) {}
     } else {
       Preferences.fetchUserDetails().then((raw) {
         if (raw.isNotEmpty) {
@@ -84,6 +101,20 @@ class _ChattingPageState extends State<ChattingPage> {
                 otherUserId: widget.resiverUserId.toString(),
               );
               chattingProvider.updateUid(fetchedId);
+
+              FirebaseFirestore.instance.collection("datingUser").doc(fetchedId).set({
+                "uid": fetchedId,
+                "name": userModel.userLogin?.name ?? "User",
+                "pro_pic": userModel.userLogin?.otherPic ?? (userModel.userLogin?.profilePic?.toString() ?? ""),
+                "isOnline": true,
+              }, SetOptions(merge: true));
+
+              FirebaseFirestore.instance.collection("datingUser").doc(widget.resiverUserId.toString()).set({
+                "uid": widget.resiverUserId.toString(),
+                "name": widget.resiverUseremail,
+                "pro_pic": widget.proPic,
+                "isOnline": true,
+              }, SetOptions(merge: true));
             }
           } catch (_) {}
         }
@@ -632,41 +663,59 @@ class _ChattingPageState extends State<ChattingPage> {
                   ),
                   const Spacer(flex: 2),
                   InkWell(
-                      onTap: () {
+                      onTap: () async {
                         if (state.homeData.audioVideo == "0") {
                           Navigator.pushNamed(context, PremiumScreen.premiumScreenRoute);
                         }
                         else {
                           chattingProvider.updateIsLoading(true);
-                          List<String> ids = [
-                            Provider.of<HomeProvider>(context, listen: false).uid,
-                            resiverUserId
-                          ];
+                          final homeProv = Provider.of<HomeProvider>(context, listen: false);
+                          String myUid = (homeProv.uid ?? "").toString();
+                          if (myUid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
+                            myUid = homeProv.userlocalData.userLogin!.id.toString();
+                          }
+                          final myName = homeProv.userlocalData.userLogin?.name ?? 'User';
+                          final myPic = homeProv.userlocalData.userLogin?.otherPic ?? (homeProv.userlocalData.userLogin?.profilePic?.toString() ?? '');
+
+                          List<String> ids = [myUid, resiverUserId];
                           ids.sort();
                           String vcRoomId = ids.join("_");
 
-                          isAudio(vcRoomId, null).then((value) {
-                            _firebaseStorage.collection("chat_rooms").doc(vcRoomId).collection("isVcAvailable").doc(vcRoomId).get().then((value) {
-
-                              chattingProvider.audioNotificationMessage(
-                                  "In Coming Audio Call From ${Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin?.name ?? 'User'}",
-                                  Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin?.name?.toString() ?? "User",
-                                  chattingProvider.fmctoken, context, vcRoomId)
-                                  .then((value) {
-                                chattingProvider.updateIsLoading(false);
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AudioCallingScreen(userData: widget.userData ?? {}, channel: vcRoomId),
-                                    ));
-                              });
-
-                              // }
+                          // 1. Send call signaling document to receiver's inbox
+                          try {
+                            await FirebaseFirestore.instance.collection("user_calls").doc(resiverUserId).set({
+                              "channel": vcRoomId,
+                              "callerId": myUid,
+                              "callerName": myName,
+                              "callerPic": myPic,
+                              "callType": "audio",
+                              "status": "ringing",
+                              "timestamp": FieldValue.serverTimestamp(),
                             });
-                          });
+                          } catch (e) {
+                            print("Error writing user_calls signal: $e");
+                          }
+
+                          // 2. Set channel status
+                          await isAudio(vcRoomId, null);
+
+                          chattingProvider.updateIsLoading(false);
+
+                          final callUserData = {
+                            "id": resiverUserId,
+                            "receiverId": resiverUserId,
+                            "name": resiverUseremail,
+                            "senderName": resiverUseremail,
+                            "pro_pic": widget.proPic,
+                            "propic": widget.proPic,
+                          };
+
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AudioCallingScreen(userData: callUserData, channel: vcRoomId),
+                              ));
                         }
-
-
                       },
                       child: SvgPicture.asset(
                         "assets/icons/Call.svg",
@@ -676,34 +725,45 @@ class _ChattingPageState extends State<ChattingPage> {
                       )),
                   const Spacer(),
                   InkWell(
-                      onTap: () {
+                      onTap: () async {
                         if (state.homeData.audioVideo == "0") {
                           Navigator.pushNamed(context, PremiumScreen.premiumScreenRoute);
                         }
                         else {
                           chattingProvider.updateIsLoading(true);
-                          List<String> ids = [
-                            Provider.of<HomeProvider>(context, listen: false).uid,
-                            resiverUserId
-                          ];
+                          final homeProv = Provider.of<HomeProvider>(context, listen: false);
+                          String myUid = (homeProv.uid ?? "").toString();
+                          if (myUid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
+                            myUid = homeProv.userlocalData.userLogin!.id.toString();
+                          }
+                          final myName = homeProv.userlocalData.userLogin?.name ?? 'User';
+                          final myPic = homeProv.userlocalData.userLogin?.otherPic ?? (homeProv.userlocalData.userLogin?.profilePic?.toString() ?? '');
+
+                          List<String> ids = [myUid, resiverUserId];
                           ids.sort();
                           String vcRoomId = ids.join("_");
-                          isvc(vcRoomId, true).then((value) {
-                            _firebaseStorage.collection("chat_rooms").doc(vcRoomId).collection("isVcAvailable").doc(vcRoomId).get().then((value) {
-                              if (value.data()!["isVc"] == true) {
-                                chattingProvider.vcNotificationMessage(
-                                    "In Coming Video Call From ${Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin?.name ?? 'User'}",
-                                    Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin?.name?.toString() ?? "User",
-                                    chattingProvider.fmctoken,
-                                    context,
-                                    vcRoomId)
-                                    .then((value) {
-                                  chattingProvider.updateIsLoading(false);
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => VideoCall(channel: vcRoomId),));
-                                });
-                              }
+
+                          // 1. Send call signaling document to receiver's inbox
+                          try {
+                            await FirebaseFirestore.instance.collection("user_calls").doc(resiverUserId).set({
+                              "channel": vcRoomId,
+                              "callerId": myUid,
+                              "callerName": myName,
+                              "callerPic": myPic,
+                              "callType": "video",
+                              "status": "ringing",
+                              "timestamp": FieldValue.serverTimestamp(),
                             });
-                          });
+                          } catch (e) {
+                            print("Error writing user_calls signal: $e");
+                          }
+
+                          // 2. Set video channel status
+                          await isvc(vcRoomId, true);
+
+                          chattingProvider.updateIsLoading(false);
+
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => VideoCall(channel: vcRoomId),));
                         }
                       },
                       child: SvgPicture.asset(

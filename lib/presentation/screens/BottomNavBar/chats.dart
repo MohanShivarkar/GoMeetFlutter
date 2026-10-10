@@ -149,10 +149,8 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
                               chattingProvider.searchIteam(s);
                             })
                         : const SizedBox(),
-                    chattingProvider.userData.isEmpty
-                        ? const SizedBox()
-                        : chattingProvider.searchController.text.isEmpty
-                            ? Expanded(child: _buildUserList())
+                    chattingProvider.searchController.text.isEmpty
+                        ? Expanded(child: _buildUserList())
                             : chattingProvider.searchIndexList.isEmpty
                                 ? Expanded(
                                     child: Column(
@@ -176,6 +174,7 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
                                       itemCount: chattingProvider.searchIndexList.length,
                                       itemBuilder: (context, index) {
                                         var result = chattingProvider.searchIndexList[index];
+                                        if (result >= chattingProvider.searchiteams.length) return const SizedBox();
                                         var itemData = Map<String,dynamic>.from(chattingProvider.searchiteams[result]);
                                         return ListTile(
                                             dense: true,
@@ -299,15 +298,19 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
     apilist.addAll(chattingProvider.getblockListApi.blockByOther as Iterable);
     print("  + + + + :---  $apilist");
 
-    if (chattingProvider.searchiteams.length < legnth - 1) {
-      if (snapshot.data!.docs.isNotEmpty) {
-        chattingProvider.searchiteams.add({
-          "name": email,
-          "image": proPic,
-          "uid": uid,
-          "message": data["message"],
-          "timestamp": data["timestamp"]
-        });
+    if (snapshot.data != null && snapshot.data!.docs.isNotEmpty) {
+      final existingIndex = chattingProvider.searchiteams.indexWhere((m) => m["uid"] == uid);
+      final itemMap = {
+        "name": email,
+        "image": proPic,
+        "uid": uid,
+        "message": data["message"] ?? "",
+        "timestamp": data["timestamp"]
+      };
+      if (existingIndex >= 0) {
+        chattingProvider.searchiteams[existingIndex] = itemMap;
+      } else {
+        chattingProvider.searchiteams.add(itemMap);
       }
     }
 
@@ -361,36 +364,43 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
   ChatServices chatservices = ChatServices();
 
   Widget _buildUserListIteam(DocumentSnapshot document, int legth) {
+    if (document.data() == null) return const SizedBox();
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-    print("firebase data :- ${data}");
-    var uid = Provider.of<HomeProvider>(context, listen: false).uid;
-    List ids = [data["uid"], uid];
+    final homeProv = Provider.of<HomeProvider>(context, listen: false);
+    String uid = (homeProv.uid ?? "").toString();
+    if (uid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
+      uid = homeProv.userlocalData.userLogin!.id.toString();
+    }
+    String myName = homeProv.userlocalData.userLogin?.name ?? "";
 
-    if (Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin!.name != data["name"]) {
-      return StreamBuilder(
-          stream: chatservices.getMessage(userId: data["uid"], otherUserId: Provider.of<HomeProvider>(context, listen: false).uid),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Text("Error${snapshot.error}",style: Theme.of(context).textTheme.bodySmall);
-            }
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox();
-            } else {
-              return snapshot.data!.docs.isEmpty
-                  ? const SizedBox()
-                  : _buildMessageiteam(snapshot.data!.docs.last, data["name"],
-                      data["uid"], data["pro_pic"].toString(), legth, snapshot);
-            }
-          });
-      // return Container(
-      //   height: 40,
-      //   width: 300,
-      //   color: Colors.red,
-      //   margin: EdgeInsets.all(8),
-      // );
-    } else {
+    final targetUid = (data["uid"] ?? "").toString();
+    final targetName = (data["name"] ?? "").toString();
+
+    // Skip current user
+    if ((uid.isNotEmpty && targetUid == uid) || (myName.isNotEmpty && targetName == myName)) {
       return const SizedBox();
     }
+    if (uid.isEmpty || targetUid.isEmpty) {
+      return const SizedBox();
+    }
+
+    return StreamBuilder(
+        stream: chatservices.getMessage(userId: targetUid, otherUserId: uid),
+        builder: (context, snapshot) {
+          if (snapshot.hasError || snapshot.connectionState == ConnectionState.waiting) {
+            return const SizedBox();
+          }
+          if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+            return const SizedBox();
+          }
+          return _buildMessageiteam(
+              snapshot.data!.docs.last,
+              targetName.isNotEmpty ? targetName : "User",
+              targetUid,
+              (data["pro_pic"] ?? "").toString(),
+              legth,
+              snapshot);
+        });
   }
 
 }

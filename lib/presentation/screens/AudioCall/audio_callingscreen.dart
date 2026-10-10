@@ -23,6 +23,7 @@ class _AudioCallingScreenState extends State<AudioCallingScreen> {
     print(widget.userData);
     print(widget.channel);
     FirebaseFirestore.instance.collection("chat_rooms").doc(widget.channel).collection("isVcAvailable").doc(widget.channel).snapshots().listen((event) {
+      if (!mounted || event.data() == null) return;
       Map data = event.data()!;
       print(data);
       if(data["Audio"] == true){
@@ -36,7 +37,19 @@ class _AudioCallingScreenState extends State<AudioCallingScreen> {
   }
 
   @override
+  void dispose() {
+    isAudio(widget.channel, false);
+    final receiverId = widget.userData["receiverId"] ?? widget.userData["id"] ?? "";
+    if (receiverId.toString().isNotEmpty) {
+      FirebaseFirestore.instance.collection("user_calls").doc(receiverId.toString()).set({"status": "ended"}, SetOptions(merge: true));
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final pic = (widget.userData["pro_pic"] ?? widget.userData["propic"] ?? "").toString();
+    final name = (widget.userData["senderName"] ?? widget.userData["name"] ?? "User").toString();
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -67,12 +80,14 @@ class _AudioCallingScreenState extends State<AudioCallingScreen> {
 
                 CircleAvatar(
                   radius: 70,
-                  backgroundImage: NetworkImage("${Config.baseUrl}${widget.userData["pro_pic"]}"),
+                  backgroundImage: (pic.isNotEmpty && pic != "null")
+                      ? NetworkImage("${Config.baseUrl}$pic")
+                      : const AssetImage("assets/Image/05.png") as ImageProvider,
                 ),
 
                 const SizedBox(height: 10),
 
-                Text("${widget.userData["senderName"]}", style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: Colors.white),),
+                Text(name, style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: Colors.white),),
 
                 const SizedBox(height: 5,),
 
