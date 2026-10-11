@@ -58,13 +58,17 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
   void _initChatRooms() {
     Preferences.getUserId().then((storedUid) {
       String uid = (storedUid ?? "").trim();
+      print("[ChatsDEBUG] _initChatRooms getUserId returned: '$uid'");
       if (uid.isEmpty) {
         final homeProv = Provider.of<HomeProvider>(context, listen: false);
         uid = (homeProv.uid ?? "").toString();
+        print("[ChatsDEBUG] _initChatRooms fallback homeProv.uid: '$uid'");
       }
       if (uid.isNotEmpty && mounted) {
         _currentUid = uid;
         _subscribeChatRooms(uid);
+      } else {
+        print("[ChatsDEBUG] _initChatRooms UID IS EMPTY! Mounted: $mounted");
       }
     });
   }
@@ -81,11 +85,16 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
       }
     });
 
+    print("[ChatsDEBUG] _subscribeChatRooms subscribing for UID: '$uid'");
     FirebaseFirestore.instance
         .collection("chat_rooms")
         .where("participants", arrayContains: uid)
         .get()
         .then((snapshot) {
+      print("[ChatsDEBUG] .get() returned ${snapshot.docs.length} docs for UID: '$uid'");
+      for (var d in snapshot.docs) {
+        print("[ChatsDEBUG] Found doc: ${d.id} -> ${d.data()}");
+      }
       if (mounted) {
         _chatSafetyTimer?.cancel();
         setState(() {
@@ -93,7 +102,9 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
           _isLoadingChats = false;
         });
       }
-    }).catchError((_) {});
+    }).catchError((err) {
+      print("[ChatsDEBUG] .get() ERROR: $err");
+    });
 
     _chatSubscription = FirebaseFirestore.instance
         .collection("chat_rooms")
@@ -334,6 +345,7 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
       );
     }
 
+    print("[ChatsDEBUG] _buildUserList called, _isLoading: $_isLoadingChats, _chatRooms.length: ${_chatRooms.length}");
     if (_chatRooms.isEmpty) {
       return Center(
         child: Column(

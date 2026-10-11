@@ -52,13 +52,12 @@ class DefaultFirebaseOptions {
   ///   apiKey, authDomain, projectId, storageBucket, messagingSenderId —
   ///   all sourced from Firebase Console → Project Settings → Your Apps → Web App.
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAjRdNTYEppYYlYy2GyyJqEYMUmDuus9V8',
-    authDomain: 'lovecloud-3c7a2.firebaseapp.com',
-    projectId: 'lovecloud-3c7a2',
-    storageBucket: 'lovecloud-3c7a2.firebasestorage.app',
-    messagingSenderId: '484185378389',
-    appId: '1:484185378389:web:352ede962d04d1395dcedc',
-    measurementId: 'G-263BRWV5DJ',
+    apiKey: 'AIzaSyDX-O6BKjk1_b9xfBcIgQluuXdLHBPLwAQ',
+    authDomain: 'lovecloud-bc2f8.firebaseapp.com',
+    projectId: 'lovecloud-bc2f8',
+    storageBucket: 'lovecloud-bc2f8.firebasestorage.app',
+    messagingSenderId: '1010945549364',
+    appId: '1:1010945549364:web:8d373ec46f0571e78d5661',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
