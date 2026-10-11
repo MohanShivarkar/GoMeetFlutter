@@ -38,13 +38,13 @@ class Routes {
         return CupertinoPageRoute(builder: (context) => const LoginScreen());
 
       case CorePwaHomeScreen.routeName:
-        return CupertinoPageRoute(builder: (context) => const HomeScreen());
+        return CupertinoPageRoute(builder: (context) => const BottomBar());
 
       case BottomBar.bottomBarRoute:
         return CupertinoPageRoute(builder: (context) => const BottomBar());
 
       case HomeScreen.homeScrennRoute:
-        return CupertinoPageRoute(builder: (context) => const HomeScreen());
+        return CupertinoPageRoute(builder: (context) => const BottomBar());
 
       case NotificationPage.notificationRoute:
         return CupertinoPageRoute(builder: (context) => const NotificationPage());
