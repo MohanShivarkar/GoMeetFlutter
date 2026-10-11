@@ -2,20 +2,20 @@ class Config {
 
   static String? firebaseKey;
 
-  static String? projectID = "redbus-3ec46";
+  static String? projectID = "lovecloud-bc2f8";
 
-  // API Base URLs — environment-driven with fallback to localhost for development
+  // API Base URLs — environment-driven with fallback for development
   // Production: Set API_BASE_URL and API_BASE_URL_API via build flags
-  //   flutter build web --dart-define=API_BASE_URL=https://api.gomeet.com/
+  //   flutter build web --dart-define=API_BASE_URL=https://lovecloud24.com/api/
   //   flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8000/
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://3.108.154.25/api/',
+    defaultValue: 'https://lovecloud24.com/api/',
   );
 
   static const String baseUrlApi = String.fromEnvironment(
     'API_BASE_URL_API',
-    defaultValue: 'http://3.108.154.25/api',
+    defaultValue: 'https://lovecloud24.com/api',
   );
 
   // OneSignal Key — environment-driven with fallback for development
