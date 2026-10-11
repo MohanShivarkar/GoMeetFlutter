@@ -104,9 +104,9 @@ Future demo1(context) async{
     snep.listen((element) {
       directoryUsers.clear();
       List<QueryDocumentSnapshot<Map<String, dynamic>>> data = element.docs;
+      var currentUid = Provider.of<HomeProvider>(context, listen: false).uid;
       for(int a = 0; a < data.length; a++){
         Map<String, dynamic> dataa = data[a].data();
-        var currentUid = Provider.of<HomeProvider>(context, listen: false).uid;
         if (dataa["uid"] != null && dataa["uid"].toString() != currentUid?.toString()) {
           directoryUsers.add({
             "name": dataa["name"] ?? "User",
@@ -116,31 +116,6 @@ Future demo1(context) async{
             "timestamp": Timestamp.now(),
           });
         }
-        if (currentUid == null) continue;
-        Stream<QuerySnapshot<Object?>> snapshot = chatservices.getMessage(userId: dataa["uid"], otherUserId: currentUid);
-        snapshot.listen((snapElement) {
-          List snapDocs = snapElement.docs;
-          for(int i = 0; i < snapDocs.length; i++){
-            Map dataa1 = snapDocs[i].data() as Map;
-            var currentName = Provider.of<HomeProvider>(context, listen: false).userlocalData.userLogin?.name;
-            if (currentName != null && currentName != dataa["name"]){
-              userData.add({
-                "name": dataa["name"],
-                "image": dataa["pro_pic"],
-                "uid": dataa["uid"],
-                "message": dataa1["message"],
-                "timestamp": dataa1["timestamp"]
-              });
-              notifyListeners();
-            }
-          }
-          isLoadingchat = false;
-          notifyListeners();
-        }, onError: (err) {
-          print("Chat messages stream error: $err");
-          isLoadingchat = false;
-          notifyListeners();
-        });
       }
       isLoadingchat = false;
       notifyListeners();
@@ -177,7 +152,17 @@ void _scrollToLastMessage() {
 
 
 
-  Widget buildMessageInpurt({required resiverUserId,required context,required void Function() ontap,required FocusNode? focusnodee,required Icon icon, required String images,required void Function() ontap1}) {
+  Widget buildMessageInpurt({
+    required resiverUserId,
+    required context,
+    required void Function() ontap,
+    required FocusNode? focusnodee,
+    required Icon icon,
+    required String images,
+    required void Function() ontap1,
+    String? receiverName,
+    String? receiverPic,
+  }) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Row(
@@ -206,7 +191,13 @@ void _scrollToLastMessage() {
                       const SizedBox(width: 5,),
                       InkWell(
                         onTap: () {
-                          sendMessage(resiverUserId: resiverUserId, fmctoken: fmctoken, context: context);
+                          sendMessage(
+                            resiverUserId: resiverUserId,
+                            fmctoken: fmctoken,
+                            context: context,
+                            receiverName: receiverName,
+                            receiverPic: receiverPic,
+                          );
                         },
                         child: Container(
                           margin: const EdgeInsets.all(5),
@@ -338,7 +329,13 @@ void _scrollToLastMessage() {
     );
   }
 
-  void sendMessage({required String resiverUserId, required String fmctoken, required BuildContext context}) async {
+  void sendMessage({
+    required String resiverUserId,
+    required String fmctoken,
+    required BuildContext context,
+    String? receiverName,
+    String? receiverPic,
+  }) async {
     final message = controller.text.trim();
     if (message.isEmpty) return;
 
@@ -348,7 +345,13 @@ void _scrollToLastMessage() {
     // 1. Send message to Firestore chat room immediately via Provider
     try {
       final chatService = Provider.of<ChatServices>(context, listen: false);
-      await chatService.sendMessage(receiverId: resiverUserId, messeage: message, context: context);
+      await chatService.sendMessage(
+        receiverId: resiverUserId,
+        messeage: message,
+        context: context,
+        receiverName: receiverName,
+        receiverPic: receiverPic,
+      );
     } catch (e) {
       print("Chat service send error: $e");
     }

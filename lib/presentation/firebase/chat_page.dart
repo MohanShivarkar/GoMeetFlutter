@@ -72,12 +72,31 @@ class _ChattingPageState extends State<ChattingPage> {
       );
       chattingProvider.updateUid(myUid);
 
-      // Ensure both users exist in datingUser for permanent chat visibility
+      // Ensure both users exist in datingUser and chat_rooms for permanent chat visibility
       try {
+        List<String> ids = [myUid, widget.resiverUserId.toString()];
+        ids.sort();
+        String chatRoomId = ids.join("_");
+        final myPic = homeProv.userlocalData.userLogin?.otherPic ?? (homeProv.userlocalData.userLogin?.profilePic?.toString() ?? "");
+
+        FirebaseFirestore.instance.collection("chat_rooms").doc(chatRoomId).set({
+          "participants": ids,
+          "users": {
+            myUid: {
+              "name": homeProv.userlocalData.userLogin?.name ?? "User",
+              "pic": myPic,
+            },
+            widget.resiverUserId.toString(): {
+              "name": widget.resiverUseremail,
+              "pic": widget.proPic,
+            }
+          }
+        }, SetOptions(merge: true));
+
         FirebaseFirestore.instance.collection("datingUser").doc(myUid).set({
           "uid": myUid,
           "name": homeProv.userlocalData.userLogin?.name ?? "User",
-          "pro_pic": homeProv.userlocalData.userLogin?.otherPic ?? (homeProv.userlocalData.userLogin?.profilePic?.toString() ?? ""),
+          "pro_pic": myPic,
           "isOnline": true,
         }, SetOptions(merge: true));
 
@@ -302,10 +321,12 @@ class _ChattingPageState extends State<ChattingPage> {
                   Column(
                     children: [
                       Expanded(
-                        child: chattingProvider.buildMessageList(context: context, resiverUserId: Provider.of<HomeProvider>(context, listen: false).uid),
+                        child: chattingProvider.buildMessageList(context: context, resiverUserId: widget.resiverUserId.toString()),
                       ),
                       chattingProvider.buildMessageInpurt(
                         resiverUserId: widget.resiverUserId,
+                        receiverName: widget.resiverUseremail,
+                        receiverPic: widget.proPic,
                         context: context,
                         ontap: () {
                         setState(() {

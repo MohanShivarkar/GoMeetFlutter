@@ -243,165 +243,197 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
   // final ScrollController _scrollController = ScrollController();
 
   Widget _buildUserList() {
-    return StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("datingUser").snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return const Text("Error");
-          }
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return ListTile(
-              contentPadding: const EdgeInsets.symmetric(vertical: 5),
-              leading: commonSimmer(height: 50, width: 50, radius: 50),
-              title: Row(
-                children: [
-                  commonSimmer(height: 10, width: 50, radius: 10),
-                ],
-              ),
-              subtitle: Row(
-                children: [
-                  commonSimmer(height: 10, width: 30, radius: 10),
-                ],
-              ),
-              trailing: commonSimmer(height: 10, width: 30, radius: 10),
-            );
-          } else {
-            return ListView(
-              // scrollDirection: Axis.vertical,
-              // physics: NeverScrollableScrollPhysics(),
-              // controller: _scrollController,
-              shrinkWrap: true,
-              children: snapshot.data!.docs.map<Widget>((doc) {
-                return _buildUserListIteam(doc, snapshot.data!.docs.length);
-              }
-             ).toList(),
-            );
-            // return ListView.builder(
-            //   controller: _scrollController,
-            //   shrinkWrap: true,
-            //   itemCount: snapshot.data!.docs.length,
-            //   itemBuilder: (context, index) {
-            //     final doc = snapshot.data!.docs[index];
-            //     return _buildUserListIteam(doc, snapshot.data!.docs.length);
-            //   },
-            // );
-          }
-        });
-  }
-
-  Widget _buildMessageiteam(document, String email, String uid, String proPic, int legnth, var snapshot) {
-    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-
-    List apilist = [];
-
-    apilist.addAll(chattingProvider.getblockListApi.blockByMe as Iterable);
-    apilist.addAll(chattingProvider.getblockListApi.blockByOther as Iterable);
-    print("  + + + + :---  $apilist");
-
-    if (snapshot.data != null && snapshot.data!.docs.isNotEmpty) {
-      final existingIndex = chattingProvider.searchiteams.indexWhere((m) => m["uid"] == uid);
-      final itemMap = {
-        "name": email,
-        "image": proPic,
-        "uid": uid,
-        "message": data["message"] ?? "",
-        "timestamp": data["timestamp"]
-      };
-      if (existingIndex >= 0) {
-        chattingProvider.searchiteams[existingIndex] = itemMap;
-      } else {
-        chattingProvider.searchiteams.add(itemMap);
-      }
-    }
-
-    return apilist.contains(uid)
-        ? const SizedBox()
-        : ListTile(
-            dense: true,
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChattingPage(
-                      proPic: proPic,
-                      resiverUserId: uid,
-                      resiverUseremail: email,
-                      userData: data,
-                    ),
-                  )
-              );
-            },
-            contentPadding: const EdgeInsets.symmetric(vertical: 5),
-            leading: proPic == "null" ? const CircleAvatar(
-                    backgroundColor: Colors.transparent,
-                    radius: 25,
-                    backgroundImage: AssetImage(
-                      "assets/Image/05.png",
-                    )) : CircleAvatar(
-                    backgroundColor: Colors.transparent,
-                    radius: 25,
-                    backgroundImage: NetworkImage("${Config.baseUrl}$proPic"),
-                  ),
-            title: Text(
-              email,
-              style: Theme.of(context).textTheme.bodyMedium!,
-            ),
-            subtitle: Text(data["message"],
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall),
-            trailing: Text(
-                DateFormat('hh:mm a')
-                    .format(DateTime.fromMicrosecondsSinceEpoch(
-                        data["timestamp"].microsecondsSinceEpoch))
-                    .toString(),
-                style: const TextStyle(
-                  fontSize: 10,
-                ))
-    );
-  }
-
-  ChatServices chatservices = ChatServices();
-
-  Widget _buildUserListIteam(DocumentSnapshot document, int legth) {
-    if (document.data() == null) return const SizedBox();
-    Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
     final homeProv = Provider.of<HomeProvider>(context, listen: false);
     String uid = (homeProv.uid ?? "").toString();
     if (uid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
       uid = homeProv.userlocalData.userLogin!.id.toString();
     }
-    String myName = homeProv.userlocalData.userLogin?.name ?? "";
+    if (uid.isEmpty) return const SizedBox();
 
-    final targetUid = (data["uid"] ?? "").toString();
-    final targetName = (data["name"] ?? "").toString();
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection("chat_rooms")
+          .where("participants", arrayContains: uid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Center(child: Text("Error loading chats"));
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return ListTile(
+            contentPadding: const EdgeInsets.symmetric(vertical: 5),
+            leading: commonSimmer(height: 50, width: 50, radius: 50),
+            title: Row(
+              children: [
+                commonSimmer(height: 10, width: 50, radius: 10),
+              ],
+            ),
+            subtitle: Row(
+              children: [
+                commonSimmer(height: 10, width: 30, radius: 10),
+              ],
+            ),
+            trailing: commonSimmer(height: 10, width: 30, radius: 10),
+          );
+        }
 
-    // Skip current user
-    if ((uid.isNotEmpty && targetUid == uid) || (myName.isNotEmpty && targetName == myName)) {
-      return const SizedBox();
-    }
-    if (uid.isEmpty || targetUid.isEmpty) {
-      return const SizedBox();
-    }
+        final docs = snapshot.data?.docs ?? [];
+        if (docs.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  "assets/icons/Chat.svg",
+                  height: 60,
+                  width: 60,
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).indicatorColor.withOpacity(0.3),
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  AppLocalizations.of(context)?.translate("No conversations yet") ?? "No conversations yet",
+                  style: TextStyle(
+                    color: Theme.of(context).indicatorColor.withOpacity(0.5),
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
 
-    return StreamBuilder(
-        stream: chatservices.getMessage(userId: targetUid, otherUserId: uid),
-        builder: (context, snapshot) {
-          if (snapshot.hasError || snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox();
-          }
-          if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
-            return const SizedBox();
-          }
-          return _buildMessageiteam(
-              snapshot.data!.docs.last,
-              targetName.isNotEmpty ? targetName : "User",
-              targetUid,
-              (data["pro_pic"] ?? "").toString(),
-              legth,
-              snapshot);
+        // Sort by timestamp descending
+        final sortedDocs = List<QueryDocumentSnapshot>.from(docs);
+        sortedDocs.sort((a, b) {
+          final dataA = a.data() as Map<String, dynamic>? ?? {};
+          final dataB = b.data() as Map<String, dynamic>? ?? {};
+          final tsA = dataA["timestamp"] is Timestamp ? (dataA["timestamp"] as Timestamp) : Timestamp(0, 0);
+          final tsB = dataB["timestamp"] is Timestamp ? (dataB["timestamp"] as Timestamp) : Timestamp(0, 0);
+          return tsB.compareTo(tsA);
         });
+
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: sortedDocs.length,
+          itemBuilder: (context, index) {
+            return _buildChatRoomItem(sortedDocs[index], uid);
+          },
+        );
+      },
+    );
   }
+
+  Widget _buildChatRoomItem(DocumentSnapshot document, String myUid) {
+    if (document.data() == null) return const SizedBox();
+    Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    List participants = (data["participants"] as List? ?? []);
+    String otherUid = participants.firstWhere((id) => id.toString() != myUid, orElse: () => "").toString();
+    if (otherUid.isEmpty) return const SizedBox();
+
+    // Check block list
+    List apilist = [];
+    apilist.addAll(chattingProvider.getblockListApi.blockByMe as Iterable);
+    apilist.addAll(chattingProvider.getblockListApi.blockByOther as Iterable);
+    if (apilist.contains(otherUid)) return const SizedBox();
+
+    // Extract user info from room metadata or fallback to directoryUsers
+    String otherName = "User";
+    String otherPic = "";
+
+    if (data["users"] is Map && data["users"][otherUid] is Map) {
+      otherName = (data["users"][otherUid]["name"] ?? "").toString();
+      otherPic = (data["users"][otherUid]["pic"] ?? "").toString();
+    }
+
+    if (otherName.isEmpty || otherName == "User") {
+      final dirMatch = chattingProvider.directoryUsers.firstWhere(
+        (u) => (u["uid"] ?? "").toString() == otherUid,
+        orElse: () => <String, dynamic>{},
+      );
+      if (dirMatch.isNotEmpty) {
+        otherName = (dirMatch["name"] ?? otherName).toString();
+        if (otherPic.isEmpty) {
+          otherPic = (dirMatch["image"] ?? "").toString();
+        }
+      }
+    }
+
+    String lastMsg = (data["lastMessage"] ?? "").toString();
+    Timestamp? ts = data["timestamp"] is Timestamp ? data["timestamp"] as Timestamp : null;
+
+    // Cache in searchiteams for search functionality
+    final existingIndex = chattingProvider.searchiteams.indexWhere((m) => m["uid"] == otherUid);
+    final itemMap = {
+      "name": otherName,
+      "image": otherPic,
+      "uid": otherUid,
+      "message": lastMsg,
+      "timestamp": ts ?? Timestamp.now(),
+    };
+    if (existingIndex >= 0) {
+      chattingProvider.searchiteams[existingIndex] = itemMap;
+    } else {
+      chattingProvider.searchiteams.add(itemMap);
+    }
+
+    final timeString = ts != null
+        ? DateFormat('hh:mm a').format(DateTime.fromMicrosecondsSinceEpoch(ts.microsecondsSinceEpoch))
+        : "";
+
+    return ListTile(
+      dense: true,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChattingPage(
+              proPic: otherPic,
+              resiverUserId: otherUid,
+              resiverUseremail: otherName,
+              userData: {
+                "uid": otherUid,
+                "name": otherName,
+                "pro_pic": otherPic,
+              },
+            ),
+          ),
+        );
+      },
+      contentPadding: const EdgeInsets.symmetric(vertical: 5),
+      leading: (otherPic.isEmpty || otherPic == "null")
+          ? const CircleAvatar(
+              backgroundColor: Colors.transparent,
+              radius: 25,
+              backgroundImage: AssetImage("assets/Image/05.png"),
+            )
+          : CircleAvatar(
+              backgroundColor: Colors.transparent,
+              radius: 25,
+              backgroundImage: NetworkImage(
+                otherPic.startsWith("http") ? otherPic : "${Config.baseUrl}$otherPic",
+              ),
+            ),
+      title: Text(
+        otherName,
+        style: Theme.of(context).textTheme.bodyMedium!,
+      ),
+      subtitle: Text(
+        lastMsg,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+      trailing: Text(
+        timeString,
+        style: const TextStyle(fontSize: 10),
+      ),
+    );
+  }
+
+  ChatServices chatservices = ChatServices();
 
 }
 

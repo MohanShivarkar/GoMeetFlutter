@@ -45,6 +45,8 @@ class ChatServices extends ChangeNotifier {
     required String receiverId,
     required String messeage,
     required BuildContext context,
+    String? receiverName,
+    String? receiverPic,
   }) async {
     try {
       final firebaseStorage = _firebaseStorage;
@@ -101,13 +103,26 @@ class ChatServices extends ChangeNotifier {
 
       // Update room metadata and ensure user entry in datingUser so chats persist
       try {
-        await firebaseStorage.collection("chat_rooms").doc(chatRoomId).set({
+        final myPic = homeProv.userlocalData.userLogin?.otherPic ?? (homeProv.userlocalData.userLogin?.profilePic?.toString() ?? "");
+        Map<String, dynamic> roomMeta = {
           "participants": ids,
           "lastMessage": messeage,
           "timestamp": timestamp,
-        }, SetOptions(merge: true));
+        };
+        if (currentUserName.isNotEmpty || (receiverName != null && receiverName.isNotEmpty)) {
+          roomMeta["users"] = {
+            currentUserId: {
+              "name": currentUserName,
+              "pic": myPic,
+            },
+            receiverId.toString(): {
+              "name": receiverName ?? "User",
+              "pic": receiverPic ?? "",
+            }
+          };
+        }
+        await firebaseStorage.collection("chat_rooms").doc(chatRoomId).set(roomMeta, SetOptions(merge: true));
 
-        final myPic = homeProv.userlocalData.userLogin?.otherPic ?? (homeProv.userlocalData.userLogin?.profilePic?.toString() ?? "");
         await firebaseStorage.collection("datingUser").doc(currentUserId).set({
           "uid": currentUserId,
           "name": currentUserName,
