@@ -35,6 +35,7 @@ import '../../core/app_download_helper.dart';
 import '../widgets/main_button.dart';
 
 class ChattingPage extends StatefulWidget {
+  static String? activeChatUserId;
   final String resiverUserId;
   final String resiverUseremail;
   final String proPic;
@@ -54,6 +55,7 @@ class _ChattingPageState extends State<ChattingPage> {
   @override
   void initState() {
     super.initState();
+    ChattingPage.activeChatUserId = widget.resiverUserId.toString();
     print("+++++++++++++RRRRRRR++++++++++++++++++++++${widget.resiverUserId}");
     print("-------------SSSSSSS-----------------------------${Provider.of<HomeProvider>(context, listen: false).uid}");
     chattingProvider = Provider.of<ChattingProvider>(context, listen: false);
@@ -72,7 +74,7 @@ class _ChattingPageState extends State<ChattingPage> {
       );
       chattingProvider.updateUid(myUid);
 
-      // Ensure both users exist in datingUser and chat_rooms for permanent chat visibility
+      // Ensure users and room exist, and mark incoming messages as read/delivered
       try {
         List<String> ids = [myUid, widget.resiverUserId.toString()];
         ids.sort();
@@ -92,6 +94,25 @@ class _ChattingPageState extends State<ChattingPage> {
             }
           }
         }, SetOptions(merge: true));
+
+        FirebaseFirestore.instance
+            .collection("chat_rooms")
+            .doc(chatRoomId)
+            .collection("message")
+            .where("reciverId", isEqualTo: myUid)
+            .where("isRead", isEqualTo: false)
+            .get()
+            .then((snap) {
+          for (var d in snap.docs) {
+            d.reference.update({"isRead": true, "isDelivered": true}).catchError((_) {});
+          }
+        }).catchError((_) {});
+
+        FirebaseFirestore.instance.collection("chat_rooms").doc(chatRoomId).get().then((rDoc) {
+          if (rDoc.exists && rDoc.data()?["lastSender"] != myUid) {
+            rDoc.reference.update({"isRead": true, "isDelivered": true}).catchError((_) {});
+          }
+        }).catchError((_) {});
 
         FirebaseFirestore.instance.collection("datingUser").doc(myUid).set({
           "uid": myUid,
@@ -158,6 +179,9 @@ class _ChattingPageState extends State<ChattingPage> {
 
   @override
   void dispose() {
+    if (ChattingPage.activeChatUserId == widget.resiverUserId.toString()) {
+      ChattingPage.activeChatUserId = null;
+    }
     super.dispose();
   }
 
@@ -1143,8 +1167,6 @@ class _ChattingPageState extends State<ChattingPage> {
       ),
     );
   }
-
-
 }
 
 final FirebaseFirestore _firebaseStorage = FirebaseFirestore.instance;

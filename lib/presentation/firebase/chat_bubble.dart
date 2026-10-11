@@ -1,7 +1,6 @@
 import 'package:dating/core/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'chat_service.dart';
 
 class ChatBubble extends StatelessWidget {
@@ -107,8 +106,10 @@ class _MessageBubbleState extends State<MessageBubble> {
                 if (widget.isMe) ...[
                   const SizedBox(width: 4),
                   widget.message.isRead
-                      ? const Icon(Icons.done_all_rounded, size: 14, color: Color(0xFF4FC3F7))
-                      : const Icon(Icons.done_rounded, size: 14, color: Colors.white70),
+                      ? const Icon(Icons.done_all_rounded, size: 14, color: Color(0xFF29B6F6))
+                      : widget.message.isDelivered
+                          ? const Icon(Icons.done_all_rounded, size: 14, color: Colors.white70)
+                          : const Icon(Icons.done_rounded, size: 14, color: Colors.white70),
                 ],
               ],
             ),

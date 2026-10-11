@@ -75,6 +75,17 @@ class ChatServices extends ChangeNotifier {
         return;
       }
 
+      // Check if receiver is online in datingUser collection
+      bool isReceiverOnline = false;
+      try {
+        final recDoc = await firebaseStorage.collection("datingUser").doc(receiverId.toString()).get();
+        if (recDoc.exists && recDoc.data()?['isOnline'] == true) {
+          isReceiverOnline = true;
+        }
+      } catch (err) {
+        print("Receiver online check error: $err");
+      }
+
       Timestamp timestamp = Timestamp.now();
 
       Message newMessage = Message(
@@ -83,6 +94,8 @@ class ChatServices extends ChangeNotifier {
         reciverId: receiverId.toString(),
         message: messeage,
         timestamp: timestamp,
+        isDelivered: isReceiverOnline,
+        isRead: false,
       );
 
       // Optimistically insert into local list immediately for instant UI feedback
@@ -107,7 +120,11 @@ class ChatServices extends ChangeNotifier {
         Map<String, dynamic> roomMeta = {
           "participants": ids,
           "lastMessage": messeage,
+          "lastSender": currentUserId,
+          "lastSenderName": currentUserName,
           "timestamp": timestamp,
+          "isDelivered": isReceiverOnline,
+          "isRead": false,
         };
         if (currentUserName.isNotEmpty || (receiverName != null && receiverName.isNotEmpty)) {
           roomMeta["users"] = {
@@ -205,15 +222,28 @@ class ChatServices extends ChangeNotifier {
           notifyListeners();
           scrollDown();
 
-          // Auto-mark incoming unread messages as read
+          // Auto-mark incoming unread messages as read AND delivered
           for (final doc in snapshot.docs) {
             final data = doc.data();
             final reciverId = (data['reciverId'] ?? data['receiverId'] ?? '').toString();
             final isRead = data['isRead'] == true;
-            if (reciverId == userId && !isRead) {
-              doc.reference.update({'isRead': true}).catchError((_) {});
+            final isDelivered = data['isDelivered'] == true;
+            if (reciverId == userId && (!isRead || !isDelivered)) {
+              doc.reference.update({'isRead': true, 'isDelivered': true}).catchError((_) {});
             }
           }
+
+          // Update room meta status
+          try {
+            firebaseStorage.collection("chat_rooms").doc(chatRoomId).get().then((roomDoc) {
+              if (roomDoc.exists) {
+                final rData = roomDoc.data();
+                if (rData != null && rData['lastSender'] != userId) {
+                  roomDoc.reference.update({'isRead': true, 'isDelivered': true}).catchError((_) {});
+                }
+              }
+            }).catchError((_) {});
+          } catch (_) {}
         },
         onError: (err) {
           print("Firestore getMessageNew error: $err");
@@ -256,6 +286,7 @@ class Message {
   final String message;
   final Timestamp timestamp;
   final bool isRead;
+  final bool isDelivered;
 
   const Message({
     required this.senderId,
@@ -264,6 +295,7 @@ class Message {
     required this.timestamp,
     required this.message,
     this.isRead = false,
+    this.isDelivered = false,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -277,13 +309,17 @@ class Message {
       ts = Timestamp.now();
     }
 
+    final read = json['isRead'] == true;
+    final delivered = (json['isDelivered'] == true) || read;
+
     return Message(
       reciverId: (json['reciverId'] ?? json['receiverId'] ?? '').toString(),
       senderId: (json['senderid'] ?? json['senderId'] ?? '').toString(),
       timestamp: ts,
       message: (json['message'] ?? '').toString(),
       senderName: (json['senderName'] ?? '').toString(),
-      isRead: json['isRead'] == true,
+      isRead: read,
+      isDelivered: delivered,
     );
   }
 
@@ -294,6 +330,7 @@ class Message {
     'message': message,
     'senderName': senderName,
     'isRead': isRead,
+    'isDelivered': isDelivered,
   };
 }
 

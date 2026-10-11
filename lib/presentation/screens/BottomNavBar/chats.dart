@@ -56,21 +56,28 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
   }
 
   void _initChatRooms() {
-    Preferences.getUserId().then((storedUid) {
-      String uid = (storedUid ?? "").trim();
-      print("[ChatsDEBUG] _initChatRooms getUserId returned: '$uid'");
-      if (uid.isEmpty) {
-        final homeProv = Provider.of<HomeProvider>(context, listen: false);
-        uid = (homeProv.uid ?? "").toString();
-        print("[ChatsDEBUG] _initChatRooms fallback homeProv.uid: '$uid'");
-      }
-      if (uid.isNotEmpty && mounted) {
-        _currentUid = uid;
-        _subscribeChatRooms(uid);
-      } else {
-        print("[ChatsDEBUG] _initChatRooms UID IS EMPTY! Mounted: $mounted");
-      }
-    });
+    final homeProv = Provider.of<HomeProvider>(context, listen: false);
+    String uid = (homeProv.uid ?? "").toString();
+    if (uid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
+      uid = homeProv.userlocalData.userLogin!.id.toString();
+    }
+    if (uid.isNotEmpty) {
+      _currentUid = uid;
+      _subscribeChatRooms(uid);
+    } else {
+      Preferences.fetchUserDetails().then((raw) {
+        if (raw.isNotEmpty) {
+          try {
+            final userModel = userModelFromJson(raw);
+            final fetchedId = (userModel.userLogin?.id ?? "").toString();
+            if (fetchedId.isNotEmpty && mounted) {
+              _currentUid = fetchedId;
+              _subscribeChatRooms(fetchedId);
+            }
+          } catch (_) {}
+        }
+      });
+    }
   }
 
   void _subscribeChatRooms(String uid) {
@@ -85,16 +92,11 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
       }
     });
 
-    print("[ChatsDEBUG] _subscribeChatRooms subscribing for UID: '$uid'");
     FirebaseFirestore.instance
         .collection("chat_rooms")
         .where("participants", arrayContains: uid)
         .get()
         .then((snapshot) {
-      print("[ChatsDEBUG] .get() returned ${snapshot.docs.length} docs for UID: '$uid'");
-      for (var d in snapshot.docs) {
-        print("[ChatsDEBUG] Found doc: ${d.id} -> ${d.data()}");
-      }
       if (mounted) {
         _chatSafetyTimer?.cancel();
         setState(() {
@@ -102,9 +104,7 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
           _isLoadingChats = false;
         });
       }
-    }).catchError((err) {
-      print("[ChatsDEBUG] .get() ERROR: $err");
-    });
+    }).catchError((_) {});
 
     _chatSubscription = FirebaseFirestore.instance
         .collection("chat_rooms")
@@ -345,7 +345,6 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
       );
     }
 
-    print("[ChatsDEBUG] _buildUserList called, _isLoading: $_isLoadingChats, _chatRooms.length: ${_chatRooms.length}");
     if (_chatRooms.isEmpty) {
       return Center(
         child: Column(
@@ -404,12 +403,8 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
 
     // Check block list
     List apilist = [];
-    if (chattingProvider.getblockListApi?.blockByMe != null) {
-      apilist.addAll(chattingProvider.getblockListApi!.blockByMe!);
-    }
-    if (chattingProvider.getblockListApi?.blockByOther != null) {
-      apilist.addAll(chattingProvider.getblockListApi!.blockByOther!);
-    }
+    apilist.addAll(chattingProvider.getblockListApi.blockByMe as Iterable);
+    apilist.addAll(chattingProvider.getblockListApi.blockByOther as Iterable);
     if (apilist.contains(otherUid)) return const SizedBox();
 
     // Extract user info from room metadata or fallback to directoryUsers
@@ -493,11 +488,25 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
         otherName,
         style: Theme.of(context).textTheme.bodyMedium!,
       ),
-      subtitle: Text(
-        lastMsg,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: Theme.of(context).textTheme.bodySmall,
+      subtitle: Row(
+        children: [
+          if (data["lastSender"]?.toString() == myUid) ...[
+            data["isRead"] == true
+                ? const Icon(Icons.done_all_rounded, size: 14, color: Color(0xFF29B6F6))
+                : data["isDelivered"] == true
+                    ? const Icon(Icons.done_all_rounded, size: 14, color: Colors.white70)
+                    : const Icon(Icons.done_rounded, size: 14, color: Colors.white70),
+            const SizedBox(width: 4),
+          ],
+          Expanded(
+            child: Text(
+              lastMsg,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+        ],
       ),
       trailing: Text(
         timeString,
