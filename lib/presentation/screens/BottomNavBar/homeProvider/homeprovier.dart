@@ -119,7 +119,7 @@ class HomeProvider extends ChangeNotifier {
   }
 
   bool isShowDialog = false;
-  late UserModel userlocalData;
+  UserModel userlocalData = UserModel();
   late AnimationController controller;
   late Animation<Offset> animation;
 

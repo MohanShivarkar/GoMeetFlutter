@@ -524,7 +524,7 @@ void _scrollToLastMessage() {
   }
 
 
-late GetblockListApi getblockListApi;
+GetblockListApi? getblockListApi = GetblockListApi(blockByMe: [], blockByOther: []);
 
 Future getblockklisttApi(context) async {
 

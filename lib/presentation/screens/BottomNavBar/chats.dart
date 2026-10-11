@@ -56,28 +56,17 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
   }
 
   void _initChatRooms() {
-    final homeProv = Provider.of<HomeProvider>(context, listen: false);
-    String uid = (homeProv.uid ?? "").toString();
-    if (uid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
-      uid = homeProv.userlocalData.userLogin!.id.toString();
-    }
-    if (uid.isNotEmpty) {
-      _currentUid = uid;
-      _subscribeChatRooms(uid);
-    } else {
-      Preferences.fetchUserDetails().then((raw) {
-        if (raw.isNotEmpty) {
-          try {
-            final userModel = userModelFromJson(raw);
-            final fetchedId = (userModel.userLogin?.id ?? "").toString();
-            if (fetchedId.isNotEmpty && mounted) {
-              _currentUid = fetchedId;
-              _subscribeChatRooms(fetchedId);
-            }
-          } catch (_) {}
-        }
-      });
-    }
+    Preferences.getUserId().then((storedUid) {
+      String uid = (storedUid ?? "").trim();
+      if (uid.isEmpty) {
+        final homeProv = Provider.of<HomeProvider>(context, listen: false);
+        uid = (homeProv.uid ?? "").toString();
+      }
+      if (uid.isNotEmpty && mounted) {
+        _currentUid = uid;
+        _subscribeChatRooms(uid);
+      }
+    });
   }
 
   void _subscribeChatRooms(String uid) {
@@ -403,8 +392,12 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
 
     // Check block list
     List apilist = [];
-    apilist.addAll(chattingProvider.getblockListApi.blockByMe as Iterable);
-    apilist.addAll(chattingProvider.getblockListApi.blockByOther as Iterable);
+    if (chattingProvider.getblockListApi?.blockByMe != null) {
+      apilist.addAll(chattingProvider.getblockListApi!.blockByMe!);
+    }
+    if (chattingProvider.getblockListApi?.blockByOther != null) {
+      apilist.addAll(chattingProvider.getblockListApi!.blockByOther!);
+    }
     if (apilist.contains(otherUid)) return const SizedBox();
 
     // Extract user info from room metadata or fallback to directoryUsers
