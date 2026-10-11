@@ -669,52 +669,61 @@ class _ChattingPageState extends State<ChattingPage> {
                         }
                         else {
                           chattingProvider.updateIsLoading(true);
-                          final homeProv = Provider.of<HomeProvider>(context, listen: false);
-                          String myUid = (homeProv.uid ?? "").toString();
-                          if (myUid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
-                            myUid = homeProv.userlocalData.userLogin!.id.toString();
-                          }
-                          final myName = homeProv.userlocalData.userLogin?.name ?? 'User';
-                          final myPic = homeProv.userlocalData.userLogin?.otherPic ?? (homeProv.userlocalData.userLogin?.profilePic?.toString() ?? '');
-
-                          List<String> ids = [myUid, resiverUserId];
-                          ids.sort();
-                          String vcRoomId = ids.join("_");
-
-                          // 1. Send call signaling document to receiver's inbox
                           try {
-                            await FirebaseFirestore.instance.collection("user_calls").doc(resiverUserId).set({
-                              "channel": vcRoomId,
-                              "callerId": myUid,
-                              "callerName": myName,
-                              "callerPic": myPic,
-                              "callType": "audio",
-                              "status": "ringing",
-                              "timestamp": FieldValue.serverTimestamp(),
-                            });
+                            final homeProv = Provider.of<HomeProvider>(context, listen: false);
+                            String myUid = (homeProv.uid ?? "").toString();
+                            if (myUid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
+                              myUid = homeProv.userlocalData.userLogin!.id.toString();
+                            }
+                            final myName = homeProv.userlocalData.userLogin?.name ?? 'User';
+                            final myPic = homeProv.userlocalData.userLogin?.otherPic ?? (homeProv.userlocalData.userLogin?.profilePic?.toString() ?? '');
+
+                            List<String> ids = [myUid, resiverUserId];
+                            ids.sort();
+                            String vcRoomId = ids.join("_");
+
+                            // 1. Send call signaling document to receiver's inbox
+                            try {
+                              await FirebaseFirestore.instance.collection("user_calls").doc(resiverUserId).set({
+                                "channel": vcRoomId,
+                                "callerId": myUid,
+                                "callerName": myName,
+                                "callerPic": myPic,
+                                "callType": "audio",
+                                "status": "ringing",
+                                "timestamp": FieldValue.serverTimestamp(),
+                              });
+                            } catch (e) {
+                              print("Error writing user_calls signal: $e");
+                            }
+
+                            // 2. Set channel status
+                            try {
+                              await isAudio(vcRoomId, null);
+                            } catch (e) {
+                              print("Error setting isAudio: $e");
+                            }
+
+                            final callUserData = {
+                              "id": resiverUserId,
+                              "receiverId": resiverUserId,
+                              "name": resiverUseremail,
+                              "senderName": resiverUseremail,
+                              "pro_pic": widget.proPic,
+                              "propic": widget.proPic,
+                            };
+
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AudioCallingScreen(userData: callUserData, channel: vcRoomId),
+                                ));
                           } catch (e) {
-                            print("Error writing user_calls signal: $e");
+                            print("Audio call error: $e");
+                            Fluttertoast.showToast(msg: "Call error: ${e.toString()}");
+                          } finally {
+                            chattingProvider.updateIsLoading(false);
                           }
-
-                          // 2. Set channel status
-                          await isAudio(vcRoomId, null);
-
-                          chattingProvider.updateIsLoading(false);
-
-                          final callUserData = {
-                            "id": resiverUserId,
-                            "receiverId": resiverUserId,
-                            "name": resiverUseremail,
-                            "senderName": resiverUseremail,
-                            "pro_pic": widget.proPic,
-                            "propic": widget.proPic,
-                          };
-
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AudioCallingScreen(userData: callUserData, channel: vcRoomId),
-                              ));
                         }
                       },
                       child: SvgPicture.asset(
@@ -731,39 +740,48 @@ class _ChattingPageState extends State<ChattingPage> {
                         }
                         else {
                           chattingProvider.updateIsLoading(true);
-                          final homeProv = Provider.of<HomeProvider>(context, listen: false);
-                          String myUid = (homeProv.uid ?? "").toString();
-                          if (myUid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
-                            myUid = homeProv.userlocalData.userLogin!.id.toString();
-                          }
-                          final myName = homeProv.userlocalData.userLogin?.name ?? 'User';
-                          final myPic = homeProv.userlocalData.userLogin?.otherPic ?? (homeProv.userlocalData.userLogin?.profilePic?.toString() ?? '');
-
-                          List<String> ids = [myUid, resiverUserId];
-                          ids.sort();
-                          String vcRoomId = ids.join("_");
-
-                          // 1. Send call signaling document to receiver's inbox
                           try {
-                            await FirebaseFirestore.instance.collection("user_calls").doc(resiverUserId).set({
-                              "channel": vcRoomId,
-                              "callerId": myUid,
-                              "callerName": myName,
-                              "callerPic": myPic,
-                              "callType": "video",
-                              "status": "ringing",
-                              "timestamp": FieldValue.serverTimestamp(),
-                            });
+                            final homeProv = Provider.of<HomeProvider>(context, listen: false);
+                            String myUid = (homeProv.uid ?? "").toString();
+                            if (myUid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
+                              myUid = homeProv.userlocalData.userLogin!.id.toString();
+                            }
+                            final myName = homeProv.userlocalData.userLogin?.name ?? 'User';
+                            final myPic = homeProv.userlocalData.userLogin?.otherPic ?? (homeProv.userlocalData.userLogin?.profilePic?.toString() ?? '');
+
+                            List<String> ids = [myUid, resiverUserId];
+                            ids.sort();
+                            String vcRoomId = ids.join("_");
+
+                            // 1. Send call signaling document to receiver's inbox
+                            try {
+                              await FirebaseFirestore.instance.collection("user_calls").doc(resiverUserId).set({
+                                "channel": vcRoomId,
+                                "callerId": myUid,
+                                "callerName": myName,
+                                "callerPic": myPic,
+                                "callType": "video",
+                                "status": "ringing",
+                                "timestamp": FieldValue.serverTimestamp(),
+                              });
+                            } catch (e) {
+                              print("Error writing user_calls signal: $e");
+                            }
+
+                            // 2. Set video channel status
+                            try {
+                              await isvc(vcRoomId, true);
+                            } catch (e) {
+                              print("Error setting isvc: $e");
+                            }
+
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => VideoCall(channel: vcRoomId),));
                           } catch (e) {
-                            print("Error writing user_calls signal: $e");
+                            print("Video call error: $e");
+                            Fluttertoast.showToast(msg: "Call error: ${e.toString()}");
+                          } finally {
+                            chattingProvider.updateIsLoading(false);
                           }
-
-                          // 2. Set video channel status
-                          await isvc(vcRoomId, true);
-
-                          chattingProvider.updateIsLoading(false);
-
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => VideoCall(channel: vcRoomId),));
                         }
                       },
                       child: SvgPicture.asset(
