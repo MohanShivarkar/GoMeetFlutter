@@ -1,7 +1,10 @@
 // ignore_for_file: avoid_print, unused_local_variable
 
+import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dating/data/localdatabase.dart';
+import 'package:dating/data/models/usermodel.dart';
 import 'package:dating/presentation/firebase/chatting_provider.dart';
 import 'package:dating/presentation/firebase/pickup_callpage.dart';
 import 'package:dating/presentation/screens/BottomNavBar/homeProvider/homeprovier.dart';
@@ -33,6 +36,11 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMixin<ChatScreen> {
   late ChattingProvider chattingProvider;
+  String? _currentUid;
+  StreamSubscription? _chatSubscription;
+  List<QueryDocumentSnapshot> _chatRooms = [];
+  bool _isLoadingChats = true;
+  Timer? _chatSafetyTimer;
 
   @override
   void initState() {
@@ -44,6 +52,80 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
     chattingProvider.getblockklisttApi(context);
     chattingProvider.searchController.clear();
     chattingProvider.isSearch = false;
+    _initChatRooms();
+  }
+
+  void _initChatRooms() {
+    final homeProv = Provider.of<HomeProvider>(context, listen: false);
+    String uid = (homeProv.uid ?? "").toString();
+    if (uid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
+      uid = homeProv.userlocalData.userLogin!.id.toString();
+    }
+    if (uid.isNotEmpty) {
+      _currentUid = uid;
+      _subscribeChatRooms(uid);
+    } else {
+      Preferences.fetchUserDetails().then((raw) {
+        if (raw.isNotEmpty) {
+          try {
+            final userModel = userModelFromJson(raw);
+            final fetchedId = (userModel.userLogin?.id ?? "").toString();
+            if (fetchedId.isNotEmpty && mounted) {
+              _currentUid = fetchedId;
+              _subscribeChatRooms(fetchedId);
+            }
+          } catch (_) {}
+        }
+      });
+    }
+  }
+
+  void _subscribeChatRooms(String uid) {
+    _chatSubscription?.cancel();
+    _chatSafetyTimer?.cancel();
+
+    _chatSafetyTimer = Timer(const Duration(milliseconds: 1500), () {
+      if (mounted && _isLoadingChats) {
+        setState(() {
+          _isLoadingChats = false;
+        });
+      }
+    });
+
+    FirebaseFirestore.instance
+        .collection("chat_rooms")
+        .where("participants", arrayContains: uid)
+        .get()
+        .then((snapshot) {
+      if (mounted) {
+        _chatSafetyTimer?.cancel();
+        setState(() {
+          _chatRooms = snapshot.docs;
+          _isLoadingChats = false;
+        });
+      }
+    }).catchError((_) {});
+
+    _chatSubscription = FirebaseFirestore.instance
+        .collection("chat_rooms")
+        .where("participants", arrayContains: uid)
+        .snapshots()
+        .listen((snapshot) {
+      if (mounted) {
+        _chatSafetyTimer?.cancel();
+        setState(() {
+          _chatRooms = snapshot.docs;
+          _isLoadingChats = false;
+        });
+      }
+    }, onError: (err) {
+      print("Chat rooms stream error: $err");
+      if (mounted) {
+        setState(() {
+          _isLoadingChats = false;
+        });
+      }
+    });
   }
 
   bool get wantKeepAlive => true;
@@ -51,6 +133,8 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
 
   @override
   void dispose() {
+    _chatSubscription?.cancel();
+    _chatSafetyTimer?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -243,85 +327,69 @@ class _ChatScreenState extends State<ChatScreen> with AutomaticKeepAliveClientMi
   // final ScrollController _scrollController = ScrollController();
 
   Widget _buildUserList() {
-    final homeProv = Provider.of<HomeProvider>(context, listen: false);
-    String uid = (homeProv.uid ?? "").toString();
-    if (uid.isEmpty && homeProv.userlocalData.userLogin?.id != null) {
-      uid = homeProv.userlocalData.userLogin!.id.toString();
+    if (_isLoadingChats) {
+      return ListTile(
+        contentPadding: const EdgeInsets.symmetric(vertical: 5),
+        leading: commonSimmer(height: 50, width: 50, radius: 50),
+        title: Row(
+          children: [
+            commonSimmer(height: 10, width: 50, radius: 10),
+          ],
+        ),
+        subtitle: Row(
+          children: [
+            commonSimmer(height: 10, width: 30, radius: 10),
+          ],
+        ),
+        trailing: commonSimmer(height: 10, width: 30, radius: 10),
+      );
     }
-    if (uid.isEmpty) return const SizedBox();
 
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection("chat_rooms")
-          .where("participants", arrayContains: uid)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const Center(child: Text("Error loading chats"));
-        }
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return ListTile(
-            contentPadding: const EdgeInsets.symmetric(vertical: 5),
-            leading: commonSimmer(height: 50, width: 50, radius: 50),
-            title: Row(
-              children: [
-                commonSimmer(height: 10, width: 50, radius: 10),
-              ],
+    if (_chatRooms.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              "assets/icons/Chat.svg",
+              height: 60,
+              width: 60,
+              colorFilter: ColorFilter.mode(
+                Theme.of(context).indicatorColor.withOpacity(0.3),
+                BlendMode.srcIn,
+              ),
             ),
-            subtitle: Row(
-              children: [
-                commonSimmer(height: 10, width: 30, radius: 10),
-              ],
+            const SizedBox(height: 12),
+            Text(
+              AppLocalizations.of(context)?.translate("No conversations yet") ?? "No conversations yet",
+              style: TextStyle(
+                color: Theme.of(context).indicatorColor.withOpacity(0.5),
+                fontSize: 15,
+              ),
             ),
-            trailing: commonSimmer(height: 10, width: 30, radius: 10),
-          );
-        }
+          ],
+        ),
+      );
+    }
 
-        final docs = snapshot.data?.docs ?? [];
-        if (docs.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(
-                  "assets/icons/Chat.svg",
-                  height: 60,
-                  width: 60,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).indicatorColor.withOpacity(0.3),
-                    BlendMode.srcIn,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  AppLocalizations.of(context)?.translate("No conversations yet") ?? "No conversations yet",
-                  style: TextStyle(
-                    color: Theme.of(context).indicatorColor.withOpacity(0.5),
-                    fontSize: 15,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
+    // Sort by timestamp descending
+    final sortedDocs = List<QueryDocumentSnapshot>.from(_chatRooms);
+    sortedDocs.sort((a, b) {
+      final dataA = a.data() as Map<String, dynamic>? ?? {};
+      final dataB = b.data() as Map<String, dynamic>? ?? {};
+      final tsA = dataA["timestamp"] is Timestamp ? (dataA["timestamp"] as Timestamp) : Timestamp(0, 0);
+      final tsB = dataB["timestamp"] is Timestamp ? (dataB["timestamp"] as Timestamp) : Timestamp(0, 0);
+      return tsB.compareTo(tsA);
+    });
 
-        // Sort by timestamp descending
-        final sortedDocs = List<QueryDocumentSnapshot>.from(docs);
-        sortedDocs.sort((a, b) {
-          final dataA = a.data() as Map<String, dynamic>? ?? {};
-          final dataB = b.data() as Map<String, dynamic>? ?? {};
-          final tsA = dataA["timestamp"] is Timestamp ? (dataA["timestamp"] as Timestamp) : Timestamp(0, 0);
-          final tsB = dataB["timestamp"] is Timestamp ? (dataB["timestamp"] as Timestamp) : Timestamp(0, 0);
-          return tsB.compareTo(tsA);
-        });
+    final homeProv = Provider.of<HomeProvider>(context, listen: false);
+    String uid = (homeProv.uid ?? _currentUid ?? "").toString();
 
-        return ListView.builder(
-          shrinkWrap: true,
-          itemCount: sortedDocs.length,
-          itemBuilder: (context, index) {
-            return _buildChatRoomItem(sortedDocs[index], uid);
-          },
-        );
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: sortedDocs.length,
+      itemBuilder: (context, index) {
+        return _buildChatRoomItem(sortedDocs[index], uid);
       },
     );
   }
