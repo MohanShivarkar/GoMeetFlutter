@@ -60,6 +60,7 @@ updateIsSearch(){
 
 List searchIndexList = [];
 List<Map> searchiteams = [];
+List<Map> directoryUsers = [];
 
 searchIteam(s) {
   searchIndexList = [];
@@ -73,6 +74,18 @@ searchIteam(s) {
     final msg = (searchiteams[i]["message"] ?? "").toString().toLowerCase();
     if (name.contains(query) || msg.contains(query)) {
       searchIndexList.add(i);
+    }
+  }
+  for (final user in directoryUsers) {
+    final name = (user["name"] ?? "").toString().toLowerCase();
+    final userUid = (user["uid"] ?? "").toString();
+    if (userUid == (uid ?? "").toString()) continue;
+    if (name.contains(query)) {
+      final alreadyInList = searchiteams.any((m) => m["uid"] == userUid);
+      if (!alreadyInList) {
+        searchiteams.add(user);
+        searchIndexList.add(searchiteams.length - 1);
+      }
     }
   }
   notifyListeners();
@@ -89,10 +102,20 @@ Future demo1(context) async{
     userData.clear();
     Stream<QuerySnapshot<Map<String, dynamic>>> snep = FirebaseFirestore.instance.collection("datingUser").snapshots();
     snep.listen((element) {
+      directoryUsers.clear();
       List<QueryDocumentSnapshot<Map<String, dynamic>>> data = element.docs;
       for(int a = 0; a < data.length; a++){
         Map<String, dynamic> dataa = data[a].data();
         var currentUid = Provider.of<HomeProvider>(context, listen: false).uid;
+        if (dataa["uid"] != null && dataa["uid"].toString() != currentUid?.toString()) {
+          directoryUsers.add({
+            "name": dataa["name"] ?? "User",
+            "image": dataa["pro_pic"] ?? "",
+            "uid": dataa["uid"] ?? "",
+            "message": "Tap to start conversation",
+            "timestamp": Timestamp.now(),
+          });
+        }
         if (currentUid == null) continue;
         Stream<QuerySnapshot<Object?>> snapshot = chatservices.getMessage(userId: dataa["uid"], otherUserId: currentUid);
         snapshot.listen((snapElement) {
