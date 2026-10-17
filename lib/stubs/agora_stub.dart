@@ -234,6 +234,11 @@ class _AgoraVideoViewState extends State<AgoraVideoView> {
           ..style.backgroundColor = '#000000'
           ..style.overflow = 'hidden'
           ..style.borderRadius = '12px';
+        try {
+          if (js.context.hasProperty('agoraWebBridge')) {
+            js.context['agoraWebBridge'].callMethod('onContainerCreated', ['agora-local-video', div]);
+          }
+        } catch (_) {}
         return div;
       },
     );
@@ -247,6 +252,11 @@ class _AgoraVideoViewState extends State<AgoraVideoView> {
           ..style.height = '100%'
           ..style.backgroundColor = '#0B0D14'
           ..style.overflow = 'hidden';
+        try {
+          if (js.context.hasProperty('agoraWebBridge')) {
+            js.context['agoraWebBridge'].callMethod('onContainerCreated', ['agora-remote-video', div]);
+          }
+        } catch (_) {}
         return div;
       },
     );

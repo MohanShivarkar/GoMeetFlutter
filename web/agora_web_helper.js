@@ -8,9 +8,54 @@ window.agoraWebBridge = {
   localAudioTrack: null,
   localVideoTrack: null,
   remoteUsers: {},
+  containers: {},
   onJoinSuccessCallback: null,
   onUserJoinedCallback: null,
   onUserOfflineCallback: null,
+
+  onContainerCreated: function(id, el) {
+    console.log("[AgoraWeb] Container created from Flutter:", id, el);
+    this.containers[id] = el;
+    if (id === 'agora-local-video' && this.localVideoTrack) {
+      this._renderLocalVideo();
+    }
+    if (id === 'agora-remote-video') {
+      const uids = Object.keys(this.remoteUsers);
+      if (uids.length > 0) {
+        const lastUser = this.remoteUsers[uids[uids.length - 1]];
+        this._renderRemoteVideo(lastUser);
+      }
+    }
+  },
+
+  _findContainer: function(id) {
+    if (this.containers[id] && document.contains(this.containers[id])) {
+      return this.containers[id];
+    }
+    let el = document.getElementById(id);
+    if (el) return el;
+
+    function findInTree(root) {
+      if (!root) return null;
+      if (root.getElementById) {
+        const found = root.getElementById(id);
+        if (found) return found;
+      }
+      if (root.querySelector) {
+        const found = root.querySelector('#' + id);
+        if (found) return found;
+      }
+      const children = root.children || [];
+      for (let i = 0; i < children.length; i++) {
+        if (children[i].shadowRoot) {
+          const found = findInTree(children[i].shadowRoot);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+    return findInTree(document.body) || this.containers[id] || null;
+  },
 
   initClient: async function(appId) {
     if (!window.AgoraRTC) {
@@ -23,6 +68,21 @@ window.agoraWebBridge = {
     this.appId = appId;
     this.client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
     this._setupListeners();
+
+    if (AgoraRTC.onAudioAutoplayFailed) {
+      AgoraRTC.onAudioAutoplayFailed = () => {
+        console.warn("[AgoraWeb] Audio autoplay blocked. Waiting for user interaction to resume...");
+        const unlock = () => {
+          AgoraRTC.resumeAudio();
+          console.log("[AgoraWeb] Audio resumed via user interaction");
+          window.removeEventListener("click", unlock);
+          window.removeEventListener("touchstart", unlock);
+        };
+        window.addEventListener("click", unlock, { once: true });
+        window.addEventListener("touchstart", unlock, { once: true });
+      };
+    }
+
     console.log("[AgoraWeb] Client initialized with appId:", appId);
     return true;
   },
@@ -128,21 +188,31 @@ window.agoraWebBridge = {
     }
   },
 
-  _renderLocalVideo: function() {
-    const el = document.getElementById("agora-local-video");
-    if (el && this.localVideoTrack) {
+  _renderLocalVideo: function(retries = 15) {
+    if (!this.localVideoTrack) return;
+    const el = this._findContainer("agora-local-video");
+    if (el) {
       el.innerHTML = "";
       this.localVideoTrack.play(el);
       console.log("[AgoraWeb] Local video mounted in container");
+    } else if (retries > 0) {
+      setTimeout(() => this._renderLocalVideo(retries - 1), 200);
+    } else {
+      console.warn("[AgoraWeb] Container #agora-local-video not found after retries");
     }
   },
 
-  _renderRemoteVideo: function(user) {
-    const el = document.getElementById("agora-remote-video");
-    if (el && user && user.videoTrack) {
+  _renderRemoteVideo: function(user, retries = 15) {
+    if (!user || !user.videoTrack) return;
+    const el = this._findContainer("agora-remote-video");
+    if (el) {
       el.innerHTML = "";
       user.videoTrack.play(el);
       console.log("[AgoraWeb] Remote video mounted in container for uid:", user.uid);
+    } else if (retries > 0) {
+      setTimeout(() => this._renderRemoteVideo(user, retries - 1), 200);
+    } else {
+      console.warn("[AgoraWeb] Container #agora-remote-video not found after retries for uid:", user.uid);
     }
   },
 

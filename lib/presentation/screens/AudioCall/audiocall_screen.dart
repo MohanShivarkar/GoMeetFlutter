@@ -24,7 +24,7 @@ class _PickUpAudioCallState extends State<PickUpAudioCall> {
   void initState() {
     super.initState();
     audioCallProvider = Provider.of<AudioCallProvider>(context,listen: false);
-    final effectiveKey = agoraVcKey.isNotEmpty ? agoraVcKey : "dfbc153e47e34ecba358f528b5880ad7";
+    final effectiveKey = agoraVcKey.isNotEmpty ? agoraVcKey : "3b2d066ea4da4c84ad4492ea72780653";
     audioCallProvider.updateIsLoading(true);
     audioCallProvider.setupVoiceSDKEngine(effectiveKey).then((value) {
       audioCallProvider.join(widget.channel, effectiveKey);

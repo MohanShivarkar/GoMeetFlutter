@@ -37,8 +37,9 @@ class _SplashScreenState extends State<SplashScreen> {
       android_in_id = value["in_id"] ?? "";
       ios_bannerid = value["ios_banner_id"] ?? "";
       ios_in_id = value["ios_in_id"] ?? "";
-      agoraVcKey = value["agora_app_id"] ?? "";
-      // agoraVcKey = "3b2d066ea4da4c84ad4492ea72780653";
+      agoraVcKey = (value["agora_app_id"] != null && value["agora_app_id"].toString().isNotEmpty)
+          ? value["agora_app_id"].toString()
+          : "3b2d066ea4da4c84ad4492ea72780653";
       print("agoraVcKey:- $agoraVcKey");
     }).catchError((_) async {
       final prefs = await SharedPreferences.getInstance();
