@@ -253,11 +253,11 @@ class _Refer_And_EarnState extends State<Refer_And_Earn> {
                           print("!!!!!.+_.-.-._+.!!!!!" + packageName.toString());
 
                           final String text =
-                              'Hey! Now use our app to share with your family or friends. '
-                              'User will get wallet amount on your 1st successful transaction. '
-                              'Enter my referral code ${Provider.of<HomeProvider>(context,listen: false).currency}${byCoinProvider.referAndEarnApiModel.signupcredit} & Enjoy your shopping !!!';
+                              'Hey! 👋 Join me on LoveCloud Dating App! '
+                              'Find real connections, chat, and meet verified profiles near you. '
+                              'Use my referral code: ${byCoinProvider.referAndEarnApiModel.signupcredit ?? ""}';
 
-                          final String linkUrl = 'https://play.google.com/store/apps/details?id=$packageName';
+                          final String linkUrl = 'https://lovecloud24.com/app/';
 
                           await Share.share(
                             '$text\n$linkUrl',

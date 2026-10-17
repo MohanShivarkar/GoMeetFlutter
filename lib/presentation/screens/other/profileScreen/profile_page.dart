@@ -579,12 +579,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           const Text(
-                                            "LoveCloud Mobile App",
+                                            "Install LoveCloud App",
                                             style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white),
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
-                                            "Get native HD voice & video calls.",
+                                            "Add to Home Screen for fast, full-screen calls & chat.",
                                             style: TextStyle(fontSize: 11, color: Colors.white.withOpacity(0.72)),
                                           ),
                                         ],
@@ -593,8 +593,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     const SizedBox(width: 8),
                                     ElevatedButton(
                                       onPressed: () {
-                                        AppDownloadHelper.downloadApk(url: '/app/lovecloud.apk', filename: 'lovecloud.apk');
-                                        Fluttertoast.showToast(msg: "Downloading LoveCloud Android APK...");
+                                        AppDownloadHelper.showInstallDialog(context);
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: const Color(0xFFFF9933),
@@ -602,7 +601,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                                       ),
-                                      child: const Text("Get APK", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+                                      child: const Text("Install App", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
                                     ),
                                   ],
                                 ),
@@ -805,11 +804,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       profileProvider.deleteButtomSheet(context);
                                     }else if(i == profileProvider.menuList.length -3) {
                                       Share.share(
-                                        "Hey! 👋've found this awesome dating app called ${profileProvider.appName} and thought you might be interested too! 😊.Check it out:${kIsWeb ? '' : (Platform.isAndroid
-                                            ? 'https://play.google.com/store/apps/details?id=${profileProvider.packageName}'
-                                            : Platform.isIOS
-                                            ? 'https://apps.apple.com/us/app/${profileProvider.appName}/id${profileProvider.packageName}'
-                                            : '')}",
+                                        "Hey! 👋 Check out LoveCloud dating app: https://lovecloud24.com/app/ - Find real connections, chat, and meet verified profiles near you! ❤️",
                                       );
                                     }
                                     else if(i == profileProvider.menuList.length -1) {
@@ -1052,11 +1047,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       profileProvider.deleteButtomSheet(context);
                                     }else if(i == profileProvider.menuListcondition.length -3) {
                                       Share.share(
-                                        "Hey! 👋've found this awesome dating app called ${profileProvider.appName} and thought you might be interested too! 😊.Check it out:${kIsWeb ? '' : (Platform.isAndroid
-                                            ? 'https://play.google.com/store/apps/details?id=${profileProvider.packageName}'
-                                            : Platform.isIOS
-                                            ? 'https://apps.apple.com/us/app/${profileProvider.appName}/id${profileProvider.packageName}'
-                                            : '')}",
+                                        "Hey! 👋 Check out LoveCloud dating app: https://lovecloud24.com/app/ - Find real connections, chat, and meet verified profiles near you! ❤️",
                                       );
                                     }
                                     else if(i == profileProvider.menuListcondition.length -1) {

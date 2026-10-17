@@ -77,6 +77,22 @@
       }
     })();
   </script>
+  <script>
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.deferredPrompt = e;
+    });
+    window.installLoveCloudPwa = function() {
+      if (window.deferredPrompt) {
+        window.deferredPrompt.prompt();
+        window.deferredPrompt.userChoice.then((choiceResult) => {
+          window.deferredPrompt = null;
+        });
+      } else {
+        alert("To install: Tap your browser's menu (⋮) and select 'Install app' or 'Add to Home screen'.");
+      }
+    };
+  </script>
 </head>
 <body>
   <!-- Agora WebRTC SDK & Calling Bridge -->
