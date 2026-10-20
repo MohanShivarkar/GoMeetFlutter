@@ -77,21 +77,33 @@ class VcProvider extends ChangeNotifier{
   }
 
 
-  Widget remoteVideo(channel,context) {
-    print("KKOKOKOKOKKO:- ${_remoteUid}");
+  int? get remoteUid => _remoteUid;
+
+  Widget remoteVideo(channel, context) {
     if (_remoteUid != null) {
-      return AgoraVideoView(
-        controller: VideoViewController.remote(
-          rtcEngine: engine,
-          canvas: VideoCanvas(uid: _remoteUid),
-          connection: RtcConnection(channelId: channel),
+      return SizedBox.expand(
+        child: AgoraVideoView(
+          controller: VideoViewController.remote(
+            rtcEngine: engine,
+            canvas: VideoCanvas(uid: _remoteUid),
+            connection: RtcConnection(channelId: channel),
+          ),
         ),
       );
     } else {
-      return  Text(
-        AppLocalizations.of(context)?.translate("Please wait for user to join") ?? "Please wait for user to join",
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.bodyMedium,
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(color: Colors.white),
+            const SizedBox(height: 20),
+            Text(
+              AppLocalizations.of(context)?.translate("Please wait for user to join") ?? "Calling... Waiting for user to join",
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
       );
     }
   }

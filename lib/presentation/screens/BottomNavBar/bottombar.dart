@@ -21,6 +21,7 @@ import '../../../Logic/cubits/Home_cubit/home_cubit.dart';
 import '../../../Logic/cubits/Home_cubit/homestate.dart';
 import '../../../core/config.dart';
 import '../../firebase/chat_page.dart';
+import 'package:dating/core/web_call_helper.dart';
 
 class BottomBar extends StatefulWidget {
   static const String bottomBarRoute = "/bottomBar";
@@ -279,6 +280,12 @@ class _BottomBarState extends State<BottomBar> {
                 senderPic: senderPic,
                 message: lastMessage,
               );
+              final fullPic = senderPic.isNotEmpty ? (senderPic.startsWith("http") ? senderPic : "${Config.baseUrl}$senderPic") : "";
+              WebCallHelper.showWebNotification(
+                senderName,
+                lastMessage,
+                fullPic,
+              );
             }
           }
         }
@@ -301,6 +308,15 @@ class _BottomBarState extends State<BottomBar> {
       final status = data["status"]?.toString() ?? "";
       if (status == "ringing" && !_isIncomingCallActive) {
         _isIncomingCallActive = true;
+        WebCallHelper.playRingtone();
+        final cName = data["callerName"]?.toString() ?? "User";
+        final cPic = data["callerPic"]?.toString() ?? "";
+        final fullPic = cPic.isNotEmpty ? (cPic.startsWith("http") ? cPic : "${Config.baseUrl}$cPic") : "";
+        WebCallHelper.showWebNotification(
+          "Incoming ${data["callType"] == "audio" ? "Audio" : "Video"} Call",
+          "Call from $cName. Tap to answer.",
+          fullPic,
+        );
         navigatorKey.currentState?.push(
           MaterialPageRoute(
             builder: (ctx) => PickUpCall(
@@ -316,6 +332,7 @@ class _BottomBarState extends State<BottomBar> {
             ),
           ),
         ).then((_) {
+          WebCallHelper.stopRingtone();
           _isIncomingCallActive = false;
           FirebaseFirestore.instance
               .collection("user_calls")
@@ -342,6 +359,7 @@ class _BottomBarState extends State<BottomBar> {
   @override
   void initState() {
     super.initState();
+    WebCallHelper.requestNotificationPermission();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;

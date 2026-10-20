@@ -10,6 +10,8 @@ import 'package:provider/provider.dart';
 import '../../main.dart';
 import 'chat_page.dart';
 
+import 'package:dating/core/web_call_helper.dart';
+
 class PickUpCall extends StatefulWidget {
   final Map userData;
   final bool isAudio;
@@ -29,6 +31,15 @@ class _PickUpCallState extends State<PickUpCall> {
   void initState() {
     super.initState();
     print("USER DATA FOR YOUR:- ${widget.userData}");
+    WebCallHelper.playRingtone();
+    final callerName = (widget.userData["senderName"] ?? widget.userData["name"] ?? "User").toString();
+    final callerPic = (widget.userData["propic"] ?? widget.userData["pro_pic"] ?? "").toString();
+    WebCallHelper.showWebNotification(
+      "Incoming ${widget.isAudio ? 'Audio' : 'Video'} Call",
+      "Call from $callerName. Tap to answer.",
+      callerPic,
+    );
+
     vcProvider = Provider.of<VcProvider>(context,listen: false);
     ids =  widget.isAudio ? "Audio": "vcId";
     dataids =  widget.isAudio ? "Audio": "isVc";
@@ -38,6 +49,7 @@ class _PickUpCallState extends State<PickUpCall> {
         Map data = event.data()!;
 
         if(data[dataids] == false){
+          WebCallHelper.stopRingtone();
           Navigator.pop(context);
           if(vcProvider.ischatPage) {
 
@@ -51,6 +63,7 @@ class _PickUpCallState extends State<PickUpCall> {
 
   @override
   void dispose() {
+    WebCallHelper.stopRingtone();
     super.dispose();
     vcProvider.ischatPage = false;
   }

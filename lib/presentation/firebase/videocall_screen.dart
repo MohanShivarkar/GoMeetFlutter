@@ -11,6 +11,9 @@ import '../../core/ui.dart';
 import '../screens/splash_bording/splash_screen.dart';
 import 'chat_page.dart';
 
+import 'package:dating/core/web_call_helper.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 class VideoCall extends StatefulWidget {
   final String channel;
   const VideoCall({Key? key, required this.channel}) : super(key: key);
@@ -23,13 +26,24 @@ class _VideoCallState extends State<VideoCall> {
 
   late VcProvider vcProvider;
   late StreamSubscription streamSubscription;
+  Timer? _callTimeoutTimer;
 
   @override
   void initState() {
     super.initState();
+    WebCallHelper.stopRingtone();
     vcProvider = Provider.of<VcProvider>(context,listen: false);
     final effectiveKey = agoraVcKey.isNotEmpty ? agoraVcKey : "3b2d066ea4da4c84ad4492ea72780653";
     vcProvider.initAgora(effectiveKey, effectiveKey, widget.channel, context);
+
+    _callTimeoutTimer = Timer(const Duration(seconds: 35), () {
+      if (mounted && vcProvider.remoteUid == null) {
+        Fluttertoast.showToast(msg: "User is not available right now. Please try again.");
+        isvc(widget.channel, false);
+        Navigator.pop(context);
+      }
+    });
+
     streamSubscription =  FirebaseFirestore.instance.collection("chat_rooms").doc(widget.channel).collection("isVcAvailable").doc(widget.channel).snapshots().listen((event) {
       if (!mounted || event.data() == null) return;
       Map data = event.data()!;
@@ -44,6 +58,8 @@ class _VideoCallState extends State<VideoCall> {
 
   @override
   void dispose() {
+    _callTimeoutTimer?.cancel();
+    WebCallHelper.stopRingtone();
     super.dispose();
     isvc(widget.channel,false);
     vcProvider.disposee();
@@ -56,25 +72,40 @@ class _VideoCallState extends State<VideoCall> {
   Widget build(BuildContext context) {
     vcProvider = Provider.of<VcProvider>(context);
     return Scaffold(
+      backgroundColor: const Color(0xFF0B0D14),
       body: Stack(
         children: [
 
-          Center(
-            child: vcProvider.remoteVideo(widget.channel,context),
+          // Fullscreen Remote Video Feed
+          Positioned.fill(
+            child: Container(
+              color: const Color(0xFF0B0D14),
+              child: vcProvider.remoteVideo(widget.channel, context),
+            ),
           ),
 
+          // Floating Local User Video Preview
           Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(
-              width: 100,
-              height: 150,
-              child: Center(
-                child: vcProvider.localUserJoined ? AgoraVideoView(
-                  controller: VideoViewController(
-                    rtcEngine: vcProvider.engine,
-                    canvas: const VideoCanvas(uid: 0),
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 40, right: 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  width: 110,
+                  height: 160,
+                  child: Container(
+                    color: Colors.black,
+                    child: vcProvider.localUserJoined
+                        ? AgoraVideoView(
+                            controller: VideoViewController(
+                              rtcEngine: vcProvider.engine,
+                              canvas: const VideoCanvas(uid: 0),
+                            ),
+                          )
+                        : Center(child: CircularProgressIndicator(color: AppColors.appColor)),
                   ),
-                ) : CircularProgressIndicator(color: AppColors.appColor),
+                ),
               ),
             ),
           ),

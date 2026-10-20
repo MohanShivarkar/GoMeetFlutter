@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 import '../../../core/ui.dart';
 import '../../firebase/chat_page.dart';
 
+import 'package:dating/core/web_call_helper.dart';
+
 class PickUpAudioCall extends StatefulWidget {
   final Map userData;
   final String channel;
@@ -23,6 +25,7 @@ class _PickUpAudioCallState extends State<PickUpAudioCall> {
   @override
   void initState() {
     super.initState();
+    WebCallHelper.stopRingtone();
     audioCallProvider = Provider.of<AudioCallProvider>(context,listen: false);
     final effectiveKey = agoraVcKey.isNotEmpty ? agoraVcKey : "3b2d066ea4da4c84ad4492ea72780653";
     audioCallProvider.updateIsLoading(true);
@@ -46,6 +49,7 @@ class _PickUpAudioCallState extends State<PickUpAudioCall> {
 
   @override
   void dispose() async {
+    WebCallHelper.stopRingtone();
     await audioCallProvider.agoraEngine.leaveChannel();
     audioCallProvider.isJoined = false;
     audioCallProvider.muteUnmute = false;
